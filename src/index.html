@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <h3>WebSocket Chat App</h3> 
+
+    <input id="room" placeholder="Enter Room ID" />
+    <button onclick="join()">Join</button>
+
+    <br><br>
+
+    <input id="msg" placeholder="Message" />
+    <button onclick="sendMsg()">Send</button>
+
+    <pre id="log"></pre>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:3000");
+
+        const log = (text) => {
+            document.getElementById("log").textContent += text + "\n";
+        };
+
+        socket.onopen = () => {
+            log("Socket connected");
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            log("Received: " + JSON.stringify(data));
+        };
+
+        function join() {
+            const roomId = document.getElementById("room").value;
+            if(!roomId) {
+                 log("RoomId could not be empty");
+                 return;
+            }
+           
+            socket.send(JSON.stringify({
+                type: "join",
+                roomId
+            }));
+            log("Joined room: " + roomId);
+        }
+
+        function sendMsg() {
+            const roomId = document.getElementById("room").value;
+            const message = document.getElementById("msg").value;
+
+            socket.send(JSON.stringify({
+                type: "signal",
+                roomId,
+                data: message
+            }));
+
+            log("Sent: " + message);
+        }
+    </script>
+</body>
+
+</html>
