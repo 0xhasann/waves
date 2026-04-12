@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from "ws"
 
-const wss = new WebSocketServer({ port: 3000 });
+const wss = new WebSocketServer({ port: 3001 });
 
 const rooms = new Map<string, Set<WebSocket>>();
 
@@ -9,8 +9,11 @@ const rooms = new Map<string, Set<WebSocket>>();
 wss.on("connection", (ws) => {
     // server received message from the client.
     ws.on("message", (data) => {
+        console.log("raw data", data);
         const message = JSON.parse(data.toString());
         const { type, roomId } = message;
+        console.log("message", message);
+
 
         // join room
         if (type == "join") {
@@ -25,10 +28,12 @@ wss.on("connection", (ws) => {
         }
 
         // when User send message via signal type
-        if (type == "signal") {
+
+        if (type === "offer" || type === "answer" || type === "ice-candidate" || type === "signal") {
+            console.log("Signal Received1");
             const clients = rooms.get(roomId);
             if (!clients) return;
-            console.log("Signal Received");
+            console.log("Signal Received2");
             // iterate over all clients(peers) 
             clients.forEach(client => {
                 // when connection is stablished then P1 can send message to all peers except itself.
@@ -36,9 +41,6 @@ wss.on("connection", (ws) => {
                     client.send(JSON.stringify(message));
             });
         }
-
-        
-
 
     });
 
@@ -51,5 +53,5 @@ wss.on("connection", (ws) => {
     });
 });
 
-console.log("Server running on ws://localhost:3000");
+console.log("Server running on ws://localhost:3001");
 
