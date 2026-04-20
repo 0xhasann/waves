@@ -35,12 +35,15 @@ function hangupCall(webServer: ExtendedWebSocket) {
     }
     peerToPeer.delete(firstPeer);
     peerToPeer.delete(secondPeer);
+
     console.log("Connection Closed");
 }
 
 wsServer.on('connection', (websocket: ExtendedWebSocket) => {
     websocket.on("close", (code: number, reason: Buffer) => {
         hangupCall(websocket);
+        if (!websocket.userName) return;
+        websocketConnections.delete(websocket.userName);
     })
   
     websocket.on("message", (data: Buffer) => {
@@ -95,9 +98,6 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                     if (!websocket.userName) {
                         websocket.send("Login First");
                     } else {
-
-
-                        
                         peerToPeer.set(parsedMessage.data.caller, websocket.userName);
                         peerToPeer.set(websocket.userName, parsedMessage.data.caller);
                         const callerSocket = websocketConnections.get(parsedMessage.data.caller);
