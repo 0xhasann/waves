@@ -12,6 +12,7 @@ type WsEvents = {
     "hang-up": () => void;
     "call": (data: { name: Name }) => void;
     "accept": (data: { caller: Name }) => void;
+    "user-list": (data: { names: Name[] }) => void;
 };
 
 export class WebSocketHandler {
@@ -73,6 +74,7 @@ export class WebSocketHandler {
             case "video-answer":
             case "new-ice-candidate":
             case "call":
+            case "user-list":
             case "accept":
                 this.emit(parsedMessage.type, parsedMessage.data);
                 break;

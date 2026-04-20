@@ -6,7 +6,8 @@
 <head>
     <title>WebSocket Chat Demo with WebRTC Calling</title>
     <meta charset="utf-8">
-    <script type="text/javascript" src="dist/index.js"></script>
+    <!-- <script type="text/javascript" src="dist/index.js"></script> -->
+    <script type="module" src="dist/index.js"></script>
 </head>
 
 <body>
@@ -14,28 +15,20 @@
         <div class="infobox">
             <p>Enter a username: <input id="name" type="text" maxlength="12" required autocomplete="username"
                     inputmode="verbatim" placeholder="Username">
-                <input type="button" name="login" value="Log in" onclick="login()">
+                <input type="button" id="loginBtn" name="login" value="Log in">
             </p>
         </div>
-        <ul class="userlistbox"></ul>
-        hasan accept
-        ajay
-        <div class="chatbox"></div>
-        <div class="camerabox">
+        <ul id="user-list"></ul>
+        <!-- <div id="camerabox">
             <video id="received_video" autoplay></video>
             <video id="local_video" autoplay muted></video>
-            <button id="hangup-button" onclick="hangUpCall();" role="button" disabled>
+            <button id="hangup-button"  role="button" disabled>
                 Hang Up
             </button>
-        </div>
-        <div class="empty-container"></div>
-        <div class="chat-controls">
-            Chat:<br />
-            <input id="text" type="text" name="text" size="100" maxlength="256"
-                placeholder="Say something meaningful..." autocomplete="off" onkeyup="handleKey(event)" disabled>
-            <input type="button" id="send" name="send" value="Send" onclick="handleSendButton()" disabled>
-        </div>
-        
+        </div> -->
+       
+      
+
     </div>
 </body>
 

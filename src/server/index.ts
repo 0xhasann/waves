@@ -79,6 +79,7 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                 case "login":
                     websocketConnections.set(parsedMessage.data.name, websocket);
                     websocket.userName = parsedMessage.data.name;
+                    websocketConnections.forEach((list) => list.send(JSON.stringify({ type: "user-list", data: { names: websocketConnections.keys().toArray() } })))
                     break
                 // If call is coming from user to server then name is callee
                 // If call is coming from server to user then name is caller
