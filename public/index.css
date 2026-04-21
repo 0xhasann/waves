@@ -1,0 +1,56 @@
+   #camerabox {
+       position: relative;
+       width: 640px;
+       height: 480px;
+       background: #000;
+       border-radius: 8px;
+       overflow: hidden;
+   }
+
+   /* Remote video fills the full box */
+   #received_video {
+       width: 100%;
+       height: 100%;
+       object-fit: cover;
+   }
+
+   /* Local video is a small picture-in-picture in the corner */
+   #local_video {
+       position: absolute;
+       bottom: 12px;
+       right: 12px;
+       width: 160px;
+       height: 120px;
+       object-fit: cover;
+       border-radius: 6px;
+       border: 2px solid #fff;
+   }
+
+   #hangup-button {
+       position: absolute;
+       bottom: 12px;
+       left: 50%;
+       transform: translateX(-50%);
+   }
+
+   .video-label {
+       position: absolute;
+       bottom: 8px;
+       left: 8px;
+       color: #fff;
+       background: rgba(0, 0, 0, 0.5);
+       padding: 2px 8px;
+       border-radius: 4px;
+       font-size: 14px;
+       font-family: sans-serif;
+   }
+
+   /* Label inside the PiP local video box */
+   .local-label {
+       bottom: 20px;
+       /* offset from camerabox bottom */
+       right: 20px;
+       /* offset from camerabox right */
+       left: auto;
+       font-size: 11px;
+   }
