@@ -4,3 +4,4 @@ build/
 .env
 *.log
 .cursor
+public/index.js
