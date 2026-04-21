@@ -45,7 +45,7 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
         if (!websocket.userName) return;
         websocketConnections.delete(websocket.userName);
     })
-  
+
     websocket.on("message", (data: Buffer) => {
         try {
             const json = JSON.parse(data.toString());
@@ -53,12 +53,15 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
 
             switch (parsedMessage.type) {
                 case "hang-up":
+                    hangupCall(websocket);
+                    break;
                 case "new-ice-candidate":
                 case "video-answer":
                 case "video-offer":
                     if (!websocket.userName) {
                         websocket.send("Login First");
                     } else {
+
                         const peer = peerToPeer.get(websocket.userName);
                         if (!peer) {
                             websocket.send("Peer Not Found Please Call Them First.");
@@ -70,11 +73,9 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                                 peerWebsocket.send(JSON.stringify(parsedMessage));
                             }
                         }
-                        if (parsedMessage.type == "hang-up") {
-                            hangupCall(websocket);
-                        }
+
                     }
-                    
+
                     break;
                 case "login":
                     websocketConnections.set(parsedMessage.data.name, websocket);
