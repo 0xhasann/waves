@@ -10,11 +10,24 @@
 import { WebSocketHandler } from "./websocketHandler";
 
 export class RTCPeerConnectionHandler {
-    private static rtcPeerConnectionHandler: RTCPeerConnectionHandler;
+    private static rtcPeerConnectionHandler: RTCPeerConnectionHandler | null;
     private rtcPeerConnection: RTCPeerConnection;
 
     private constructor() {
         this.rtcPeerConnection = createPeerConnection();
+    }
+
+    public static close():void {
+        this.pc.getTransceivers().forEach(t => t.stop());
+        this.pc.ontrack = null;
+        this.pc.onicecandidate = null;
+        this.pc.oniceconnectionstatechange = null;
+        this.pc.onsignalingstatechange = null;
+        this.pc.onicegatheringstatechange = null;
+        this.pc.onnegotiationneeded = null;
+        this.pc.close();
+        this.rtcPeerConnectionHandler = null;
+ 
     }
 
     public static get pc(): RTCPeerConnection {

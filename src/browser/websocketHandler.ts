@@ -24,7 +24,7 @@ export class WebSocketHandler {
 
 
     private constructor() {
-        this.ws = new WebSocket("ws://localhost:3002/");
+        this.ws = new WebSocket("ws://localhost:3000/");
         this.ws.onmessage = this.handleWsMessages.bind(this);
     }
 
