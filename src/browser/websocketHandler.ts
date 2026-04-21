@@ -20,10 +20,18 @@ export class WebSocketHandler {
     public myUserName: Name | undefined;
     private listeners: { [K in keyof WsEvents]?: WsEvents[K] } = {};
 
+    private static instance: WebSocketHandler;
 
-    constructor() {
+
+    private constructor() {
         this.ws = new WebSocket("ws://localhost:3002/");
         this.ws.onmessage = this.handleWsMessages.bind(this);
+    }
+
+    public static getInstance(): WebSocketHandler {
+        if (this.instance) return this.instance;
+        this.instance = new WebSocketHandler();
+        return this.instance;
     }
 
     on<K extends keyof WsEvents>(event: K, handler: WsEvents[K]) {

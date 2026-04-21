@@ -7,3 +7,57 @@
 // onicegatheringstatechange -> update the dom to reflect ine gathering states
 // onsignalingstatechange -> update the dom to reflect rtc signaling states
 
+import { WebSocketHandler } from "./websocketHandler";
+
+export class RTCPeerConnectionHandler {
+    private static rtcPeerConnectionHandler: RTCPeerConnectionHandler;
+    private rtcPeerConnection: RTCPeerConnection;
+
+    private constructor() {
+        this.rtcPeerConnection = createPeerConnection();
+    }
+
+    public static get pc(): RTCPeerConnection {
+        if (this.rtcPeerConnectionHandler) return this.rtcPeerConnectionHandler.rtcPeerConnection;
+        this.rtcPeerConnectionHandler = new RTCPeerConnectionHandler();
+        return this.rtcPeerConnectionHandler.rtcPeerConnection;
+    }
+
+}
+
+function createPeerConnection(): RTCPeerConnection {
+    const ws = WebSocketHandler.getInstance();
+    const pc = new RTCPeerConnection({
+        iceServers: [
+            {
+                urls: "stun:stun.stunprotocol.org",
+            },
+        ],
+    });
+    pc.onicecandidate = (e) => {
+        if (!e.candidate) return;
+        ws.newIceCandidate(e.candidate);
+    }
+    pc.onnegotiationneeded = () => {
+        if (pc.signalingState != "stable") return;
+        pc
+            .createOffer()
+            .then((offer) => pc.setLocalDescription(offer))
+            .then(() => {
+                if (!pc.localDescription) throw new Error("local description not found");
+                ws.videoOffer(pc.localDescription);
+            })
+            .catch(window.reportError);
+    }
+    pc.ontrack = (event) => {
+        const receivedVideo = document.getElementById("received_video") as HTMLVideoElement | null;
+        if (receivedVideo && event.streams && event.streams[0]) {
+            receivedVideo.srcObject = event.streams[0];
+        }
+        const hangupBtn = document.getElementById("hangup-button") as HTMLButtonElement | null;
+        if (hangupBtn) {
+            hangupBtn.disabled = false;
+        }
+    };
+    return pc;
+}
