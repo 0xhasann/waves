@@ -1,10 +1,10 @@
 {
-  "name": "webrtc-chat-app",
+  "name": "waves",
   "type": "module",
   "scripts": {
     "dev": "bun run --watch src/server/index.ts",
     "start": "bun run src/server/index.ts",
-    "build:browser": "bun build ./src/browser/index.ts --outfile public/dist/index.js --watch --target browser"
+    "build:browser": "bun build ./src/browser/index.ts --outfile public/index.js --watch --target browser"
   },
   "devDependencies": {
     "@types/bun": "latest"
