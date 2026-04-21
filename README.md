@@ -29,10 +29,13 @@ how it works:
   - [MDN: WebRTC API](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API)
   - [MDN: WebSockets API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
 
+
 **websocket & webrtc signaling diagram:**
+
 <img src="public/webrtc_signaling_diagram.svg" alt="WebSocket and WebRTC signaling diagram" width="540" style="margin:1em 0;"/>
 
 **webrtc ice candidate gathering:**
+
 <img src="public/webrtc_ice_candidate_exchange.svg" alt="WebRTC ICE candidate gathering diagram" width="540" style="margin:1em 0;"/>
 
 For demo and learning use. No backend storage or authentication.
