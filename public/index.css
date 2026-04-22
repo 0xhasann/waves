@@ -7,14 +7,12 @@
        overflow: hidden;
    }
 
-   /* Remote video fills the full box */
    #received_video {
        width: 100%;
        height: 100%;
        object-fit: cover;
    }
 
-   /* Local video is a small picture-in-picture in the corner */
    #local_video {
        position: absolute;
        bottom: 12px;
@@ -45,12 +43,9 @@
        font-family: sans-serif;
    }
 
-   /* Label inside the PiP local video box */
    .local-label {
        bottom: 20px;
-       /* offset from camerabox bottom */
        right: 20px;
-       /* offset from camerabox right */
        left: auto;
        font-size: 11px;
    }
