@@ -16,20 +16,50 @@ type WsEvents = {
 };
 
 export class WebSocketHandler {
-    private ws: WebSocket;
+    private ws!: WebSocket;
     public myUserName: Name | undefined;
     private listeners: { [K in keyof WsEvents]?: WsEvents[K] } = {};
-
     private static instance: WebSocketHandler;
+    private reconnectTimeout?: number;
 
 
     private constructor() {
+        this.connect();
+    }
+    private connect() {
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        this.ws = new WebSocket(`${protocol}//${window.location.host}/`);
-        this.ws.onmessage = this.handleWsMessages.bind(this);
-        this.ws.onclose = () => {
-        WebSocketHandler.instance = undefined as unknown as WebSocketHandler;
+
+        const url = `${protocol}//${window.location.host}/ws`;
+
+        this.ws = new WebSocket(url);
+
+        this.ws.onopen = () => {
+            console.log("WebSocket connected");
+
+            if (this.myUserName) {
+                this.login(this.myUserName);
+            }
         };
+
+        this.ws.onmessage = this.handleWsMessages.bind(this);
+
+        this.ws.onerror = (err) => {
+            console.error("WebSocket error", err);
+        };
+
+        this.ws.onclose = () => {
+            console.warn("WebSocket closed, retrying...");
+            this.scheduleReconnect();
+        };
+    }
+
+    private scheduleReconnect() {
+        if (this.reconnectTimeout) return;
+
+        this.reconnectTimeout = window.setTimeout(() => {
+            this.reconnectTimeout = undefined;
+            this.connect();
+        }, 2000);
     }
 
     public static getInstance(): WebSocketHandler {
