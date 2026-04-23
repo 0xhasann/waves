@@ -1,10 +1,18 @@
-import { WebSocketServer, WebSocket } from "ws";
+// import { WebSocketServer, WebSocket } from "ws";
+// import { createServer } from "http";
+// import { handleWebRequest, log, PORT } from "./utils";
+// import { WebSocketMessageSchema, type WebSocketMessage } from "../shared";
+// import type { Name } from "../shared/chatmessage";
+// import * as z from "zod";
+//create a http server
+
 import { createServer } from "http";
 import { handleWebRequest, log, PORT } from "./utils";
-import { WebSocketMessageSchema, type WebSocketMessage } from "../shared";
+import { WebSocketServer, WebSocket } from "ws";
 import type { Name } from "../shared/chatmessage";
-import * as z from "zod";
-//create a http server
+import { WebSocketMessageSchema } from "../shared";
+import * as z from "zod"
+
 // const webServer = createServer(handleWebRequest);
 const webServer = createServer((req, res) => {
     handleWebRequest(req, res);
@@ -19,7 +27,7 @@ interface ExtendedWebSocket extends WebSocket {
 }
 
 const wsServer = new WebSocketServer({
-    server: webServer
+    noServer: true
 });
 // When a client connects to our websocket server
 // on connection event is triggered
@@ -45,7 +53,20 @@ function hangupCall(webServer: ExtendedWebSocket) {
     console.log("Connection Closed");
 }
 
+webServer.on("upgrade", (req, socket, head) => {
+    console.log("upgrade request:", req.url);
+    if (req.url !== "/ws") {
+        console.log("destroy socket:", req.url);
+        socket.destroy();
+        return;
+    }
+
+    wsServer.handleUpgrade(req, socket, head, (ws) => {
+        wsServer.emit("connection", ws, req);
+    });
+});
 wsServer.on('connection', (websocket: ExtendedWebSocket) => {
+    
     websocket.on("close", (code: number, reason: Buffer) => {
         hangupCall(websocket);
         if (!websocket.userName) return;
@@ -86,7 +107,13 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                 case "login":
                     websocketConnections.set(parsedMessage.data.name, websocket);
                     websocket.userName = parsedMessage.data.name;
-                    websocketConnections.forEach((list) => list.send(JSON.stringify({ type: "user-list", data: { names: websocketConnections.keys().toArray() } })))
+                    websocketConnections.forEach((list) => 
+                        list.send(JSON.stringify({ 
+                            type: "user-list", 
+                            data: { names: Array.from(websocketConnections.keys()) } 
+                        }))
+                    );
+               
                     break
                 // If call is coming from user to server then name is callee
                 // If call is coming from server to user then name is caller
@@ -130,20 +157,11 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
         }
 
     })
+
+    
 })
 
-wsServer.on('close', () => {
-    console.log("Websocket Server Closed");
-})
 
-wsServer.on("error", (err) => {
-    console.error("WS Server Error:", err);
-});
 
-wsServer.on("connection", (ws, req) => {
-    console.log("WS CONNECTED:", req.url);
-});
 
-webServer.on("upgrade", (req, socket, head) => {
-    console.log("UPGRADE REQUEST:", req.url);
-});
+
