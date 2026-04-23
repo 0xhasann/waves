@@ -22,6 +22,10 @@ const serveStaticFile = (
     contentType: string
 ): void => {
     readFile(filePath, (err, content) => {
+        res.setHeader(
+            "Content-Security-Policy",
+            "connect-src 'self' wss://waves-irft.onrender.com"
+        );
         if (err) {
             res.writeHead(500);
             res.end("Internal Server Error");
