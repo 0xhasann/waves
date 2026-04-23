@@ -144,25 +144,16 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
         }
 
     })
-})
 
-wsServer.on('close', () => {
-    console.log("Websocket Server Closed");
-})
-
-wsServer.on("error", (err) => {
-    console.error("WS Server Error:", err);
-});
-
-wsServer.on("connection", (ws, req) => {
-    console.log("WS CONNECTED:", req.url);
-});
-
-webServer.on("upgrade", (req, socket, head) => {
-    console.log("UPGRADE REQUEST:", req.url);
-    wsServer.handleUpgrade(req, socket, head, (ws) => {
-        wsServer.emit("connection", ws, req);
+    webServer.on("upgrade", (req, socket, head) => {
+        console.log("UPGRADE REQUEST:", req.url);
+        wsServer.handleUpgrade(req, socket, head, (ws) => {
+            wsServer.emit("connection", ws, req);
+        });
     });
-});
+})
+
+
+
 
 

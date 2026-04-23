@@ -32,6 +32,7 @@ export class WebSocketHandler {
         const url = new URL("/ws", window.location.origin);
 
         this.ws = new WebSocket(url);
+        
 
         this.ws.onopen = () => {
             console.log("WebSocket connected");
