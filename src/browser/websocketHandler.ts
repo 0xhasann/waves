@@ -24,7 +24,8 @@ export class WebSocketHandler {
 
 
     private constructor() {
-        this.ws = new WebSocket("ws://localhost:3000/");
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        this.ws = new WebSocket(`${protocol}//${window.location.host}/`);
         this.ws.onmessage = this.handleWsMessages.bind(this);
     }
 
