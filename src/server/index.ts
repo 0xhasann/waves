@@ -27,7 +27,7 @@ interface ExtendedWebSocket extends WebSocket {
 }
 
 const wsServer = new WebSocketServer({
-    noServer: true
+    server: webServer
 });
 // When a client connects to our websocket server
 // on connection event is triggered
