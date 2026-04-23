@@ -82,7 +82,14 @@ export class WebSocketHandler {
     }
 
     private send(message: WebSocketMessage) {
-        this.ws.send(JSON.stringify(message));
+        // this.ws.send(JSON.stringify(message));
+        if (this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify(message));
+        } else if (this.ws.readyState === WebSocket.CONNECTING) {
+            this.ws.addEventListener("open", () => {
+                this.ws.send(JSON.stringify(message));
+            }, { once: true });
+        }
     }
 
     private handleWsMessages(event: MessageEvent) {
