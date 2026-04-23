@@ -27,10 +27,19 @@ export class WebSocketHandler {
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         this.ws = new WebSocket(`${protocol}//${window.location.host}/`);
         this.ws.onmessage = this.handleWsMessages.bind(this);
+        this.ws.onclose = () => {
+        WebSocketHandler.instance = undefined as unknown as WebSocketHandler;
+        };
     }
 
     public static getInstance(): WebSocketHandler {
-        if (this.instance) return this.instance;
+        if (
+            this.instance &&
+            this.instance.ws.readyState !== WebSocket.CLOSING &&
+            this.instance.ws.readyState !== WebSocket.CLOSED
+        ) {
+            return this.instance;
+        }
         this.instance = new WebSocketHandler();
         return this.instance;
     }
