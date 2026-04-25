@@ -38,4 +38,22 @@ how it works:
 
 <img src="public/webrtc_ice_candidate_exchange.svg" alt="WebRTC ICE candidate gathering diagram" width="540" style="margin:1em 0;"/>
 
-For demo and learning use. No backend storage or authentication.
+## Live & Usage
+
+This application is deployed on an AWS EC2 instance and accessible via a custom domain: **https://waves.cam**.  
+The `.cam` domain is used since the `.com` variant is already occupied.
+
+
+### Usage
+- Allow **camera and microphone permissions** when prompted  
+- Ensure your browser supports modern WebRTC features  
+- Use a modern browser (Chrome, Edge, Firefox, etc.) for best experience  
+
+---
+
+##  Notes
+
+- Audio/video features will not work without **HTTPS**  
+- WebSocket connections use secure protocol: `wss://`  
+- If the app fails to connect, check browser permissions for camera/microphone  
+- For demo and learning use.
