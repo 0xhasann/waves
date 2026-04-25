@@ -5,7 +5,7 @@ import { WebSocketMessageSchema, type WebSocketMessage } from "../shared";
 import type { Name } from "../shared/chatmessage";
 import * as z from "zod";
 //create a http server
-// const webServer = createServer(handleWebRequest);
+// the singaling server
 const webServer = createServer((req, res) => {
     handleWebRequest(req, res);
 });
@@ -86,7 +86,11 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                 case "login":
                     websocketConnections.set(parsedMessage.data.name, websocket);
                     websocket.userName = parsedMessage.data.name;
-                    websocketConnections.forEach((list) => list.send(JSON.stringify({ type: "user-list", data: { names: websocketConnections.keys().toArray() } })))
+                    websocketConnections.forEach((list) =>
+                        list.send(JSON.stringify({
+                            type: "user-list", data:
+                                { names: websocketConnections.keys().toArray() }
+                        })))
                     break
                 // If call is coming from user to server then name is callee
                 // If call is coming from server to user then name is caller
@@ -140,9 +144,7 @@ wsServer.on("error", (err) => {
     console.error("WS Server Error:", err);
 });
 
-wsServer.on("connection", (ws, req) => {
-    console.log("WS CONNECTED:", req.url);
-});
+
 
 webServer.on("upgrade", (req, socket, head) => {
     console.log("UPGRADE REQUEST:", req.url);

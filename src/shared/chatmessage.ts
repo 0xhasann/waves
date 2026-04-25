@@ -1,5 +1,15 @@
 import * as z from "zod";
 export type Name = string;
+// user session messages
+//  This is the core part between server and browser.
+// It defines every message that can travel over WebSocket using Zod schemas.
+/*
+login client → server register a username
+call  client → server initiate a call to someone
+accept client → server accept an incoming call 
+user-list server → client broadcast online users 
+logout client → server disconnect
+*/
 export type ChatMessage =
     { type: "login"; data: { name: Name } } |
     { type: "call"; data: { name: Name } } |

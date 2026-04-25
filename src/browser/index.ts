@@ -1,3 +1,23 @@
+// the browser orchestration layer
+// ties everything together. listens for ws events and drives the webrtc flow
+
+/* caller (you called someone)
+ws.on("accept") fires → call is accepted
+Attaches local media (attachUserMedia) → adding tracks triggers onnegotiationneeded
+onnegotiationneeded → creates offer → sends video-offer
+ws.on("video-answer") → pc.setRemoteDescription()
+ws.on("new-ice-candidate") → pc.addIceCandidate()
+*/
+
+/* callee flow (someone called you):
+
+ws.on("video-offer") fires → you are the answerer
+pc.setRemoteDescription(offer)
+Attaches local media
+pc.createAnswer() → pc.setLocalDescription(answer) → sends video-answer
+ws.on("new-ice-candidate") → pc.addIceCandidate()
+*/
+
 import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel } from "./dom";
 import { RTCPeerConnectionHandler } from "./webrtcEventHandler";
 import { WebSocketHandler } from "./websocketHandler";
@@ -5,6 +25,7 @@ import { WebSocketHandler } from "./websocketHandler";
 const ws = WebSocketHandler.getInstance();
 document.getElementById("loginBtn")?.addEventListener("click", login);
 document.getElementById("hangup-button")?.addEventListener("click", hangUpCall);
+
 
 
 ws.on("accept",async ({ name }) => {

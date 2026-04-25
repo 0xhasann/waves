@@ -9,6 +9,7 @@
 // show accept when an call is received from server for the given caller name in user list
 // hangup button
 
+// UI logic hanlder
 import type { Name } from "../shared/chatmessage";
 import { RTCPeerConnectionHandler } from "./webrtcEventHandler";
 import { WebSocketHandler } from "./websocketHandler";
@@ -23,6 +24,7 @@ export function disableRemoteNameLabel() {
     }
 
 }
+
 export function setRemoteNameLabel(remoteName: string) {
     const remoteLabel = document.getElementById("remote-name-label") as HTMLSpanElement;
     const btn = document.getElementById("hangup-button");
@@ -31,6 +33,8 @@ export function setRemoteNameLabel(remoteName: string) {
         btn.style.display = "block";
     }
 }
+
+// hides the form, shows welcome text, calls ws.login()
 export function login() {
     const ws = WebSocketHandler.getInstance();
     const nameInput = document.getElementById("name") as HTMLInputElement;
@@ -52,6 +56,7 @@ export function login() {
     ws.login(name);
 }
 
+//builds the user list with a "Call" button per user
 export function renderUserList(data: { names: Name[] }) {
     const ws = WebSocketHandler.getInstance();
     const userListDiv = document.getElementById("user-list");
@@ -88,6 +93,7 @@ export function renderUserList(data: { names: Name[] }) {
     userListDiv.appendChild(ul);
 }
 
+// inserts an "Accept" prompt when a call comes in
 export function renderIncomingCall(data: { name: Name }) {
     const ws = WebSocketHandler.getInstance();
     const userListDiv = document.getElementById("user-list");
@@ -168,7 +174,7 @@ export function enableCallbutton() {
     }
 }
 
-
+//  stops media tracks, closes RTCPeerConnection, calls ws.hangUp()
 export function hangUpCall() {
     const ws = WebSocketHandler.getInstance();
     const localVideo = document.getElementById("local_video") as HTMLVideoElement | null;
@@ -194,6 +200,7 @@ export function hangUpCall() {
     disableRemoteNameLabel();
 }
 
+// gets camera/mic, adds tracks to the peer connection
 export async function attachUserMedia() {
     const pc = RTCPeerConnectionHandler.pc;
     await navigator.mediaDevices

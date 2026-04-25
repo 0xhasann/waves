@@ -9,6 +9,8 @@
 
 import { WebSocketHandler } from "./websocketHandler";
 
+// the webrtc event handler
+// singleton class
 export class RTCPeerConnectionHandler {
     private static rtcPeerConnectionHandler: RTCPeerConnectionHandler | null;
     private rtcPeerConnection: RTCPeerConnection;
@@ -17,6 +19,7 @@ export class RTCPeerConnectionHandler {
         this.rtcPeerConnection = createPeerConnection();
     }
 
+    //cleanly nulls all handlers and closes the connection.
     public static close():void {
         this.pc.getTransceivers().forEach(t => t.stop());
         this.pc.ontrack = null;
@@ -47,10 +50,13 @@ function createPeerConnection(): RTCPeerConnection {
             },
         ],
     });
+    // sends gathered ICE candidates to the other peer via ws.newIceCandidate()
     pc.onicecandidate = (e) => {
         if (!e.candidate) return;
         ws.newIceCandidate(e.candidate);
     }
+    // creates an SDP offer, sets local description, sends video-offer via ws
+    // this fires automatically when tracks are added
     pc.onnegotiationneeded = () => {
         if (pc.signalingState != "stable") return;
         pc
@@ -62,6 +68,8 @@ function createPeerConnection(): RTCPeerConnection {
             })
             .catch(window.reportError);
     }
+    // shows the hang-up button when connected
+    
     pc.onconnectionstatechange = () => {
         const btn = document.getElementById("hangup-button");
         if (!btn) return;
@@ -69,6 +77,7 @@ function createPeerConnection(): RTCPeerConnection {
             btn.style.display = "block";
         }
     };
+    //  receives the remote video stream and plugs it into the <video#received_video> element
     pc.ontrack = (event) => {
         const receivedVideo = document.getElementById("received_video") as HTMLVideoElement | null;
         if (receivedVideo && event.streams && event.streams[0]) {

@@ -3,7 +3,7 @@
 // add methods to handle when these events are received on(new-ice-candidate & hangup)
 
 import { WebSocketMessageSchema, type WebSocketMessage } from "../shared";
-import type {  Name } from "../shared/chatmessage";
+import type { Name } from "../shared/chatmessage";
 
 type WsEvents = {
     "video-offer": (data: { sdp: RTCSessionDescriptionInit }) => void;
@@ -14,7 +14,8 @@ type WsEvents = {
     "accept": (data: { name: Name }) => void;
     "user-list": (data: { names: Name[] }) => void;
 };
-
+// websocket client
+// Singleton 
 export class WebSocketHandler {
     private ws!: WebSocket;
     public myUserName: Name | undefined;
@@ -96,11 +97,11 @@ export class WebSocketHandler {
     }
 
     accept(name: Name) {
-        this.send({type:"accept", data: {name}})
+        this.send({ type: "accept", data: { name } })
     }
 
     call(name: Name) {
-        this.send({type:"call", data: {name}})
+        this.send({ type: "call", data: { name } })
     }
 
     videoOffer(sdp: RTCSessionDescription) {
@@ -112,7 +113,6 @@ export class WebSocketHandler {
     }
 
     private send(message: WebSocketMessage) {
-        // this.ws.send(JSON.stringify(message));
         if (this.ws.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify(message));
         } else if (this.ws.readyState === WebSocket.CONNECTING) {
@@ -123,22 +123,8 @@ export class WebSocketHandler {
     }
 
     private handleWsMessages(event: MessageEvent) {
-        let text: string;
-        if (typeof event.data === "string") {
-            text = event.data;
-        } else if (event.data instanceof ArrayBuffer) {
-            text = new TextDecoder().decode(new Uint8Array(event.data));
-        } else if (Array.isArray(event.data) && event.data[0] instanceof ArrayBuffer) {
-            text = new TextDecoder().decode(new Uint8Array(event.data[0]));
-        } else if (event.data && typeof (event.data as any).toString === "function") {
-            text = event.data.toString();
-        } else {
-            throw new Error("Unable to parse WebSocket event data");
-        }
-        const json = JSON.parse(text);
-
+        const json = this.parseWebSocketData(event.data);
         const parsedMessage = WebSocketMessageSchema.parse(json);
-
         switch (parsedMessage.type) {
             case "video-offer":
             case "video-answer":
@@ -157,4 +143,21 @@ export class WebSocketHandler {
     private emit(event: keyof WsEvents, data?: unknown) {
         (this.listeners[event] as ((d?: unknown) => void) | undefined)?.(data);
     }
+
+    private parseWebSocketData(data: MessageEvent["data"]): unknown {
+        if (typeof data === "string") {
+            return JSON.parse(data);
+        }
+        if (data instanceof ArrayBuffer) {
+            return JSON.parse(new TextDecoder().decode(data));
+        }
+        if (Array.isArray(data) && data[0] instanceof ArrayBuffer) {
+            return JSON.parse(new TextDecoder().decode(data[0]));
+        }
+        if (data != null && typeof data.toString === "function") {
+            return JSON.parse(data.toString());
+        }
+        throw new Error("Unable to parse WebSocket event data");
+    }
+
 }
