@@ -40,7 +40,7 @@ how it works:
 
 ## Live & Usage
 
-This application is deployed on an AWS EC2 instance and accessible via a custom domain: **https://waves.cam**.  
+This application is deployed on an AWS EC2 instance and accessible via a custom domain: **https://waves.cam** 
 The `.cam` domain is used since the `.com` variant is already occupied.
 
 
