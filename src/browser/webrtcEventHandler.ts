@@ -7,12 +7,14 @@
 // onicegatheringstatechange -> update the dom to reflect ine gathering states
 // onsignalingstatechange -> update the dom to reflect rtc signaling states
 
+import { ChatUI } from "./chat";
 import { WebSocketHandler } from "./websocketHandler";
 
 // the webrtc event handler
 // singleton class
 export class RTCPeerConnectionHandler {
     private static rtcPeerConnectionHandler: RTCPeerConnectionHandler | null;
+    public static dataChannel: RTCDataChannel | null = null;
     private rtcPeerConnection: RTCPeerConnection;
 
     private constructor() {
@@ -21,6 +23,9 @@ export class RTCPeerConnectionHandler {
 
     //cleanly nulls all handlers and closes the connection.
     public static close():void {
+        this.dataChannel?.close();
+        this.dataChannel = null;
+        this.pc.ondatachannel = null;
         this.pc.getTransceivers().forEach(t => t.stop());
         this.pc.ontrack = null;
         this.pc.onicecandidate = null;
@@ -50,6 +55,23 @@ function createPeerConnection(): RTCPeerConnection {
             },
         ],
     });
+    if (!RTCPeerConnectionHandler.dataChannel) {
+        RTCPeerConnectionHandler.dataChannel = pc.createDataChannel("chat");
+
+        RTCPeerConnectionHandler.dataChannel.onopen = () => {
+            console.log("Data channel open");
+            document.getElementById("chat-input")?.removeAttribute("disabled");
+        };
+
+        RTCPeerConnectionHandler.dataChannel.onmessage = (event) => {
+            console.log("Message received:", event.data);
+            ChatUI.appendMessage(event.data, "remote");
+        };
+
+        RTCPeerConnectionHandler.dataChannel.onclose = () => {
+            console.log("Data channel closed");
+        };
+    }
     // sends gathered ICE candidates to the other peer via ws.newIceCandidate()
     pc.onicecandidate = (e) => {
         if (!e.candidate) return;
@@ -88,5 +110,23 @@ function createPeerConnection(): RTCPeerConnection {
             hangupBtn.disabled = false;
         }
     };
+
+    pc.ondatachannel = (event) => {
+        RTCPeerConnectionHandler.dataChannel = event.channel;
+
+        RTCPeerConnectionHandler.dataChannel.onopen = () => {
+            console.log("Data channel open");
+        };
+
+        RTCPeerConnectionHandler.dataChannel.onmessage = (event) => {
+            console.log("Message received:", event.data);
+            ChatUI.appendMessage(event.data, "remote");
+        };
+
+        RTCPeerConnectionHandler.dataChannel.onclose = () => {
+            console.log("Data channel closed");
+        };
+    };
+    
     return pc;
 }

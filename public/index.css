@@ -49,3 +49,95 @@
        left: auto;
        font-size: 11px;
    }
+
+   #chat {
+       width: 300px;
+       border: 1px solid #ccc;
+       display: flex;
+       flex-direction: column;
+       font-family: sans-serif;
+   }
+
+   #messages {
+       height: 200px;
+       overflow-y: auto;
+       padding: 8px;
+       background: #f9f9f9;
+   }
+
+   .message {
+       margin: 4px 0;
+   }
+
+   .self {
+       text-align: right;
+       color: blue;
+   }
+
+   .remote {
+       text-align: left;
+       color: green;
+   }
+
+   #inputArea {
+       display: flex;
+   }
+
+   #msgInput {
+       flex: 1;
+       padding: 6px;
+   }
+
+   #sendBtn {
+       padding: 6px 10px;
+   }
+
+   #chat-container {
+       width: 300px;
+       border: 1px solid #ccc;
+       display: flex;
+       flex-direction: column;
+       font-family: sans-serif;
+   }
+
+   #messages {
+       height: 200px;
+       overflow-y: auto;
+       padding: 8px;
+       display: flex;
+       flex-direction: column;
+       gap: 6px;
+       background: #f9f9f9;
+   }
+
+   #messages .self {
+       align-self: flex-end;
+       background: #d1e7dd;
+       padding: 6px 10px;
+       border-radius: 8px;
+       max-width: 70%;
+   }
+
+   #messages .remote {
+       align-self: flex-start;
+       background: #e2e3e5;
+       padding: 6px 10px;
+       border-radius: 8px;
+       max-width: 70%;
+   }
+
+   #chat-input {
+       border: none;
+       border-top: 1px solid #ccc;
+       padding: 8px;
+       outline: none;
+   }
+
+   #send-btn {
+       border: none;
+       border-top: 1px solid #ccc;
+       padding: 8px;
+       cursor: pointer;
+       background: #007bff;
+       color: white;
+   }

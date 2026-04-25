@@ -18,6 +18,7 @@ pc.createAnswer() → pc.setLocalDescription(answer) → sends video-answer
 ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
+import { ChatUI } from "./chat";
 import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel } from "./dom";
 import { RTCPeerConnectionHandler } from "./webrtcEventHandler";
 import { WebSocketHandler } from "./websocketHandler";
@@ -27,6 +28,7 @@ document.getElementById("loginBtn")?.addEventListener("click", login);
 document.getElementById("hangup-button")?.addEventListener("click", hangUpCall);
 
 
+ChatUI.init();
 
 ws.on("accept",async ({ name }) => {
     disableCallButton(name);
