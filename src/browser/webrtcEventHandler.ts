@@ -55,23 +55,6 @@ function createPeerConnection(): RTCPeerConnection {
             },
         ],
     });
-    if (!RTCPeerConnectionHandler.dataChannel) {
-        RTCPeerConnectionHandler.dataChannel = pc.createDataChannel("chat");
-
-        RTCPeerConnectionHandler.dataChannel.onopen = () => {
-            console.log("Data channel open");
-            document.getElementById("chat-input")?.removeAttribute("disabled");
-        };
-
-        RTCPeerConnectionHandler.dataChannel.onmessage = (event) => {
-            console.log("Message received:", event.data);
-            ChatUI.appendMessage(event.data, "remote");
-        };
-
-        RTCPeerConnectionHandler.dataChannel.onclose = () => {
-            console.log("Data channel closed");
-        };
-    }
     // sends gathered ICE candidates to the other peer via ws.newIceCandidate()
     pc.onicecandidate = (e) => {
         if (!e.candidate) return;
@@ -80,7 +63,9 @@ function createPeerConnection(): RTCPeerConnection {
     // creates an SDP offer, sets local description, sends video-offer via ws
     // this fires automatically when tracks are added
     pc.onnegotiationneeded = () => {
-        if (pc.signalingState != "stable") return;
+        if (pc.signalingState != "stable" && pc.signalingState != "have-remote-offer") return;
+        //only caller should create offer
+        if (!RTCPeerConnectionHandler.dataChannel) return;
         pc
             .createOffer()
             .then((offer) => pc.setLocalDescription(offer))
@@ -112,19 +97,16 @@ function createPeerConnection(): RTCPeerConnection {
     };
 
     pc.ondatachannel = (event) => {
-        RTCPeerConnectionHandler.dataChannel = event.channel;
+        const dc = event.channel;
+        RTCPeerConnectionHandler.dataChannel = dc;
 
-        RTCPeerConnectionHandler.dataChannel.onopen = () => {
+        dc.onopen = () => {
             console.log("Data channel open");
+            document.getElementById("chat-input")?.removeAttribute("disabled");
         };
 
-        RTCPeerConnectionHandler.dataChannel.onmessage = (event) => {
-            console.log("Message received:", event.data);
+        dc.onmessage = (event) => {
             ChatUI.appendMessage(event.data, "remote");
-        };
-
-        RTCPeerConnectionHandler.dataChannel.onclose = () => {
-            console.log("Data channel closed");
         };
     };
     

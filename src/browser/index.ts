@@ -29,18 +29,32 @@ document.getElementById("hangup-button")?.addEventListener("click", hangUpCall);
 
 
 ChatUI.init();
+const pc = RTCPeerConnectionHandler.pc;
+
+ws.on("new-ice-candidate", async (event) => {
+    await pc.addIceCandidate(event.candidate);
+});
+ws.on("video-answer", async (event) => {
+    if (pc.signalingState !== "have-local-offer") return;
+    await pc.setRemoteDescription(event.sdp);
+})
 
 ws.on("accept",async ({ name }) => {
     disableCallButton(name);
-    const pc = RTCPeerConnectionHandler.pc;
+    const dc = pc.createDataChannel("chat");
+    RTCPeerConnectionHandler.dataChannel = dc;
+
+    dc.onopen = () => {
+        console.log("Data channel open");
+        document.getElementById("chat-input")?.removeAttribute("disabled");
+    };
+
+    dc.onmessage = (event) => {
+        ChatUI.appendMessage(event.data, "remote");
+    };
 
 
-    ws.on("new-ice-candidate", async (event) => {
-        await pc.addIceCandidate(event.candidate);
-    });
-    ws.on("video-answer", async (event) => {
-        await pc.setRemoteDescription(event.sdp);
-    })
+
     ws.on("hang-up", () => {
         hangUpCall();
        
@@ -52,12 +66,6 @@ ws.on("accept",async ({ name }) => {
 
 
 ws.on("video-offer", async (event) => {
-    const pc = RTCPeerConnectionHandler.pc;
-
-
-    ws.on("new-ice-candidate", async (event) => {
-        await pc.addIceCandidate(event.candidate);
-    });
     ws.on("hang-up", () => {
         hangUpCall();
        

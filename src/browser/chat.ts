@@ -6,6 +6,10 @@ export class ChatUI {
         const input = document.getElementById("chat-input") as HTMLInputElement;
         const btn = document.getElementById("send-btn") as HTMLButtonElement;
 
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") btn.click();
+        });
+
         btn.onclick = () => {
             const message = input.value.trim();
             if (!message) return;
@@ -22,9 +26,33 @@ export class ChatUI {
         if (!container) return;
 
         const div = document.createElement("div");
-        div.textContent = message;
+        
+        div.innerHTML = message.replace(
+            /(https?:\/\/[^\s]+)/g,
+            '<a href="$1" target="_blank">$1</a>'
+        );
         div.className = type;
 
-        container.appendChild(div);
+        
+
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${type}`;
+
+        const text = document.createElement("div");
+        text.textContent = message;
+
+        const time = document.createElement("div");
+        time.className = "time";
+
+        const now = new Date();
+        time.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+        msgDiv.appendChild(text);
+        msgDiv.appendChild(time);
+
+        container.appendChild(msgDiv);
+
+        container.scrollTop = container.scrollHeight;
+
     }
 }
