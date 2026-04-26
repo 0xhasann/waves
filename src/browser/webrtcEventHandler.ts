@@ -7,12 +7,14 @@
 // onicegatheringstatechange -> update the dom to reflect ine gathering states
 // onsignalingstatechange -> update the dom to reflect rtc signaling states
 
+import { ChatUI } from "./chat";
 import { WebSocketHandler } from "./websocketHandler";
 
 // the webrtc event handler
 // singleton class
 export class RTCPeerConnectionHandler {
     private static rtcPeerConnectionHandler: RTCPeerConnectionHandler | null;
+    public static dataChannel: RTCDataChannel | null = null;
     private rtcPeerConnection: RTCPeerConnection;
 
     private constructor() {
@@ -21,6 +23,9 @@ export class RTCPeerConnectionHandler {
 
     //cleanly nulls all handlers and closes the connection.
     public static close():void {
+        this.dataChannel?.close();
+        this.dataChannel = null;
+        this.pc.ondatachannel = null;
         this.pc.getTransceivers().forEach(t => t.stop());
         this.pc.ontrack = null;
         this.pc.onicecandidate = null;
@@ -58,7 +63,9 @@ function createPeerConnection(): RTCPeerConnection {
     // creates an SDP offer, sets local description, sends video-offer via ws
     // this fires automatically when tracks are added
     pc.onnegotiationneeded = () => {
-        if (pc.signalingState != "stable") return;
+        if (pc.signalingState != "stable" && pc.signalingState != "have-remote-offer") return;
+        //only caller should create offer
+        if (!RTCPeerConnectionHandler.dataChannel) return;
         pc
             .createOffer()
             .then((offer) => pc.setLocalDescription(offer))
@@ -88,5 +95,36 @@ function createPeerConnection(): RTCPeerConnection {
             hangupBtn.disabled = false;
         }
     };
+
+    pc.ondatachannel = (event) => {
+        const dc = event.channel;
+        RTCPeerConnectionHandler.dataChannel = dc;
+        attachDataChannelHandlers(dc);
+    };
+    
     return pc;
+}
+
+export function attachDataChannelHandlers(dc: RTCDataChannel) {
+    dc.onopen = () => {
+        const input = document.getElementById("chat-input") as HTMLInputElement;
+        const btn = document.getElementById("send-btn") as HTMLButtonElement;
+
+        input.removeAttribute("disabled");
+        // btn.removeAttribute("disabled");
+        btn.disabled = false;
+    };
+
+    dc.onclose = () => {
+        const input = document.getElementById("chat-input") as HTMLInputElement;
+        const btn = document.getElementById("send-btn") as HTMLButtonElement;
+
+        input.setAttribute("disabled", "true");
+        // btn.setAttribute("disabled", "true");
+        btn.disabled = true;
+    };
+
+    dc.onmessage = (event) => {
+        ChatUI.appendMessage(event.data, "remote");
+    };
 }

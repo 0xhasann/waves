@@ -12,29 +12,37 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="infobox">
-        <p id="login-form">
-            Enter a username:
-            <input id="name" type="text" maxlength="12" required autocomplete="username" inputmode="verbatim"
-                placeholder="Username">
-            <input type="button" id="loginBtn" name="login" value="Log in">
-        </p>
-        <p id="welcome-text" style="display:none;"></p>
+    <div id="app">
+        <div class="container">
+            <div class="infobox">
+                <p id="login-form">
+                    Enter a username:
+                    <input id="name" type="text" maxlength="12" required autocomplete="username" inputmode="verbatim"
+                        placeholder="Username">
+                    <input type="button" id="loginBtn" name="login" value="Log in">
+                </p>
+                <p id="welcome-text" style="display:none;"></p>
+            </div>
+            <ul id="user-list"></ul>
         </div>
-        <ul id="user-list"></ul>
-        </div>
-        <div id="camerabox" >
+        <div id="camerabox">
             <video id="received_video" autoplay></video>
-                <span id="remote-name-label" class="video-label"></span> 
+            <span id="remote-name-label" class="video-label"></span>
             <video id="local_video" autoplay muted></video>
-                <span id="local-name-label" class="video-label local-label"></span> 
+            <span id="local-name-label" class="video-label local-label"></span>
 
             <button id="hangup-button" style="display:none;">Hang Up</button>
         </div>
-       
-      
+        <div id="chat-container">
+            <div id="chat-header">
+                <div id="chat-user">Chat </div>
+            </div>
+            <div id="messages"></div>
+            <input id="chat-input" disabled type="text" placeholder="Type message..." />
+            <button id="send-btn" disabled>Send</button>
+        </div>
 
+    </div>
     </div>
 </body>
 

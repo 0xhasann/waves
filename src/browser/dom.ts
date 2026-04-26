@@ -27,11 +27,20 @@ export function disableRemoteNameLabel() {
 
 export function setRemoteNameLabel(remoteName: string) {
     const remoteLabel = document.getElementById("remote-name-label") as HTMLSpanElement;
-    const btn = document.getElementById("hangup-button");
-    remoteLabel.textContent = remoteName;
+    const btn = document.getElementById("hangup-button") as HTMLSpanElement;
+    const header = document.getElementById("chat-header") as HTMLSpanElement;
+    const chatUser = document.getElementById("chat-user") as HTMLSpanElement;
+    if (chatUser) {
+        chatUser.textContent = remoteName;
+    }
+    
     if (btn) {
         btn.style.display = "block";
     }
+    if (header) header.textContent = `Chat with ${remoteName}`;
+    remoteLabel.textContent = remoteName;
+
+
 }
 
 // hides the form, shows welcome text, calls ws.login()

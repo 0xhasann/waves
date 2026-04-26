@@ -18,8 +18,9 @@ pc.createAnswer() → pc.setLocalDescription(answer) → sends video-answer
 ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
+import { ChatUI } from "./chat";
 import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel } from "./dom";
-import { RTCPeerConnectionHandler } from "./webrtcEventHandler";
+import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
 import { WebSocketHandler } from "./websocketHandler";
 
 const ws = WebSocketHandler.getInstance();
@@ -27,18 +28,23 @@ document.getElementById("loginBtn")?.addEventListener("click", login);
 document.getElementById("hangup-button")?.addEventListener("click", hangUpCall);
 
 
+ChatUI.init();
+const pc = RTCPeerConnectionHandler.pc;
+
+ws.on("new-ice-candidate", async (event) => {
+    await pc.addIceCandidate(event.candidate);
+});
+ws.on("video-answer", async (event) => {
+    if (pc.signalingState !== "have-local-offer") return;
+    await pc.setRemoteDescription(event.sdp);
+})
 
 ws.on("accept",async ({ name }) => {
     disableCallButton(name);
-    const pc = RTCPeerConnectionHandler.pc;
+    const dc = pc.createDataChannel("chat");
+    RTCPeerConnectionHandler.dataChannel = dc;
+    attachDataChannelHandlers(dc);
 
-
-    ws.on("new-ice-candidate", async (event) => {
-        await pc.addIceCandidate(event.candidate);
-    });
-    ws.on("video-answer", async (event) => {
-        await pc.setRemoteDescription(event.sdp);
-    })
     ws.on("hang-up", () => {
         hangUpCall();
        
@@ -50,12 +56,6 @@ ws.on("accept",async ({ name }) => {
 
 
 ws.on("video-offer", async (event) => {
-    const pc = RTCPeerConnectionHandler.pc;
-
-
-    ws.on("new-ice-candidate", async (event) => {
-        await pc.addIceCandidate(event.candidate);
-    });
     ws.on("hang-up", () => {
         hangUpCall();
        
