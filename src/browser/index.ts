@@ -19,7 +19,7 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
 import { ChatUI } from "./chat";
-import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel } from "./dom";
+import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream } from "./dom";
 import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
 import { WebSocketHandler } from "./websocketHandler";
 
@@ -30,6 +30,32 @@ document.querySelectorAll(".controls button").forEach(btn => {
     btn.addEventListener("click", () => {
         btn.classList.toggle("active");
     });
+});
+
+let audioEnabled = true;
+let videoEnabled = true;
+
+const micButton = document.getElementById("micBtn") as HTMLButtonElement | null;
+
+micButton?.addEventListener("click", () => {
+    audioEnabled = !audioEnabled;
+    micButton?.classList.toggle("active");
+
+    (localStream as unknown as MediaStream | null)?.getAudioTracks().forEach(track => {
+        track.enabled = audioEnabled;
+    });
+    document.getElementById("micBtn")?.classList.toggle("active");
+});
+
+const videoButton = document.getElementById("videoBtn") as HTMLButtonElement | null;
+
+videoButton?.addEventListener("click", () => {
+    videoEnabled = !videoEnabled;
+    videoButton?.classList.toggle("active");
+    (localStream as unknown as MediaStream | null)?.getVideoTracks().forEach(track => {
+        track.enabled = videoEnabled;
+    });
+    document.getElementById("videoBtn")?.classList.toggle("active");
 });
 
 
@@ -44,7 +70,7 @@ ws.on("video-answer", async (event) => {
     await pc.setRemoteDescription(event.sdp);
 })
 
-ws.on("accept",async ({ name }) => {
+ws.on("accept", async ({ name }) => {
     disableCallButton(name);
     const dc = pc.createDataChannel("chat");
     RTCPeerConnectionHandler.dataChannel = dc;
@@ -55,7 +81,8 @@ ws.on("accept",async ({ name }) => {
        
     })
 
-    await attachUserMedia();
+    const granted = await attachUserMedia(audioEnabled, videoEnabled);
+    if (!granted) return;
     setRemoteNameLabel(name);
 });
 
@@ -69,7 +96,9 @@ ws.on("video-offer", async (event) => {
     await pc.setRemoteDescription(event.sdp);
 
     // Get media and use addTrack (not addTransceiver)
-    await attachUserMedia();
+    const granted = await attachUserMedia(audioEnabled, videoEnabled);
+    if (!granted) return;
+
 
 
     const answer = await pc.createAnswer();
@@ -80,4 +109,4 @@ ws.on("video-offer", async (event) => {
 
 
 ws.on("call", renderIncomingCall);
-ws.on("user-list",  renderUserList);
+ws.on("user-list", renderUserList);
