@@ -100,7 +100,10 @@ ws.on("accept", async ({ name }) => {
     })
 
     const granted = await attachUserMedia(audioEnabled, videoEnabled);
-    if (!granted) return;
+    if (!granted) {
+        hangUpCall();
+        return;
+    }
     setRemoteNameLabel(name);
 });
 
@@ -115,7 +118,10 @@ ws.on("video-offer", async (event) => {
 
     // Get media and use addTrack (not addTransceiver)
     const granted = await attachUserMedia(audioEnabled, videoEnabled);
-    if (!granted) return;
+    if (!granted) {
+        hangUpCall();
+        return;
+    }
 
 
 

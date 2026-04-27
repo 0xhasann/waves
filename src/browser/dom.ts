@@ -219,10 +219,16 @@ export async function attachUserMedia(audio: boolean, video: boolean): Promise<b
         shareBtn.style.display = "block";
 
     try {
+        // Always acquire both tracks on first stage
         localStream = await navigator.mediaDevices.getUserMedia({
-            audio,
-            video
+            audio: true,
+            video: true
         });
+
+        // Use the booleans to set initial enabled state
+        localStream.getAudioTracks().forEach(track => (track.enabled = audio));
+        localStream.getVideoTracks().forEach(track => (track.enabled = video));
+
 
         const localVideoElem = document.getElementById("local_video") as HTMLVideoElement | null;
         if (localVideoElem) {
@@ -236,7 +242,7 @@ export async function attachUserMedia(audio: boolean, video: boolean): Promise<b
             }
         });
 
-        return true; // permission granted, tracks added
+        return true;
 
     } catch (err: any) {
         if (err.name === "NotAllowedError") {

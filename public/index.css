@@ -131,19 +131,15 @@ body {
 
 #send-btn {
     width: 40px;
+    height: 40px;
+    border-radius: 50%;
     background: #075e54;
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-left: 8px;
-    height: 36px;
-    padding: 0 16px;
-    border-radius: 18px;
-    border: none;
-    color: white;
-    transition: background 0.1s ease;
 }
 
 
