@@ -19,13 +19,62 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
 import { ChatUI } from "./chat";
-import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel } from "./dom";
+import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream } from "./dom";
 import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
 import { WebSocketHandler } from "./websocketHandler";
 
 const ws = WebSocketHandler.getInstance();
 document.getElementById("loginBtn")?.addEventListener("click", login);
 document.getElementById("hangup-button")?.addEventListener("click", hangUpCall);
+document.querySelectorAll(".controls button").forEach(btn => {
+    btn.addEventListener("click", () => {
+        btn.classList.toggle("active");
+    });
+});
+
+let audioEnabled = true;
+let videoEnabled = true;
+let shareBtnEnabled = false;
+
+const micButton = document.getElementById("micBtn") as HTMLButtonElement | null;
+
+micButton?.addEventListener("click", () => {
+    audioEnabled = !audioEnabled;
+    micButton?.classList.toggle("active");
+    const tooltip = micButton?.querySelector(".tooltip");
+    if (tooltip) tooltip.textContent = audioEnabled ? "Mute" : "Unmute";
+    (localStream as unknown as MediaStream | null)?.getAudioTracks().forEach(track => {
+        track.enabled = audioEnabled;
+    });
+    micButton?.classList.toggle("active");
+});
+
+const videoButton = document.getElementById("videoBtn") as HTMLButtonElement | null;
+
+videoButton?.addEventListener("click", () => {
+    videoEnabled = !videoEnabled;
+    videoButton?.classList.toggle("active");
+    const tooltip = videoButton?.querySelector(".tooltip");
+    if (tooltip) tooltip.textContent = videoEnabled ? "Stop Video" : "Start Video";
+    (localStream as unknown as MediaStream | null)?.getVideoTracks().forEach(track => {
+        track.enabled = videoEnabled;
+    });
+    videoButton?.classList.toggle("active");
+
+});
+
+const shareBtn = document.getElementById("share-button") as HTMLButtonElement | null;
+
+shareBtn?.addEventListener("click", () => {
+    shareBtnEnabled = !shareBtnEnabled
+    shareBtn.classList.toggle("active");
+    const tooltip = shareBtn?.querySelector(".tooltip");
+    if (tooltip) {
+        tooltip.textContent = shareBtnEnabled ? "Start Sharing" : "Stop Sharing";
+    }
+    shareBtn.classList.toggle("active");
+
+})
 
 
 ChatUI.init();
@@ -39,7 +88,7 @@ ws.on("video-answer", async (event) => {
     await pc.setRemoteDescription(event.sdp);
 })
 
-ws.on("accept",async ({ name }) => {
+ws.on("accept", async ({ name }) => {
     disableCallButton(name);
     const dc = pc.createDataChannel("chat");
     RTCPeerConnectionHandler.dataChannel = dc;
@@ -50,7 +99,11 @@ ws.on("accept",async ({ name }) => {
        
     })
 
-    await attachUserMedia();
+    const granted = await attachUserMedia(audioEnabled, videoEnabled);
+    if (!granted) {
+        hangUpCall();
+        return;
+    }
     setRemoteNameLabel(name);
 });
 
@@ -64,7 +117,12 @@ ws.on("video-offer", async (event) => {
     await pc.setRemoteDescription(event.sdp);
 
     // Get media and use addTrack (not addTransceiver)
-    await attachUserMedia();
+    const granted = await attachUserMedia(audioEnabled, videoEnabled);
+    if (!granted) {
+        hangUpCall();
+        return;
+    }
+
 
 
     const answer = await pc.createAnswer();
@@ -75,4 +133,4 @@ ws.on("video-offer", async (event) => {
 
 
 ws.on("call", renderIncomingCall);
-ws.on("user-list",  renderUserList);
+ws.on("user-list", renderUserList);

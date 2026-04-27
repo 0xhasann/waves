@@ -30,16 +30,41 @@
             <span id="remote-name-label" class="video-label"></span>
             <video id="local_video" autoplay muted></video>
             <span id="local-name-label" class="video-label local-label"></span>
+            <div class="controls">
 
-            <button id="hangup-button" style="display:none;">Hang Up</button>
+                <button id="micBtn" type="button" aria-label="Mute microphone">
+                    <img src="mic.png" alt="" />
+                    <span class="tooltip">Mute</span>
+                </button>
+                <button id="videoBtn" type="button" aria-label="Turn camera off">
+                    <img src="cam_video.png" alt="" />
+                    <span class="tooltip">Stop Video</span>
+                </button>
+                <button id="share-button" style="display:none;" type="button" aria-label="Start Sharing Screen">
+                    <img src="share.webp" alt="" />
+                    <span class="tooltip">Start Sharing</span>
+                </button>
+
+                <button id="hangup-button" class="active" style="display:none;" type="button" aria-label="Hang Up">
+                    <img src="call.png" alt="" />
+                    <span class="tooltip">Hang Up</span>
+                </button>
+            </div>
+
         </div>
         <div id="chat-container">
             <div id="chat-header">
-                <div id="chat-user">Chat </div>
+                <div id="chat-user">Chat</div>
             </div>
             <div id="messages"></div>
-            <input id="chat-input" disabled type="text" placeholder="Type message..." />
-            <button id="send-btn" disabled>Send</button>
+            <div class="chat-input-container">
+                <input id="chat-input" disabled type="text" placeholder="Type message..." />
+                <button id="send-btn" type="button" disabled aria-label="Send message"></button>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                    <path d="M2 21l21-9L2 3v7l15 2-15 2z" />
+                </svg>
+                </button>
+            </div>
         </div>
 
     </div>

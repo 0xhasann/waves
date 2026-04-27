@@ -14,6 +14,8 @@ import type { Name } from "../shared/chatmessage";
 import { RTCPeerConnectionHandler } from "./webrtcEventHandler";
 import { WebSocketHandler } from "./websocketHandler";
 
+export let localStream: MediaStream | null = null;
+
 export function disableRemoteNameLabel() {
     const remoteLabel = document.getElementById("remote-name-label") as HTMLSpanElement;
     remoteLabel.textContent = "";
@@ -210,20 +212,46 @@ export function hangUpCall() {
 }
 
 // gets camera/mic, adds tracks to the peer connection
-export async function attachUserMedia() {
+export async function attachUserMedia(audio: boolean, video: boolean): Promise<boolean> {
     const pc = RTCPeerConnectionHandler.pc;
-    await navigator.mediaDevices
-        .getUserMedia({ audio: true, video: true })
-        .then((localStream) => {
-            const localVideoElem = document.getElementById("local_video") as HTMLVideoElement | null;
-            if (localVideoElem) {
-                localVideoElem.srcObject = localStream;
-            }
-            localStream
-                .getTracks()
-                .forEach((track) => {
-                    pc.addTrack(track, localStream);
-                });
+    const shareBtn = document.getElementById("share-button");
+    if (shareBtn)
+        shareBtn.style.display = "block";
 
+    try {
+        // Always acquire both tracks on first stage
+        localStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
         });
+
+        // Use the booleans to set initial enabled state
+        localStream.getAudioTracks().forEach(track => (track.enabled = audio));
+        localStream.getVideoTracks().forEach(track => (track.enabled = video));
+
+
+        const localVideoElem = document.getElementById("local_video") as HTMLVideoElement | null;
+        if (localVideoElem) {
+            localVideoElem.srcObject = localStream;
+        }
+
+        if (!localStream) return false;
+        localStream.getTracks().forEach((track) => {
+            if (localStream) {
+                pc.addTrack(track, localStream);
+            }
+        });
+
+        return true;
+
+    } catch (err: any) {
+        if (err.name === "NotAllowedError") {
+            console.warn("User denied camera/mic permission");
+        } else if (err.name === "NotFoundError") {
+            console.warn("No camera/mic device found");
+        } else {
+            console.error("getUserMedia error:", err);
+        }
+        return false;
+    }
 }
