@@ -356,3 +356,66 @@ body {
     background: #ff5c5c;
     color: #ffffff;
 }
+
+/* // record media */
+
+body {
+    font:
+        14px "Open Sans",
+        "Arial",
+        sans-serif;
+}
+
+video {
+    margin-top: 2px;
+    border: 1px solid black;
+}
+
+.button {
+    cursor: pointer;
+    display: block;
+    width: 160px;
+    border: 1px solid black;
+    font-size: 16px;
+    text-align: center;
+    padding-top: 2px;
+    padding-bottom: 4px;
+    color: white;
+    background-color: darkgreen;
+    text-decoration: none;
+}
+
+h2 {
+    margin-bottom: 4px;
+}
+
+.videoleft {
+    margin-right: 10px;
+    float: left;
+    width: 160px;
+    padding: 0px;
+}
+
+.rightchat {
+    margin-left: 10px;
+    float: left;
+    width: 160px;
+    padding: 0px;
+}
+
+.bottom {
+    clear: both;
+    padding-top: 10px;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#app {
+    width: 100vw;
+    height: 100vh;
+}
