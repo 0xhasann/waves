@@ -425,3 +425,20 @@ body {
     height: 34px;
     padding-bottom: 0px;
 }
+
+#local_video {
+    transition: all 0.3s ease;
+}
+
+#local_video.pip-mode {
+    position: absolute;
+    width: 160px;
+    height: 100px;
+    bottom: 80px;
+    /* above controls */
+    right: 12px;
+    border-radius: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    object-fit: cover;
+}

@@ -242,7 +242,11 @@ export async function attachUserMedia(audio: boolean, video: boolean): Promise<b
         if (!localStream) return false;
         localStream.getTracks().forEach((track) => {
             if (localStream) {
-                pc.addTrack(track, localStream);
+                // pc.addTrack(track, localStream);
+                const alreadyAdded = pc.getSenders().some(s => s.track === track);
+                if (!alreadyAdded) {
+                    pc.addTrack(track, localStream);
+                }
             }
         });
 

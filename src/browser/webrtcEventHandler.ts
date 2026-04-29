@@ -87,13 +87,39 @@ function createPeerConnection(): RTCPeerConnection {
     //  receives the remote video stream and plugs it into the <video#received_video> element
     pc.ontrack = (event) => {
         const receivedVideo = document.getElementById("received_video") as HTMLVideoElement | null;
-        if (receivedVideo && event.streams && event.streams[0]) {
-            receivedVideo.srcObject = event.streams[0];
+        const localVideo = document.getElementById("local_video") as HTMLVideoElement | null;
+        if (!receivedVideo || !event.streams?.[0]) return;
+
+        const track = event.track;
+
+        if (track.kind === "video") {
+            const stream = event.streams[0];
+
+            // Screen share tracks have contentHint "detail" or "text",
+            // or we detect via label — getDisplayMedia tracks are never from a camera
+            const isScreenShare = track.label.toLowerCase().includes("screen") ||
+                track.contentHint === "detail" ||
+                track.contentHint === "text";
+
+            if (isScreenShare) {
+                // Put screen share in the main big video
+                receivedVideo.srcObject = stream;
+                receivedVideo.style.objectFit = "contain"; // don't crop screen content
+
+                // Push local camera to PiP position
+                localVideo?.classList.add("pip-mode");
+            } else {
+                // Regular camera — assign normally
+                receivedVideo.srcObject = stream;
+                receivedVideo.style.objectFit = "cover";
+
+                // Restore local video from PiP if it was in PiP mode
+                localVideo?.classList.remove("pip-mode");
+            }
         }
+
         const hangupBtn = document.getElementById("HangupBtn") as HTMLButtonElement | null;
-        if (hangupBtn) {
-            hangupBtn.disabled = false;
-        }
+        if (hangupBtn) hangupBtn.disabled = false;
     };
 
     pc.ondatachannel = (event) => {
@@ -125,6 +151,27 @@ export function attachDataChannelHandlers(dc: RTCDataChannel) {
     };
 
     dc.onmessage = (event) => {
+        try {
+            const msg = JSON.parse(event.data);
+
+            if (msg.type === "screen-share") {
+                const receivedVideo = document.getElementById("received_video") as HTMLVideoElement;
+                const localVideo = document.getElementById("local_video") as HTMLVideoElement;
+
+                if (msg.active) {
+                    receivedVideo.style.objectFit = "contain";
+                    localVideo?.classList.add("pip-mode");
+                } else {
+                    receivedVideo.style.objectFit = "cover";
+                    localVideo?.classList.remove("pip-mode");
+                }
+                return;
+            }
+        } catch(e) {
+            
+            console.error("Screen capture JSON error:", e);
+            return;
+        }
         ChatUI.appendMessage(event.data, "remote");
     };
 }
