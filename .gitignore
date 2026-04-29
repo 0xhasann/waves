@@ -6,3 +6,4 @@ build/
 .cursor
 public/index.js
 webrtc.js
+test/

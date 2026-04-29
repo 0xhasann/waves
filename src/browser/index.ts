@@ -20,12 +20,14 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 
 import { ChatUI } from "./chat";
 import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream } from "./dom";
+import { recordStream } from "./recordStream";
+import { shareScreen } from "./shareScreen";
 import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
 import { WebSocketHandler } from "./websocketHandler";
 
 const ws = WebSocketHandler.getInstance();
 document.getElementById("loginBtn")?.addEventListener("click", login);
-document.getElementById("hangup-button")?.addEventListener("click", hangUpCall);
+document.getElementById("HangupBtn")?.addEventListener("click", hangUpCall);
 document.querySelectorAll(".controls button").forEach(btn => {
     btn.addEventListener("click", () => {
         btn.classList.toggle("active");
@@ -34,7 +36,7 @@ document.querySelectorAll(".controls button").forEach(btn => {
 
 let audioEnabled = true;
 let videoEnabled = true;
-let shareBtnEnabled = false;
+
 
 const micButton = document.getElementById("micBtn") as HTMLButtonElement | null;
 
@@ -63,19 +65,17 @@ videoButton?.addEventListener("click", () => {
 
 });
 
-const shareBtn = document.getElementById("share-button") as HTMLButtonElement | null;
+// Record Stream 
+const recordBtn = document.getElementById("recordBtn") as HTMLDivElement | null;
+recordBtn?.addEventListener("click", async () => {
+    await recordStream();
+});
 
-shareBtn?.addEventListener("click", () => {
-    shareBtnEnabled = !shareBtnEnabled
-    shareBtn.classList.toggle("active");
-    const tooltip = shareBtn?.querySelector(".tooltip");
-    if (tooltip) {
-        tooltip.textContent = shareBtnEnabled ? "Start Sharing" : "Stop Sharing";
-    }
-    shareBtn.classList.toggle("active");
-
-})
-
+// Share Screen
+const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement | null;
+shareBtn?.addEventListener("click", async () => {
+    await shareScreen();
+});
 
 ChatUI.init();
 const pc = RTCPeerConnectionHandler.pc;

@@ -12,7 +12,9 @@
 </head>
 
 <body>
-    <div id="app">
+    <!-- frontend app -->
+    <div id="app" autoplay>
+        <!-- login container -->
         <div class="container">
             <div class="infobox">
                 <p id="login-form">
@@ -25,6 +27,7 @@
             </div>
             <ul id="user-list"></ul>
         </div>
+        <!-- // video container  -->
         <div id="camerabox">
             <video id="received_video" autoplay></video>
             <span id="remote-name-label" class="video-label"></span>
@@ -40,18 +43,23 @@
                     <img src="cam_video.png" alt="" />
                     <span class="tooltip">Stop Video</span>
                 </button>
-                <button id="share-button" style="display:none;" type="button" aria-label="Start Sharing Screen">
+                <button id="shareBtn" style="display:none;" type="button" aria-label="Start Sharing Screen">
                     <img src="share.webp" alt="" />
                     <span class="tooltip">Start Sharing</span>
                 </button>
 
-                <button id="hangup-button" class="active" style="display:none;" type="button" aria-label="Hang Up">
+                <button id="recordBtn" type="button"  style="display:none;" aria-label="Recording Call">
+                    <img src="rec.png" alt="">
+                    <span class="tooltip">Start Recording</span>
+                </button>
+
+                <button id="HangupBtn" class="active" style="display:none;" type="button" aria-label="Hang Up">
                     <img src="call.png" alt="" />
                     <span class="tooltip">Hang Up</span>
                 </button>
             </div>
-
         </div>
+        <!-- // chat container  -->
         <div id="chat-container">
             <div id="chat-header">
                 <div id="chat-user">Chat</div>
@@ -66,8 +74,30 @@
                 </button>
             </div>
         </div>
+        <!-- record stream -->
+        <div class="popup" id="recordingPopup" style="display:none;">
+            <h3 class="popup-title">Recording Complete</h3>
 
-    </div>
+            <p class="popup-meta">
+                Duration: <b id="duration"></b>
+                &nbsp;·&nbsp;
+                Size: <b id="size"></b>
+            </p>
+
+            <div class="popup-actions">
+                <a id="popupDownload" class="btn download" download="screen-recording.webm">
+                    ⬇️ Download
+                </a>
+
+                <button id="popupClose" class="btn discard">
+                    ❌ Discard
+                </button>
+            </div>
+        </div>
+
+        <div id="recordingBackdrop" class="backdrop" style="display:none;"></div>
+
+
     </div>
 </body>
 
