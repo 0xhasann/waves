@@ -67,7 +67,7 @@ export async function shareScreen() {
         return;
     }
 
-    // Attach onended BEFORE replacing the track
+    // Attach onended before replacing the track
     screenTrack.onended = () => stopSharing();
 
     console.log("Senders:", pc.getSenders());

@@ -104,7 +104,7 @@ function createPeerConnection(): RTCPeerConnection {
             if (isScreenShare) {
                 // Put screen share in the main big video
                 receivedVideo.srcObject = stream;
-                receivedVideo.style.objectFit = "contain"; // don't crop screen content
+                receivedVideo.style.objectFit = "contain"; 
 
                 // Push local camera to PiP position
                 localVideo?.classList.add("pip-mode");
