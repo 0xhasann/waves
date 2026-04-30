@@ -244,7 +244,7 @@ h2 {
     height: 400px;
     max-height: 420px;
     flex-direction: column;
-    background-image: url("bg-img.jpg");
+    background-image: url("background-img.jpg");
     border: 1px solid #ccc;
     border-radius: 12px;
     overflow: hidden;
