@@ -37,7 +37,7 @@ export function setRemoteNameLabel(remoteName: string) {
     }
     
     if (btn) {
-        btn.style.display = "block";
+        btn.style.display = "flex";
     }
     if (header) header.textContent = `Chat with ${remoteName}`;
     remoteLabel.textContent = remoteName;
@@ -57,7 +57,7 @@ export function login() {
     loginForm.style.display = "none";
 
     welcomeText.textContent = `Welcome To Waves, ${name}!`;
-    welcomeText.style.display = "block";
+    welcomeText.style.display = "flex";
     const localLabel = document.getElementById("local-name-label") as HTMLSpanElement;
     localLabel.textContent = name;
     if (!name) {
@@ -209,6 +209,14 @@ export function hangUpCall() {
     }
     enableCallbutton();
     disableRemoteNameLabel();
+
+    const loginPage = document.querySelector(".container");
+    if (loginPage)
+        loginPage.classList.add('active');
+
+    document.getElementById("camerabox")?.classList.remove("active");
+    document.getElementById("chat-container")?.classList.remove("active");
+    document.querySelector(".container")?.classList.remove("active");
 }
 
 // gets camera/mic, adds tracks to the peer connection
@@ -216,11 +224,17 @@ export async function attachUserMedia(audio: boolean, video: boolean): Promise<b
     const pc = RTCPeerConnectionHandler.pc;
     const shareBtn = document.getElementById("shareBtn");
     if (shareBtn)
-        shareBtn.style.display = "block";
+        shareBtn.style.display = "flex";
 
     const recordBtn = document.getElementById("recordBtn");
     if (recordBtn)
-        recordBtn.style.display = "block";
+        recordBtn.style.display = "flex";
+
+    const chatToggleBtn = document.getElementById("chatToggleBtn");
+    if (chatToggleBtn) {
+        chatToggleBtn.style.display = "flex";
+        chatToggleBtn.style.removeProperty('display');
+    }
 
     try {
         // Always acquire both tracks on first stage

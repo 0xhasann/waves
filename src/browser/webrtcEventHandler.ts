@@ -152,26 +152,37 @@ export function attachDataChannelHandlers(dc: RTCDataChannel) {
 
     dc.onmessage = (event) => {
         try {
+
             const msg = JSON.parse(event.data);
 
-            if (msg.type === "screen-share") {
-                const receivedVideo = document.getElementById("received_video") as HTMLVideoElement;
-                const localVideo = document.getElementById("local_video") as HTMLVideoElement;
+            switch (msg.type) {
+                case "screen-share":
+                    const receivedVideo = document.getElementById("received_video") as HTMLVideoElement;
+                    const localVideo = document.getElementById("local_video") as HTMLVideoElement;
 
-                if (msg.active) {
-                    receivedVideo.style.objectFit = "contain";
-                    localVideo?.classList.add("pip-mode");
-                } else {
-                    receivedVideo.style.objectFit = "cover";
-                    localVideo?.classList.remove("pip-mode");
-                }
-                return;
+                    if (msg.active) {
+                        receivedVideo.style.objectFit = "contain";
+                        localVideo?.classList.add("pip-mode");
+                    } else {
+                        receivedVideo.style.objectFit = "cover";
+                        localVideo?.classList.remove("pip-mode");
+                    }
+                    break;
+                case "chat":
+                    ChatUI.appendMessage(msg.data, "remote");
+                    break;
+                default:
+                    console.error("no valid type found", msg.type);
+                    break;
+
+
+
             }
         } catch(e) {
-            
             console.error("Screen capture JSON error:", e);
             return;
         }
-        ChatUI.appendMessage(event.data, "remote");
+       
+
     };
 }

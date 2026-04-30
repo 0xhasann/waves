@@ -1,36 +1,63 @@
-/* video */
+/* ── Reset & Base ── */
+html,
 body {
     margin: 0;
-    height: 100vh;
+    padding: 0;
+    height: 100%;
+    font: 14px "Open Sans", "Arial", sans-serif;
+}
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
     background: #f0f2f5;
 }
 
+h2 {
+    margin-bottom: 4px;
+}
+
+/* ── App Layout ── */
 #app {
+    width: 100vw;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    max-width: 1200px;
-    width: 100%;
     justify-content: center;
     gap: 16px;
     padding: 10px;
+    max-width: 1200px;
+    box-sizing: border-box;
 }
 
-#camerabox {
+/* ── Call Wrapper ── */
+#call-wrapper {
     position: relative;
-    height: 480px;
-    width: 100%;
-    max-width: 800px;
-    aspect-ratio: 4 / 3;
+    display: inline-block;
+}
+
+/* ── Camera Box ── */
+#camerabox {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 90vh;
+    width: 90vw;
     background: rgb(146, 158, 175);
     border-radius: 8px;
     overflow: hidden;
+    z-index: 1000;
 }
 
+#camerabox.active {
+    display: block;
+}
+
+/* ── Video Elements ── */
 #received_video {
     width: 100%;
     height: 100%;
@@ -47,17 +74,22 @@ body {
     width: 25%;
     max-width: 180px;
     height: auto;
+    transition: all 0.3s ease;
 }
 
-.video-label.remote {
-    left: 8px;
+#local_video.pip-mode {
+    position: absolute;
+    width: 160px;
+    height: 100px;
+    bottom: 80px;
+    right: 12px;
+    border-radius: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    object-fit: cover;
 }
 
-.video-label.local {
-    right: 8px;
-    left: auto;
-}
-
+/* ── Video Labels ── */
 .video-label {
     position: absolute;
     bottom: 8px;
@@ -69,6 +101,11 @@ body {
     border-radius: 999px;
 }
 
+.video-label.remote {
+    left: 8px;
+}
+
+.video-label.local,
 .local-label {
     bottom: 20px;
     right: 20px;
@@ -80,17 +117,143 @@ body {
     border-radius: 999px;
 }
 
-/* chat */
-
-#chat-container {
-    height: 300px;
+/* ── Controls Bar ── */
+.controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    flex-direction: column;
-    border: 1px solid #ccc;
-    font-family: sans-serif;
-    background: #efeae2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(250, 250, 250, 0.6);
+    padding: 10px 20px;
+    border-radius: 50px;
+    z-index: 1000;
+    max-width: calc(100% - 40px);
+    box-sizing: border-box;
+}
+
+.controls button {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    margin: 0 !important;
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.5);
+    transition: background 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+}
+
+.controls button[style*="display: none"],
+.controls button[style*="display:none"] {
+    display: none !important;
+}
+
+.controls button:hover {
+    background: rgba(250, 250, 250, 0.6);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.controls button.active {
+    background: red;
+}
+
+.controls button.active:hover {
+    background: #b30000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.controls button.active img {
+    filter: brightness(0) invert(1);
+}
+
+.controls img {
+    width: 20px;
+    height: 20px;
+}
+
+/* ── Individual Control Buttons ── */
+#chatToggleBtn {
+    order: 5;
+    border-radius: 50% !important;
+    background: rgba(60, 60, 60, 0.85) !important;
+    border: none !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+#chatToggleBtn img {
+    width: 22px !important;
+    height: 22px !important;
+    object-fit: contain !important;
+}
+
+#HangupBtn {
+    order: 6;
+}
+
+#recordBtn img {
+    width: 34px;
+    height: 34px;
+}
+
+/* ── Tooltip ── */
+.tooltip {
+    position: absolute;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.controls button:hover .tooltip {
+    opacity: 1;
+}
+
+/* ── Chat Container ── */
+#chat-container {
+    display: none;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 30;
     width: 100%;
     max-width: 400px;
+    height: 300px;
+    max-height: 420px;
+    flex-direction: column;
+    background-image: url("bg-img.jpg");
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    font-family: sans-serif;
+}
+
+#chat-container.active {
+    display: flex;
 }
 
 #chat-header {
@@ -100,54 +263,7 @@ body {
     font-weight: 600;
 }
 
-#messages {
-    flex: 1;
-    overflow-y: auto;
-}
-
-.chat-input-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    background: #f0f0f0;
-}
-
-#chat-input {
-    flex: 1;
-    height: 40px;
-    border-radius: 20px;
-    border: none;
-    outline: none;
-    background: #ffffff;
-    padding: 0 14px;
-    font-size: 14px;
-    color: #333;
-}
-
-#chat-input::placeholder {
-    color: #aaa;
-}
-
-#send-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #075e54;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-
-#send-btn:hover {
-    background: #053d36;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
+/* ── Messages ── */
 #messages {
     flex: 1;
     overflow-y: auto;
@@ -183,11 +299,49 @@ body {
     margin-top: 4px;
 }
 
-#input-area {
+/* ── Chat Input ── */
+.chat-input-container {
     display: flex;
-    padding: 8px;
-    background: #f0f0f0;
     align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: #f0f0f0;
+}
+
+#chat-input {
+    flex: 1;
+    height: 40px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    background: #ffffff;
+    padding: 0 14px;
+    font-size: 14px;
+    color: #333;
+}
+
+#chat-input::placeholder {
+    color: #aaa;
+}
+
+/* ── Send Button ── */
+#send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #075e54;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+#send-btn:hover:not(:disabled) {
+    background: #053d36;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 #send-btn:disabled {
@@ -197,89 +351,7 @@ body {
     pointer-events: none;
 }
 
-#send-btn:not(:disabled) {
-    background: #075e54;
-    cursor: pointer;
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.controls {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-
-    display: flex;
-    gap: 12px;
-}
-
-/* base button */
-.controls button {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(255, 255, 255, 0.5);
-    transition: background 0.2s ease, transform 0.1s ease;
-    position: relative;
-}
-
-.controls img {
-    width: 20px;
-    height: 20px;
-}
-
-.emoji {
-    font-size: 18px;
-}
-
-.controls button:hover {
-    background: rgba(250, 250, 250, 0.6);
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.controls button.active {
-    background: red;
-}
-
-.controls button.active:hover {
-    background: #b30000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.controls button.active img {
-    filter: brightness(0) invert(1);
-}
-
-.tooltip {
-    position: absolute;
-    bottom: 48px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.75);
-    color: white;
-    font-size: 12px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-}
-
-.controls button:hover .tooltip {
-    opacity: 1;
-}
-
-/* // download and discard popup */
+/* ── Recording Popup ── */
 .backdrop {
     position: fixed;
     inset: 0;
@@ -338,8 +410,8 @@ body {
     cursor: pointer;
     border: none;
     text-decoration: none;
-    transition: transform 0.15s ease, opacity 0.15s ease;
     white-space: nowrap;
+    transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .popup .btn:hover {
@@ -357,88 +429,7 @@ body {
     color: #ffffff;
 }
 
-/* // record media */
-
-body {
-    font:
-        14px "Open Sans",
-        "Arial",
-        sans-serif;
-}
-
-video {
-    margin-top: 2px;
-    border: 1px solid black;
-}
-
-.button {
-    cursor: pointer;
-    display: block;
-    width: 160px;
-    border: 1px solid black;
-    font-size: 16px;
-    text-align: center;
-    padding-top: 2px;
-    padding-bottom: 4px;
-    color: white;
-    background-color: darkgreen;
-    text-decoration: none;
-}
-
-h2 {
-    margin-bottom: 4px;
-}
-
-.videoleft {
-    margin-right: 10px;
-    float: left;
-    width: 160px;
-    padding: 0px;
-}
-
-.rightchat {
-    margin-left: 10px;
-    float: left;
-    width: 160px;
-    padding: 0px;
-}
-
-.bottom {
-    clear: both;
-    padding-top: 10px;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-}
-
-#app {
-    width: 100vw;
-    height: 100vh;
-}
-
-#recordBtn img {
-    width: 34px;
-    height: 34px;
-    padding-bottom: 0px;
-}
-
-#local_video {
-    transition: all 0.3s ease;
-}
-
-#local_video.pip-mode {
-    position: absolute;
-    width: 160px;
-    height: 100px;
-    bottom: 80px;
-    /* above controls */
-    right: 12px;
-    border-radius: 8px;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    object-fit: cover;
+/* ── Login / User List ── */
+.container.active {
+    display: none;
 }

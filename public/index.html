@@ -27,53 +27,66 @@
             </div>
             <ul id="user-list"></ul>
         </div>
-        <!-- // video container  -->
-        <div id="camerabox">
-            <video id="received_video" autoplay></video>
-            <span id="remote-name-label" class="video-label"></span>
-            <video id="local_video" autoplay muted></video>
-            <span id="local-name-label" class="video-label local-label"></span>
-            <div class="controls">
+        <div id="call-wrapper">
+            <!-- // video container  -->
+            <div id="camerabox">
 
-                <button id="micBtn" type="button" aria-label="Mute microphone">
-                    <img src="mic.png" alt="" />
-                    <span class="tooltip">Mute</span>
-                </button>
-                <button id="videoBtn" type="button" aria-label="Turn camera off">
-                    <img src="cam_video.png" alt="" />
-                    <span class="tooltip">Stop Video</span>
-                </button>
-                <button id="shareBtn" style="display:none;" type="button" aria-label="Start Sharing Screen">
-                    <img src="share.webp" alt="" />
-                    <span class="tooltip">Start Sharing</span>
-                </button>
+                <!-- // chat container  -->
+                <div id="chat-container">
+                    <div id="chat-header">
+                        <div id="chat-user">Chat</div>
+                    </div>
+                    <div id="messages"></div>
+                    <div class="chat-input-container">
+                        <input id="chat-input" disabled type="text" placeholder="Type message..." />
+                        <button id="send-btn" type="button" disabled aria-label="Send message">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                            <path d="M2 21l21-9L2 3v7l15 2-15 2z" />
+                        </svg>
 
-                <button id="recordBtn" type="button"  style="display:none;" aria-label="Recording Call">
-                    <img src="rec.png" alt="">
-                    <span class="tooltip">Start Recording</span>
-                </button>
+                        </button>
+                    </div>
+                </div>
 
-                <button id="HangupBtn" class="active" style="display:none;" type="button" aria-label="Hang Up">
-                    <img src="call.png" alt="" />
-                    <span class="tooltip">Hang Up</span>
-                </button>
+
+                <video id="received_video" autoplay></video>
+                <span id="remote-name-label" class="video-label"></span>
+                <video id="local_video" autoplay muted></video>
+                <span id="local-name-label" class="video-label local-label"></span>
+                <div class="controls">
+
+                    <button id="micBtn" type="button" aria-label="Mute microphone">
+                        <img src="mic.png" alt="" />
+                        <span class="tooltip">Mute</span>
+                    </button>
+                    <button id="videoBtn" type="button" aria-label="Turn camera off">
+                        <img src="cam_video.png" alt="" />
+                        <span class="tooltip">Stop Video</span>
+                    </button>
+                    <button id="shareBtn" style="display:none;" type="button" aria-label="Start Sharing Screen">
+                        <img src="share.webp" alt="" />
+                        <span class="tooltip">Start Sharing</span>
+                    </button>
+
+                    <button id="recordBtn" type="button" style="display:none;" aria-label="Recording Call">
+                        <img src="rec.png" alt="">
+                        <span class="tooltip">Start Recording</span>
+                    </button>
+                    <button id="chatToggleBtn" type="button" aria-label="Toggle Chat">
+                        <img src="chatt.png" alt="">
+                        <span class="tooltip">Chat</span>
+                    </button>
+
+                    <button id="HangupBtn" class="active" style="display:none;" type="button" aria-label="Hang Up">
+                        <img src="call.png" alt="" />
+                        <span class="tooltip">Hang Up</span>
+                    </button>
+                   
+
+                </div>
             </div>
         </div>
-        <!-- // chat container  -->
-        <div id="chat-container">
-            <div id="chat-header">
-                <div id="chat-user">Chat</div>
-            </div>
-            <div id="messages"></div>
-            <div class="chat-input-container">
-                <input id="chat-input" disabled type="text" placeholder="Type message..." />
-                <button id="send-btn" type="button" disabled aria-label="Send message"></button>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                    <path d="M2 21l21-9L2 3v7l15 2-15 2z" />
-                </svg>
-                </button>
-            </div>
-        </div>
+
         <!-- record stream -->
         <div class="popup" id="recordingPopup" style="display:none;">
             <h3 class="popup-title">Recording Complete</h3>

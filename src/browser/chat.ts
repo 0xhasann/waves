@@ -20,7 +20,7 @@ export class ChatUI {
             if (!message) return;
 
             this.appendMessage(message, "self");
-            RTCPeerConnectionHandler.dataChannel?.send(message);
+            RTCPeerConnectionHandler.dataChannel?.send(JSON.stringify({ type: "chat", data: message }));
 
             input.value = "";
         };
