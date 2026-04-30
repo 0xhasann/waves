@@ -233,7 +233,7 @@ export async function attachUserMedia(audio: boolean, video: boolean): Promise<b
     const chatToggleBtn = document.getElementById("chatToggleBtn");
     if (chatToggleBtn) {
         chatToggleBtn.style.display = "flex";
-        chatToggleBtn.style.removeProperty('display');
+        // chatToggleBtn.style.removeProperty('display');
     }
 
     try {
