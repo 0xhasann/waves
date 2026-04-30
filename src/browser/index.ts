@@ -105,8 +105,19 @@ ws.on("accept", async ({ name }) => {
         return;
     }
     setRemoteNameLabel(name);
-});
+    const camerabox = document.getElementById("camerabox") as HTMLElement | null;
+    camerabox?.classList.add("active");
+    const loginPage = document.querySelector(".container");
+    if (loginPage)
+        loginPage.classList.add('active');
 
+});
+const chatToggleBtn = document.getElementById("chatToggleBtn");
+const chatContainer = document.getElementById("chat-container");
+
+chatToggleBtn?.addEventListener("click", () => {
+    chatContainer?.classList.toggle("active");
+});
 
 ws.on("video-offer", async (event) => {
     ws.on("hang-up", () => {
@@ -129,6 +140,11 @@ ws.on("video-offer", async (event) => {
     await pc.setLocalDescription(answer);
     if (!pc.localDescription) return;
     ws.videoAnswer(pc.localDescription);
+    const camerabox = document.getElementById("camerabox") as HTMLElement | null;
+    camerabox?.classList.add("active");
+    const loginPage = document.querySelector(".container");
+    if(loginPage)
+        loginPage.classList.add('active');
 });
 
 
