@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "bun run --watch src/server/index.ts",
     "start": "bun run src/server/index.ts",
+    "migrate": "bun run src/db/migrate.ts",
     "build:browser:dev": "bun build ./src/browser/index.ts --outfile public/index.js --watch --target browser",
     "build:browser:prod": "bun build ./src/browser/index.ts --outfile public/index.js --target browser"
   },

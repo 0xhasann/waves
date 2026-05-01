@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { readFile, existsSync } from "fs";
 import { extname, join } from "path";
+import { authRoutes } from "../models/auth/auth.route";
 
 export const PORT = process.env.PORT || 3000;
 
@@ -47,11 +48,63 @@ export const log = (text: string): void => {
 // if req.url is '/' then fetches index.html under public directory file path
 // else set the file path as req.url as suffix on path under public directory.
 // if filepath doesn't exist we send 404
-export const handleWebRequest = (
+export const handleWebRequest = async (
     req: IncomingMessage,
     res: ServerResponse
-): void => {
+): Promise<void> => {
     log(`Received request for ${req.url}`);
+    // backend APIs for user flow
+    if (req.url?.startsWith("/api")) {
+
+        const body =
+            req.method !== "GET" && req.method !== "HEAD"
+                ? await new Promise<string>((resolve) => {
+                    let data = ""
+                    req.on("data", chunk => (data += chunk))
+                    req.on("end", () => resolve(data))
+                })
+                : undefined
+
+        const request = new Request(`http://localhost:3000${req.url}`, {
+            method: req.method,
+            headers: req.headers as any,
+            body,
+        });
+
+        const response = await authRoutes(request);
+
+        if (response) {
+            const headers: Record<string, string> = {}
+            response.headers.forEach((value, key) => {
+                headers[key] = value
+            })
+
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Access-Control-Allow-Headers", "*");
+            res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+
+            if (req.method === "OPTIONS") {
+                res.writeHead(200);
+                res.end();
+                return;
+            }
+
+            
+            res.writeHead(
+                response.status,
+                headers
+            );
+
+            const buffer = Buffer.from(await response.arrayBuffer());
+            res.end(buffer);
+            return;
+        }
+
+        res.writeHead(404);
+        res.end("API Route Not Found");
+        return;
+    }
+
     const filePath = req.url === "/"
         ? join(process.cwd(), "public", "index.html")
         : join(process.cwd(), "public", req.url!);
