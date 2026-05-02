@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS message_status (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  message_id TEXT NOT NULL,
-  user_id TEXT NOT NULL,
+  message_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
   msg_status TEXT NOT NULL, -- 'sent' | 'delivered' | 'read'
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
 

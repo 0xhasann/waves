@@ -7,3 +7,4 @@ build/
 public/index.js
 webrtc.js
 test/
+wavesChat.db

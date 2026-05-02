@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS messages (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  conversation_id TEXT NOT NULL,
-  sender_id TEXT NOT NULL,
+  conversation_id INTEGER NOT NULL,
+  sender_id INTEGER NOT NULL,
 
   type TEXT NOT NULL, -- 'text' | 'image' | 'video'
   content TEXT,       -- text or file URL

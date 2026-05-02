@@ -10,7 +10,6 @@ const dir = "./migrations";
 
 export function runMigration() {
 
-    // create migrations table
     database.run(`
   CREATE TABLE IF NOT EXISTS migrations (
     id TEXT PRIMARY KEY,
@@ -23,13 +22,11 @@ export function runMigration() {
         return createHash("sha256").update(content).digest("hex");
     }
 
-    // read applied migrations
     const applied = new Map(
         database.query("SELECT id, checksum FROM migrations").all()
             .map((r: any) => [r.id, r.checksum])
     );
 
-    // read files
     const files = readdirSync(dir)
         .filter(f => f.endsWith(".sql"))
         .sort();

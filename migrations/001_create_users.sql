@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id TEXT NOT NULL UNIQUE,
-  user_name TEXT NOT NULL UNIQUE,
-  mobile_no TEXT,
-  email_id TEXT,
+  username TEXT NOT NULL UNIQUE,
+  user_pass TEXT NOT NULL,
+  mobile_no TEXT UNIQUE,
+  email_id TEXT UNIQUE,
   avatar_url TEXT,
   first_name TEXT,
   last_name TEXT,

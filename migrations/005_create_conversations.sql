@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS conversations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user1_id TEXT NOT NULL,
-  user2_id TEXT NOT NULL,
+  user1_id INTEGER NOT NULL,
+  user2_id INTEGER NOT NULL,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
   UNIQUE (user1_id, user2_id),
