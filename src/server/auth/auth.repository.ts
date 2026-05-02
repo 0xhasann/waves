@@ -2,7 +2,8 @@ import { scryptSync, randomBytes } from "crypto";
 
 import { database } from "../../db/utils";
 import type { DB } from "../../db/utils";
-import type { CreateUserInput, User } from "../../shared/types";
+import type {  User } from "../../shared/types";
+import type { SignupInput } from "./auth.schema";
 
 export const findByUsername = (username: string): User | undefined => {
     return database
@@ -11,7 +12,7 @@ export const findByUsername = (username: string): User | undefined => {
 };
 
 
-export const createUser = (db: DB, data: CreateUserInput) => {
+export const createUser = (db: DB, data: SignupInput) => {
 
     const salt = randomBytes(16).toString("hex");
     const hash = scryptSync(data.password, salt, 64).toString("hex");
@@ -33,10 +34,10 @@ export const createUser = (db: DB, data: CreateUserInput) => {
         data.email ?? null,
         encryptedPassword,
         data.username,
-        data.first_name ?? null,
-        data.last_name ?? null,
-        data.avatar_url ?? null,
-        data.mobile_no ?? null
+        data.firstName ?? null,
+        data.lastName ?? null,
+        data.avatarURL ?? null,
+        data.mobileNo ?? null
     );
 
     return result.lastInsertRowid;
