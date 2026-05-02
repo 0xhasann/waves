@@ -1,9 +1,8 @@
-import { scryptSync, randomBytes } from "crypto";
 import { database } from "../../db/utils";
 import * as repo from "./auth.repository";
 import type { SigninInput, SignupInput } from "./auth.schema";
 import { AppError } from "../units/app.errors";
-import { verifyPassword } from "../middlewares/validate";
+import { verifyPassword } from "../units/validate";
 
 
 

@@ -1,10 +1,9 @@
-// app.ts
 import "express-async-errors";
 import express from "express";
 import authRoutes from "./auth/auth.routes";
-import { notFound } from "./middlewares/notFound";
-import { errorHandler } from "./middlewares/errorHandler";
 import path from "node:path";
+import { notFound } from "./units/notFound";
+import { errorHandler } from "./units/errorHandler";
 
 
 export const app = express();

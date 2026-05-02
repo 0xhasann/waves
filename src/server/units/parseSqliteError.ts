@@ -1,4 +1,3 @@
-// utils/parseSqliteError.ts
 export const parseSqliteError = (msg: string) => {
     if (msg.includes("users.username")) {
         return "Username already exists";

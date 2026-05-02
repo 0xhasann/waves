@@ -2,25 +2,7 @@ import { scryptSync, randomBytes } from "crypto";
 
 import { database } from "../../db/utils";
 import type { DB } from "../../db/utils";
-
-type CreateUserInput = {
-    email?: string;
-    password: string;
-    username: string;
-    first_name?: string | null;
-    last_name?: string | null;
-    avatar_url?: string | null;
-    mobile_no?: string | null;
-};
-
-export type User = {
-    id: number;
-    username: string;
-    user_pass: string;
-    email_id?: string | null;
-    mobile_no?: string | null;
-};
-
+import type { CreateUserInput, User } from "../../shared/types";
 
 export const findByUsername = (username: string): User | undefined => {
     return database

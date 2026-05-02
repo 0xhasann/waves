@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import * as service from "./auth.service";
-import { sendResponse, type ApiResponse } from "../middlewares/apiResponse";
+import { sendResponse } from "../units/apiResponse";
 
 export const signup = async (req: Request, res: Response) => {
     const user = await service.signup(req.body);
