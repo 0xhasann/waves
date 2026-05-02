@@ -1,15 +1,15 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { createServer } from "http";
-import { handleWebRequest, log, PORT } from "./utils";
 import { WebSocketMessageSchema, type WebSocketMessage } from "../shared";
 import type { Name } from "../shared/chatmessage";
 import * as z from "zod";
+import { app } from "./app";
+import { log } from "../config/logger";
 //create a http server
 // the singaling server
-const webServer = createServer((req, res) => {
-    handleWebRequest(req, res);
-});
+const webServer = createServer(app);
 //listen http req and sends http res via PORT
+const PORT = process.env.PORT || 3000;
 webServer.listen(PORT, () => {
     log(`Server is listening on http://localhost:${PORT}`);
 });
