@@ -10,3 +10,11 @@ export type User = {
     created_at: string | null;
     updated_at: string | null;
 };
+
+export const RequestStatus = {
+    pending: "pending",
+    accepted: "accepted",
+    rejected: "rejected",
+} as const;
+
+export type RequestStatus = typeof RequestStatus[keyof typeof RequestStatus];

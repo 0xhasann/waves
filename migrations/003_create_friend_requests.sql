@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS friend_requests (
   created_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
   updated_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
 
+  UNIQUE (user1_id, user2_id),
   CHECK (sender_id != receiver_id),
 
   FOREIGN KEY (sender_id) REFERENCES users(id),

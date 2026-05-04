@@ -12,7 +12,7 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
     sendResponse(res, 200, result, "Request has been sent");
 };
 
-export const acceptFriendRequest = async (req: Request, res: Response) => {
-    const result = await service.acceptFriendRequest(req.body);
-    sendResponse(res, 200, result, "Request has been accepted");
+export const processFriendRequest = async (req: Request, res: Response) => {
+    const result = await service.processFriendRequest(req.body);
+    sendResponse(res, 200, result, "Request has been processed");
 };
