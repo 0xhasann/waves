@@ -14,5 +14,10 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
 
 export const processFriendRequest = async (req: Request, res: Response) => {
     const result = await service.processFriendRequest(req.body);
-    sendResponse(res, 200, result, "Request has been processed");
+    sendResponse(res, 200, result, "Request has been processed Successfully");
+};
+
+export const unfollowFriend = async (req: Request, res: Response) => {
+    const result = await service.unfollowFriend(req.body);
+    sendResponse(res, 200, result, "Request has been processed Successfully");
 };

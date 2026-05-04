@@ -16,5 +16,7 @@ export const RequestStatus = {
     accepted: "accepted",
     rejected: "rejected",
 } as const;
-
+export interface FriendRow {
+  id: number;
+}
 export type RequestStatus = typeof RequestStatus[keyof typeof RequestStatus];
