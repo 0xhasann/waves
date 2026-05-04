@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS message_status (
   message_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
   msg_status TEXT NOT NULL, -- 'sent' | 'delivered' | 'read'
-  updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  created_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
+  updated_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
 
   UNIQUE (message_id, user_id),
 

@@ -22,6 +22,6 @@ export const sendFriendRequest = (query: FriendRequestSchema): number | bigint =
 export const acceptFriendRequest = (query: FriendRequestSchema): number => {
   const result  = database.
     prepare(`UPDATE friend_requests set status = ?, updated_at = ? where sender_id = ? and receiver_id = ?;`)
-    .run(query.status, now, query.sender_id, query.receiver_id);
+    .run(query.status, now(), query.sender_id, query.receiver_id);
   return result.changes;
 };

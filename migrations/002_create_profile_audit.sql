@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS  profile_audit (
   field_name TEXT NOT NULL,
   old_value TEXT,
   new_value TEXT,
-  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  created_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
+  updated_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );

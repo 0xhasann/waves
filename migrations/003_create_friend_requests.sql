@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS friend_requests (
   sender_id INTEGER NOT NULL,
   receiver_id INTEGER NOT NULL,
   status TEXT NOT NULL, -- 'pending' | 'accepted' | 'rejected'
-  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  created_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
+  updated_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
 
   CHECK (sender_id != receiver_id),
 
