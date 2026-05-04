@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS friend_requests (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
+  CHECK (sender_id != receiver_id),
+
   FOREIGN KEY (sender_id) REFERENCES users(id),
   FOREIGN KEY (receiver_id) REFERENCES users(id)
 );
