@@ -273,22 +273,3 @@ export async function attachUserMedia(audio: boolean, video: boolean): Promise<b
         return false;
     }
 }
-
-export function handleOAuthRedirect() {
-    const params = new URLSearchParams(window.location.search);
-
-    const token = params.get("token");
-    const name = params.get("name");
-
-    if (token && name) {
-      localStorage.setItem("token", token);
-      const nameInput = document.getElementById(
-        "name",
-      ) as HTMLInputElement | null;
-      if (nameInput) {
-        nameInput.value = name;
-      }
-      login(name);
-      window.history.replaceState({}, document.title, "/");
-    }
-}

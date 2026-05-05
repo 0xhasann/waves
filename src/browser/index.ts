@@ -19,7 +19,7 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
 import { ChatUI } from "./chat";
-import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream, handleOAuthRedirect } from "./dom";
+import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream } from "./dom";
 import { recordStream } from "./recordStream";
 import { shareScreen } from "./shareScreen";
 import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
@@ -31,6 +31,22 @@ document.getElementById("HangupBtn")?.addEventListener("click", hangUpCall);
 document.getElementById("googleLoginBtn")?.addEventListener("click", () => {
     window.location.href = "http://localhost:3000/auth/google";
 })
+window.addEventListener("DOMContentLoaded", async () => {
+    try {
+    const res = await fetch("http://localhost:3000/auth/google/me", {
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      console.error("Res check failed");
+    }
+    const user = await res.json();
+
+    login(user.first_name || user.username);
+  } catch (err) {
+    console.error("Auth check failed");
+  }
+});
 document.querySelectorAll(".controls button").forEach(btn => {
     btn.addEventListener("click", () => {
         btn.classList.toggle("active");
@@ -153,5 +169,3 @@ ws.on("video-offer", async (event) => {
 ws.on("call", renderIncomingCall);
 ws.on("user-list", renderUserList);
 
-// handle Redirects from backend
-handleOAuthRedirect();
