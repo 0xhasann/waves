@@ -20,3 +20,31 @@ export interface FriendRow {
   id: number;
 }
 export type RequestStatus = typeof RequestStatus[keyof typeof RequestStatus];
+
+export type Message = {
+  id: number;
+  sender_id: number;
+  type: "text";
+  content: string;
+  created_at: string;
+};
+
+export type Conversation = {
+  id: number;
+  messages: Message[];
+  updated_at: string;
+};
+
+export type FetchConversationsResponse = {
+  conversations: Conversation[];
+};
+
+export type Row = {
+  conversation_id: number;
+  updated_at: string;
+  message_id: number | null;
+  sender_id: number | null;
+  type: string | null;
+  content: string | null;
+  created_at: string | null;
+};

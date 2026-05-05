@@ -35,23 +35,27 @@ export const processRequest = (query: ProcessFriendRequestSchema): number => {
 
 export const createFriends = (query: ProcessFriendRequestSchema): number | bigint => {
   const user1_id = Math.min(query.sender_id, query.receiver_id);
-  const user2_id = Math.min(query.sender_id, query.receiver_id);
+  const user2_id = Math.max(query.sender_id, query.receiver_id);
   const result = database.
     prepare(`INSERT into friends (user1_id, user2_id) VALUES(?, ?)`)
     .run(user1_id, user2_id);
   return result.lastInsertRowid;
 };
 
-export const findFriends = (query: FriendsSchema): number => {
+export const findFriends = (query: FriendsSchema): boolean => {
+  const user1_id = Math.min(query.user1_id, query.user2_id);
+  const user2_id = Math.max(query.user1_id, query.user2_id);
   const result = database.
-    prepare(`SELECT 1 FROM friends WHERE user1_id = MIN(?,?) AND user2_id = MAX(?,?) AND deleted = 0;`)
-    .get(query.user1_id, query.user2_id, query.user1_id, query.user2_id) as FriendRow | null;
-  return result?.id ?? 0;
+    prepare(`SELECT 1 FROM friends WHERE user1_id = ? AND user2_id = ? AND deleted = 0;`)
+    .get(user1_id, user2_id) as FriendRow | null;
+  return !!result;
 }
 
 export const deleteFriends = (query: FriendsSchema): number | bigint => {
+  const user1_id = Math.min(query.user1_id, query.user2_id);
+  const user2_id = Math.max(query.user1_id, query.user2_id);
   const result = database.
-    prepare(`UPDATE friends set deleted = 1 WHERE user1_id = MIN(?,?) AND user2_id = MAX(?,?);`)
-    .run(query.user1_id, query.user2_id, query.user1_id, query.user2_id);
+    prepare(`UPDATE friends set deleted = 1 WHERE user1_id = ? AND user2_id =?;`)
+    .run(user1_id, user2_id);
   return result.changes;
 };
