@@ -17,9 +17,11 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ws": "^8.18.1",
     "axios": "^1.16.0",
+    "cookie-parser": "^1.4.7",
     "express": "4",
     "express-async-errors": "^3.1.1",
     "express-async-handler": "^1.2.0",
