@@ -1,3 +1,5 @@
+import { now } from "../server/units/timeUtils";
+
 export const log = (text: string) => {
-    console.log(`[${new Date().toLocaleTimeString()}] ${text}`);
+    console.log(`[${now()}] ${text}`);
 };
