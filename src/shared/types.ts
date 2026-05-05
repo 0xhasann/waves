@@ -1,25 +1,29 @@
+import jwt from "jsonwebtoken";
+
 export type User = {
-    id: number;
-    username: string;
-    user_pass: string;
-    mobile_no: string | null;
-    email_id: string | null;
-    avatar_url: string | null;
-    first_name: string | null;
-    last_name: string | null;
-    created_at: string | null;
-    updated_at: string | null;
+  id: number;
+  username: string | null;
+  google_id: string | null;
+  provider: string;
+  user_pass: string | null;
+  mobile_no: string | null;
+  email_id: string | null;
+  avatar_url: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export const RequestStatus = {
-    pending: "pending",
-    accepted: "accepted",
-    rejected: "rejected",
+  pending: "pending",
+  accepted: "accepted",
+  rejected: "rejected",
 } as const;
 export interface FriendRow {
   id: number;
 }
-export type RequestStatus = typeof RequestStatus[keyof typeof RequestStatus];
+export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus];
 
 export type Message = {
   id: number;
@@ -47,4 +51,8 @@ export type Row = {
   type: string | null;
   content: string | null;
   created_at: string | null;
+};
+
+export type JwtUser = jwt.JwtPayload & {
+  userId: number;
 };
