@@ -5,7 +5,7 @@ export type User = {
   username: string | null;
   google_id: string | null;
   provider: string;
-  user_pass: string | null;
+  user_pass: string;
   mobile_no: string | null;
   email_id: string | null;
   avatar_url: string | null;
