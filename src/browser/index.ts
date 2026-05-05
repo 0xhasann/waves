@@ -19,7 +19,7 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
 import { ChatUI } from "./chat";
-import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream } from "./dom";
+import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream, handleOAuthRedirect } from "./dom";
 import { recordStream } from "./recordStream";
 import { shareScreen } from "./shareScreen";
 import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
@@ -27,6 +27,10 @@ import { WebSocketHandler } from "./websocketHandler";
 
 const ws = WebSocketHandler.getInstance();
 document.getElementById("HangupBtn")?.addEventListener("click", hangUpCall);
+//Frontend -> Backend -> Google -> Redirect -> backend -> Frontend
+document.getElementById("googleLoginBtn")?.addEventListener("click", () => {
+    window.location.href = "http://localhost:3000/auth/google";
+})
 document.querySelectorAll(".controls button").forEach(btn => {
     btn.addEventListener("click", () => {
         btn.classList.toggle("active");
@@ -35,28 +39,6 @@ document.querySelectorAll(".controls button").forEach(btn => {
 
 let audioEnabled = true;
 let videoEnabled = true;
-
-const params = new URLSearchParams(window.location.search);
-
-const token = params.get("token");
-const name = params.get("name");
-
-if (token && name) {
-  localStorage.setItem("token", token);
-  const nameInput = document.getElementById("name") as HTMLInputElement | null;
-  if (nameInput) {
-    nameInput.value = name;
-  }
-  login(name); 
-  window.history.replaceState({}, document.title, "/");
-}
-
-const googleLoginBtn = document.getElementById("googleLoginBtn") as HTMLButtonElement | null;
-
-//Frontend -> Backend -> Google -> Redirect -> backend -> Frontend
-googleLoginBtn?.addEventListener("click", () => {
-    window.location.href = "http://localhost:3000/auth/google";
-});
 
 const micButton = document.getElementById("micBtn") as HTMLButtonElement | null;
 
@@ -170,3 +152,6 @@ ws.on("video-offer", async (event) => {
 
 ws.on("call", renderIncomingCall);
 ws.on("user-list", renderUserList);
+
+// handle Redirects from backend
+handleOAuthRedirect();
