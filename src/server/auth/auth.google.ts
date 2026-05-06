@@ -117,18 +117,25 @@ export const callbackRoute = async (req: Request, res: Response) => {
 
       user = (await db
         .prepare(`SELECT * FROM users WHERE id = ?;`)
-        .get(user.id)) as User | undefined;
+        .get(user.id)) as User;
     }
-
-    const token = jwt.sign(
-      { userId: (user as { id: number }).id },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" },
-    );
 
     if (!user) {
       return res.status(500).send("User creation failed");
     }
+
+    tokenCookie(user.id, req, res);
+    res.redirect("http://localhost:3000");
+    
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Auth failed");
+  }
+};
+export const tokenCookie = async(id: number, req: Request, res: Response) => {  
+    const token = jwt.sign({ userId: id }, process.env.JWT_SECRET!, {
+      expiresIn: "7d",
+    });
       
     res.cookie("auth_token", token, {
       httpOnly: true,
@@ -136,13 +143,7 @@ export const callbackRoute = async (req: Request, res: Response) => {
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
-    res.redirect("http://localhost:3000");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Auth failed");
-  }
-};
+}
 
 export const getTokenFromCookie = async (req: Request, res: Response) => {
     const token = req.cookies.auth_token;
