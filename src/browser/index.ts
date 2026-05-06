@@ -18,6 +18,7 @@ pc.createAnswer() → pc.setLocalDescription(answer) → sends video-answer
 ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
+import { signup } from "./auth.user.dom";
 import { ChatUI } from "./chat";
 import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream } from "./dom";
 import { recordStream } from "./recordStream";
@@ -52,6 +53,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     console.error("Auth check failed");
   }
 });
+// singup backend api
+const signupForm = document.getElementById(
+    "signupForm"
+) as HTMLFormElement;
+
+signupForm.addEventListener("submit", signup);
+
 document.querySelectorAll(".controls button").forEach(btn => {
     btn.addEventListener("click", () => {
         btn.classList.toggle("active");
