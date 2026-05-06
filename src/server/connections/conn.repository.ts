@@ -11,11 +11,11 @@ export const searchUser = (query: string): string[] | undefined => {
     .all(q, q, q, q, q) as string[] | undefined;
 };
 
-export const sendRequest = (query: SendFriendRequestSchema): number | bigint => {
+export const sendRequest = (query: SendFriendRequestSchema): number => {
   const result = database.
     prepare(`INSERT into friend_requests (status, sender_id, receiver_id) VALUES(?, ?, ?)`)
     .run("pending", query.sender_id, query.receiver_id);
-  return result.lastInsertRowid;
+  return result.lastInsertRowid as number;
 };
 
 export const findPendingRequest = (query: ProcessFriendRequestSchema)  => {
@@ -33,13 +33,13 @@ export const processRequest = (query: ProcessFriendRequestSchema): number => {
   return result.changes;
 };
 
-export const createFriends = (query: ProcessFriendRequestSchema): number | bigint => {
+export const createFriends = (query: ProcessFriendRequestSchema): number => {
   const user1_id = Math.min(query.sender_id, query.receiver_id);
   const user2_id = Math.max(query.sender_id, query.receiver_id);
   const result = database.
     prepare(`INSERT into friends (user1_id, user2_id) VALUES(?, ?)`)
     .run(user1_id, user2_id);
-  return result.lastInsertRowid;
+  return result.lastInsertRowid as number;
 };
 
 export const findFriends = (query: FriendsSchema): boolean => {
@@ -51,7 +51,7 @@ export const findFriends = (query: FriendsSchema): boolean => {
   return !!result;
 }
 
-export const deleteFriends = (query: FriendsSchema): number | bigint => {
+export const deleteFriends = (query: FriendsSchema): number => {
   const user1_id = Math.min(query.user1_id, query.user2_id);
   const user2_id = Math.max(query.user1_id, query.user2_id);
   const result = database.

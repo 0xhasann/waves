@@ -3,7 +3,7 @@ import type { Conversation } from "../../shared/types";
 import { prepareCreateConvQuery, prepareFetchConvQuery, prepareSendMessageQuery } from "./chat.query";
 import type { ConversationSchema, FetchConversationSchema, SendConversationMessageSchema } from "./chat.schema";
 
-export const getOrCreateConversation = (query: ConversationSchema): number | bigint => {
+export const getOrCreateConversation = (query: ConversationSchema): number => {
     const u1 = Math.min(query.user1_id, query.user2_id);
     const u2 = Math.max(query.user1_id, query.user2_id);
     const conversation = database.
@@ -21,7 +21,7 @@ export const fetchConversations = (query: FetchConversationSchema): any[] | unde
     return rows;
 };
 
-export const sendConversationMessages = (query: SendConversationMessageSchema): number | bigint => {
+export const sendConversationMessages = (query: SendConversationMessageSchema): number => {
     const result = database.prepare(prepareSendMessageQuery).run(query.conversation_id, query.sender_id, query.type, query.content);
-    return result.lastInsertRowid;
+    return result.lastInsertRowid as number;
 }
