@@ -55,7 +55,7 @@ export const deleteFriends = (query: FriendsSchema): number | bigint => {
   const user1_id = Math.min(query.user1_id, query.user2_id);
   const user2_id = Math.max(query.user1_id, query.user2_id);
   const result = database.
-    prepare(`UPDATE friends set deleted = 1 WHERE user1_id = ? AND user2_id =?;`)
-    .run(user1_id, user2_id);
+    prepare(`UPDATE friends set deleted = 1, updated_at=? WHERE user1_id = ? AND user2_id =?;`)
+    .run(now(),user1_id, user2_id);
   return result.changes;
 };
