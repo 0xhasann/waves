@@ -87,8 +87,14 @@ res.cookie("auth_token", token, {
 ### Trigger login
 
 ```js
-document.getElementById("googleLoginBtn").addEventListener("click", () => {
-  window.location.href = "http://localhost:3000/auth/google";
+const googleButtons = document.querySelectorAll(
+    ".google-btn"
+) as NodeListOf<HTMLButtonElement>;
+
+googleButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+        window.location.href = "http://localhost:3000/auth/google";
+    });
 });
 ```
 
@@ -115,7 +121,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 ```js
 function login(name) {
-  document.getElementById("googleLoginBtn").style.display = "none";
   document.getElementById("welcome-text").textContent = `Welcome ${name}`;
 }
 ```

@@ -28,9 +28,14 @@ import { WebSocketHandler } from "./websocketHandler";
 const ws = WebSocketHandler.getInstance();
 document.getElementById("HangupBtn")?.addEventListener("click", hangUpCall);
 //Frontend -> Backend -> Google -> Redirect -> backend -> Frontend
-document.getElementById("googleLoginBtn")?.addEventListener("click", () => {
+const googleButtons = document.querySelectorAll(".google-btn",) as NodeListOf<HTMLButtonElement>;
+
+googleButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
     window.location.href = "http://localhost:3000/auth/google";
-})
+  });
+});
+
 window.addEventListener("DOMContentLoaded", async () => {
     try {
     const res = await fetch("http://localhost:3000/auth/google/me", {
@@ -51,6 +56,42 @@ document.querySelectorAll(".controls button").forEach(btn => {
     btn.addEventListener("click", () => {
         btn.classList.toggle("active");
     });
+});
+
+document.getElementById("loginTab")?.addEventListener("click", () => {
+  showForm("login");
+});
+
+document.getElementById("signupTab")?.addEventListener("click", () => {
+  showForm("signup");
+});
+
+function showForm(type: "login" | "signup") {
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const buttons = document.querySelectorAll<HTMLButtonElement>(".tab-btn");
+    buttons.forEach((btn) => btn.classList.remove("active"));
+
+    if (type === "login") {
+        loginForm?.classList.add("active");
+        signupForm?.classList.remove("active");
+        buttons[0]?.classList.add("active");
+    } else {
+        signupForm?.classList.add("active");
+        loginForm?.classList.remove("active");
+        buttons[1]?.classList.add("active");
+    }
+}
+
+const loginTab = document.getElementById("loginTab");
+const signupTab = document.getElementById("signupTab");
+
+loginTab?.addEventListener("click", () => {
+  showForm("login");
+});
+
+signupTab?.addEventListener("click", () => {
+  showForm("signup");
 });
 
 let audioEnabled = true;

@@ -47,21 +47,20 @@ export function setRemoteNameLabel(remoteName: string) {
 
 // hides the form, shows welcome text, calls ws.login()
 export function login(name: string) {
-  const ws = WebSocketHandler.getInstance();
+    const ws = WebSocketHandler.getInstance();
+    const welcomeText = document.getElementById("welcome-text") as HTMLParagraphElement;
+    const authContainer = document.querySelector(".auth-container") as HTMLElement;
 
-  const welcomeText = document.getElementById("welcome-text") as HTMLParagraphElement;
-  const googleLoginBtn = document.getElementById("googleLoginBtn") as HTMLButtonElement;
+    if (authContainer) {
+    authContainer.style.display = "none";
+    }
+    if (!name) return;
+    welcomeText.textContent = `Welcome To Waves, ${name}!`;
+    welcomeText.style.display = "flex";
 
-  if (!name) return;
-
-  googleLoginBtn.style.display = "none";
-
-  welcomeText.textContent = `Welcome To Waves, ${name}!`;
-  welcomeText.style.display = "flex";
-
-  const localLabel = document.getElementById("local-name-label") as HTMLSpanElement;
-  localLabel.textContent = name;
-  ws.login(name);
+    const localLabel = document.getElementById("local-name-label") as HTMLSpanElement;
+    localLabel.textContent = name;
+    ws.login(name);
 }
 
 //builds the user list with a "Call" button per user

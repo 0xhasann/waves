@@ -14,14 +14,47 @@
 <body>
     <!-- frontend app -->
     <div id="app" autoplay>
-        <!-- login container -->
-        <div class="container">
-            <div class="infobox">
-                <input type="button" id="googleLoginBtn" value="Sign in with Google">
-                <p id="welcome-text" style="display:none;"></p>
+        <!-- auth-container -->
+            <div class="auth-container">
+                <div class="tabs">
+                    <button class="tab-btn active" id="loginTab">Login</button>
+                    <button class="tab-btn" id="signupTab">Signup</button>
+                </div>
+                <!-- login -->
+                <form id="loginForm" class="active">
+                    <!-- login with username -->
+                    <input type="text" placeholder="Username" />
+                    <input type="password" placeholder="Password" />
+                    <button type="submit" class="submit-btn">
+                        Login
+                    </button>
+                    <div class="divider">OR</div>
+                    <button type="button" id="googleLoginBtn" class="google-btn">
+                        Continue with Google
+                    </button>
+                </form>
+                <!-- signup -->
+                <form id="signupForm">
+                    <input type="text" placeholder="Username *" />
+                    <input type="text" placeholder="First Name" />
+                    <input type="text" placeholder="Last Name" />
+                    <input type="email" placeholder="Email ID" />
+                    <input type="text" placeholder="Mobile Number" />
+                    <input type="password" placeholder="Password *" />
+                    <input type="url" placeholder="Avatar URL" />
+                    <button type="submit" class="submit-btn">
+                        Create Account
+                    </button>
+                    <div class="divider">OR</div>
+                    <button type="button" id="googleLoginBtn" class="google-btn">
+                        Signup with Google
+                    </button>
+                </form>
             </div>
+            <p id="welcome-text" style="display:none;"></p>
             <ul id="user-list"></ul>
-        </div>
+
+
         <div id="call-wrapper">
             <!-- // video container  -->
             <div id="camerabox">
