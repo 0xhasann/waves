@@ -8,10 +8,10 @@ import type { FriendsSchema } from "../connections/conn.schema";
 import type { Conversation } from "../../shared/types";
 
 export const conversation = async (body: ConversationSchema) => {
-    const doesFriendExists = await friendsRepo.findFriends(body as FriendsSchema);
-    if (!doesFriendExists) {
-        throw new AppError("Record not found");
-    }
+    // const doesFriendExists = await friendsRepo.findFriends(body as FriendsSchema);
+    // if (!doesFriendExists) {
+    //     throw new AppError("Record not found");
+    // }
     const result = await repo.getOrCreateConversation(body);
 
     if (!result) {
