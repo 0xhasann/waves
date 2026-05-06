@@ -3,9 +3,6 @@ import * as repo from "./auth.repository";
 import type { SigninInput, SignupInput } from "./auth.schema";
 import { AppError } from "../units/app.errors";
 import { verifyPassword } from "../units/validate";
-import { tokenCookie } from "./auth.google";
-
-
 
 export const signup = async (body: SignupInput) => {
 
@@ -32,7 +29,6 @@ export const signin = async (body: SigninInput) => {
   if (!isValid) {
     throw new AppError("Invalid Credentials", 401);
   }
-
 
   return {id: user.id};
 
