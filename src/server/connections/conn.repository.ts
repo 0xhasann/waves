@@ -8,7 +8,6 @@ type Users = {
 };
 export const searchUser = (query: string): Users[] | undefined => {
 	const q = query;
-	console.log("queryquery ::", query);
 	const sql = `
 	SELECT id, username
 	FROM users
@@ -19,14 +18,11 @@ export const searchUser = (query: string): Users[] | undefined => {
 	   OR last_name = ?;
 `;
 
-	console.log("SQL :: ", sql);
-	console.log("PARAMS :: ", [q, q, q, q, q]);
 	const result = database
 		.prepare(
 			`SELECT id, username  FROM users WHERE email_id = ? OR mobile_no = ? OR username = ? OR first_name = ? OR last_name = ?;`,
 		)
 		.all(q, q, q, q, q) as Users[] | undefined;
-	console.log("result :: ", result);
 	return result;
 };
 

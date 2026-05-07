@@ -3,7 +3,6 @@ import * as service from "./conn.service";
 import { sendResponse } from "../units/apiResponse";
 
 export const search = async (req: Request, res: Response) => {
-	console.log("search query :: ", req.query);
 	const result = await service.search(req.query.query as string);
 	sendResponse(res, 200, result, `${result.length} users found`);
 };

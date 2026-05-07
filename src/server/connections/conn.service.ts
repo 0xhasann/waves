@@ -4,11 +4,7 @@ import * as repo from "./conn.repository"
 import { RequestStatus } from "../../shared/types";
 
 export const search = async (query: string) => {
-	console.log("search reqQuery :: ", query);
-	console.log("search reqQueryquery :: ", query);
-
 	const result = await repo.searchUser(query);
-	console.log(result);
 	if (!result) {
 		throw new AppError("User not found", 404);
 	}

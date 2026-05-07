@@ -62,7 +62,7 @@ export function login(name: string) {
 	) as HTMLSpanElement;
 	localLabel.textContent = name;
 	ws.login(name);
-	window.location.href = "/whatsapp.html";
+	window.location.href = "/conversation_timeline.html";
 }
 
 //builds the user list with a "Call" button per user

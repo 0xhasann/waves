@@ -125,7 +125,7 @@ export const callbackRoute = async (req: Request, res: Response) => {
     }
 
     tokenCookie(user.id, req, res);
-    res.redirect("http://localhost:3000/whatsapp.html");
+    res.redirect("http://localhost:3000/conversation_timeline.html");
     
   } catch (err) {
     console.error(err);
