@@ -60,7 +60,9 @@ export function login(name: string) {
 
     const localLabel = document.getElementById("local-name-label") as HTMLSpanElement;
     localLabel.textContent = name;
-    ws.login(name);
+	ws.login(name);
+	window.location.href = "/whatsapp.html";
+	
 }
 
 //builds the user list with a "Call" button per user
