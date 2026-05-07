@@ -90,7 +90,7 @@ function showDownloadPopup(blob: Blob) {
         URL.revokeObjectURL(url);
     };
 
-    backdrop.addEventListener("click", close);
+    backdrop?.addEventListener("click", close);
     popup.querySelector("#popupClose")?.addEventListener("click", close);
 
     document.body.appendChild(backdrop);

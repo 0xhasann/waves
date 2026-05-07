@@ -5,6 +5,7 @@ export class ChatUI {
     static init() {
         const input = document.getElementById("chat-input") as HTMLInputElement;
         const btn = document.getElementById("send-btn") as HTMLButtonElement;
+        if(!btn || !input) return;
         btn.disabled = true;
 
         input.addEventListener("keydown", (e) => {

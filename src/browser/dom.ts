@@ -47,22 +47,25 @@ export function setRemoteNameLabel(remoteName: string) {
 
 // hides the form, shows welcome text, calls ws.login()
 export function login(name: string) {
-    const ws = WebSocketHandler.getInstance();
-    const welcomeText = document.getElementById("welcome-text") as HTMLParagraphElement;
-    const authContainer = document.querySelector(".auth-container") as HTMLElement;
+	const ws = WebSocketHandler.getInstance();
+	// const welcomeText = document.getElementById("welcome-text") as HTMLParagraphElement;
+	const authContainer = document.querySelector(
+		".auth-container",
+	) as HTMLElement;
 
-    if (authContainer) {
-    authContainer.style.display = "none";
-    }
-    if (!name) return;
-    welcomeText.textContent = `Welcome To Waves, ${name}!`;
-    welcomeText.style.display = "flex";
+	if (authContainer) {
+		authContainer.style.display = "none";
+	}
+	if (!name) return;
+	// welcomeText.textContent = `Welcome To Waves, ${name}!`;
+	// welcomeText.style.display = "flex";
 
-    const localLabel = document.getElementById("local-name-label") as HTMLSpanElement;
-    localLabel.textContent = name;
+	const localLabel = document.getElementById(
+		"local-name-label",
+	) as HTMLSpanElement;
+	localLabel.textContent = name;
 	ws.login(name);
 	window.location.href = "/whatsapp.html";
-	
 }
 
 //builds the user list with a "Call" button per user
@@ -86,7 +89,7 @@ export function renderUserList(data: { names: Name[] }) {
 
         const callBtn = document.createElement("button");
         callBtn.textContent = "Call";
-        callBtn.addEventListener("click", () => {
+        callBtn?.addEventListener("click", () => {
             ws.call(name);
             callBtn.textContent = "Calling...";
             callBtn.disabled = true;
@@ -119,8 +122,9 @@ export function renderIncomingCall(data: { name: Name }) {
     message.textContent = `Incoming call from ${data.name}.`;
 
     const acceptBtn = document.createElement("button");
-    acceptBtn.textContent = "Accept";
-    acceptBtn.addEventListener("click", () => {
+    if(acceptBtn)
+        acceptBtn.textContent = "Accept";
+    acceptBtn?.addEventListener("click", () => {
         ws.accept(data.name);
         promptDiv.remove();
         const userListDiv = document.getElementById("user-list");
