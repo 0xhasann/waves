@@ -48,7 +48,6 @@ export function setRemoteNameLabel(remoteName: string) {
 // hides the form, shows welcome text, calls ws.login()
 export function login(name: string) {
 	const ws = WebSocketHandler.getInstance();
-	// const welcomeText = document.getElementById("welcome-text") as HTMLParagraphElement;
 	const authContainer = document.querySelector(
 		".auth-container",
 	) as HTMLElement;
@@ -57,8 +56,6 @@ export function login(name: string) {
 		authContainer.style.display = "none";
 	}
 	if (!name) return;
-	// welcomeText.textContent = `Welcome To Waves, ${name}!`;
-	// welcomeText.style.display = "flex";
 
 	const localLabel = document.getElementById(
 		"local-name-label",
