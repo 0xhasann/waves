@@ -23,7 +23,7 @@ export async function signup(e: SubmitEvent) {
 
       if (response.ok) {
         // alert("Account created successfully!");
-        window.location.href = "/";
+        window.location.href = "/whatsapp.html";
         console.log(data);
       } else {
         alert(data.message || "Signup failed");
