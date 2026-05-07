@@ -2,13 +2,32 @@ import { database } from "../../db/utils";
 import type { FriendRow, RequestStatus } from "../../shared/types";
 import { now } from "../units/timeUtils";
 import type { FriendsSchema, ProcessFriendRequestSchema, SendFriendRequestSchema } from "./conn.schema";
+type Users = {
+	id: number;
+	username: string;
+};
+export const searchUser = (query: string): Users[] | undefined => {
+	const q = query;
+	console.log("queryquery ::", query);
+	const sql = `
+	SELECT id, username
+	FROM users
+	WHERE email_id = ?
+	   OR mobile_no = ?
+	   OR username = ?
+	   OR first_name = ?
+	   OR last_name = ?;
+`;
 
-export const searchUser = (query: string): string[] | undefined => {
-  console.log(query);
-  const q = query.trim();
-  return database
-    .prepare(`SELECT id, username  FROM users WHERE email_id = ? OR mobile_no = ? OR username = ? OR first_name = ? OR last_name = ?;`)
-    .all(q, q, q, q, q) as string[] | undefined;
+	console.log("SQL :: ", sql);
+	console.log("PARAMS :: ", [q, q, q, q, q]);
+	const result = database
+		.prepare(
+			`SELECT id, username  FROM users WHERE email_id = ? OR mobile_no = ? OR username = ? OR first_name = ? OR last_name = ?;`,
+		)
+		.all(q, q, q, q, q) as Users[] | undefined;
+	console.log("result :: ", result);
+	return result;
 };
 
 export const sendRequest = (query: SendFriendRequestSchema): number => {

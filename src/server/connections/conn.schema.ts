@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export const searchSchema = z.object({
-    body: z.object({
-        query: z.string().min(1, "Search query is required"),
-    }),
+	query: z.object({
+		query: z.string().trim(),
+	}),
 });
 
 export const sendFriendRequestSchema = z.object({
@@ -30,7 +30,7 @@ export const friendsSchema = z.object({
     }),
 });
 
-export type SearchSchema = z.infer<typeof searchSchema>["body"];
+export type SearchSchema = z.infer<typeof searchSchema>["query"];
 export type ProcessFriendRequestSchema = z.infer<typeof processFriendRequestSchema>["body"];
 export type SendFriendRequestSchema = z.infer<typeof sendFriendRequestSchema>["body"];
 

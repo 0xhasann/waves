@@ -1,18 +1,19 @@
 import jwt from "jsonwebtoken";
 
 export type User = {
-  id: number;
-  username: string | null;
-  google_id: string | null;
-  provider: string;
-  user_pass: string;
-  mobile_no: string | null;
-  email_id: string | null;
-  avatar_url: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  created_at: string | null;
-  updated_at: string | null;
+	id: number;
+	username: string | null;
+	google_id: string | null;
+	provider: string;
+	user_pass: string;
+	mobile_no: string | null;
+	email_id: string | null;
+	avatar_url: string | null;
+	first_name: string | null;
+	last_name: string | null;
+	last_chat?: string;
+	created_at: string | null;
+	updated_at: string | null;
 };
 
 export const RequestStatus = {

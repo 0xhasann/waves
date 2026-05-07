@@ -3,17 +3,17 @@ import { friendsSchema, type SendFriendRequestSchema, type ProcessFriendRequestS
 import * as repo from "./conn.repository"
 import { RequestStatus } from "../../shared/types";
 
-export const search = async (body: SearchSchema) => {
-  const reqQuery = body.query.trim();
+export const search = async (query: string) => {
+	console.log("search reqQuery :: ", query);
+	console.log("search reqQueryquery :: ", query);
 
-
-  const result = await repo.searchUser(reqQuery); 
-  console.log(result)
-  if (!result) {
-    throw new AppError("User not found", 404);
-  }
-  return result;
-}
+	const result = await repo.searchUser(query);
+	console.log(result);
+	if (!result) {
+		throw new AppError("User not found", 404);
+	}
+	return result;
+};
 
 
 export const sendFriendRequest = async (body: SendFriendRequestSchema) => {

@@ -1,10 +1,13 @@
 import type { Request, Response } from "express";
 import * as service from "./conn.service";
 import { sendResponse } from "../units/apiResponse";
+import type { SearchSchema } from "./conn.schema";
 
 export const search = async (req: Request, res: Response) => {
-    const result = await service.search(req.body);
-    sendResponse(res, 200, result, `${result.length} users found`);
+	// const query = { query: req.query.query as string };
+	console.log("search query :: ", req.query);
+	const result = await service.search(req.query.query as string);
+	sendResponse(res, 200, result, `${result.length} users found`);
 };
 
 export const sendFriendRequest = async (req: Request, res: Response) => {
