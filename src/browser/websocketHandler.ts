@@ -13,6 +13,7 @@ type WsEvents = {
     "call": (data: { name: Name }) => void;
     "accept": (data: { name: Name }) => void;
     "user-list": (data: { names: Name[] }) => void;
+    "direct-message": (data: { from?: Name; content: string; conversationId?: number; sentAt?: string }) => void;
 };
 // websocket client
 // Singleton 
@@ -103,6 +104,9 @@ export class WebSocketHandler {
     call(name: Name) {
         this.send({ type: "call", data: { name } })
     }
+    directMessage(to: Name, content: string, conversationId?: number) {
+        this.send({ type: "direct-message", data: { to, content, conversationId } });
+    }
 
     videoOffer(sdp: RTCSessionDescription) {
         this.send({ type: "video-offer", data: { sdp } })
@@ -123,20 +127,28 @@ export class WebSocketHandler {
     }
 
     private handleWsMessages(event: MessageEvent) {
-        const json = this.parseWebSocketData(event.data);
-        const parsedMessage = WebSocketMessageSchema.parse(json);
-        switch (parsedMessage.type) {
-            case "video-offer":
-            case "video-answer":
-            case "new-ice-candidate":
-            case "call":
-            case "user-list":
-            case "accept":
-                this.emit(parsedMessage.type, parsedMessage.data);
-                break;
-            case "hang-up":
-                this.emit("hang-up");
-                break;
+        try {
+            const json = this.parseWebSocketData(event.data);
+            if (json === null) {
+                return;
+            }
+            const parsedMessage = WebSocketMessageSchema.parse(json);
+            switch (parsedMessage.type) {
+                case "video-offer":
+                case "video-answer":
+                case "new-ice-candidate":
+                case "call":
+                case "user-list":
+                case "accept":
+                case "direct-message":
+                    this.emit(parsedMessage.type, parsedMessage.data);
+                    break;
+                case "hang-up":
+                    this.emit("hang-up");
+                    break;
+            }
+        } catch (error) {
+            console.warn("Ignored invalid websocket payload", error);
         }
     }
 
@@ -144,8 +156,12 @@ export class WebSocketHandler {
         (this.listeners[event] as ((d?: unknown) => void) | undefined)?.(data);
     }
 
-    private parseWebSocketData(data: MessageEvent["data"]): unknown {
+    private parseWebSocketData(data: MessageEvent["data"]): unknown | null {
         if (typeof data === "string") {
+            const trimmed = data.trim();
+            if (!(trimmed.startsWith("{") || trimmed.startsWith("["))) {
+                return null;
+            }
             return JSON.parse(data);
         }
         if (data instanceof ArrayBuffer) {
