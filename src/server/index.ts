@@ -106,6 +106,28 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                         }
                     }
                     break
+                case "direct-message":
+                    if (!websocket.userName) {
+                        websocket.send("Login First");
+                    } else if (!parsedMessage.data.to) {
+                        websocket.send("Receiver not provided");
+                    } else {
+                        const receiverSocket = websocketConnections.get(parsedMessage.data.to);
+                        if (!receiverSocket) {
+                            websocket.send("Receiver is offline");
+                        } else {
+                            receiverSocket.send(JSON.stringify({
+                                type: "direct-message",
+                                data: {
+                                    from: websocket.userName,
+                                    content: parsedMessage.data.content,
+                                    conversationId: parsedMessage.data.conversationId,
+                                    sentAt: new Date().toISOString(),
+                                },
+                            }));
+                        }
+                    }
+                    break;
                 case "accept":
                     if (!websocket.userName) {
                         websocket.send("Login First");

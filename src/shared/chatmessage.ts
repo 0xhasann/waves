@@ -14,6 +14,7 @@ export type ChatMessage =
     { type: "login"; data: { name: Name } } |
     { type: "call"; data: { name: Name } } |
     { type: "accept"; data: { name: Name } }
+    | { type: "direct-message"; data: { to?: Name; from?: Name; content: string; conversationId?: number; sentAt?: string } }
     | { type: "user-list"; data: {names: string[]} }
     | { type: "logout" };
 
@@ -23,10 +24,20 @@ const callSchema = z.object({ type: z.literal("call"), data: z.object({ name: na
 const acceptSchema = z.object({ type: z.literal("accept"), data: z.object({ name: nameSchema }) });
 const logoutSchema = z.object({ type: z.literal("logout") });
 const userListSchema = z.object({ type: z.literal("user-list"), data: z.object({ names: z.array(nameSchema) }) });
+const directMessageSchema = z.object({
+    type: z.literal("direct-message"),
+    data: z.object({
+        to: nameSchema.optional(),
+        from: nameSchema.optional(),
+        content: z.string().min(1),
+        conversationId: z.number().optional(),
+        sentAt: z.string().optional(),
+    }),
+});
 
 
 
 
 export const ChatMessageSchema = z.discriminatedUnion("type", [
-    loginSchema, callSchema, acceptSchema, logoutSchema, userListSchema
+    loginSchema, callSchema, acceptSchema, logoutSchema, userListSchema, directMessageSchema
 ])
