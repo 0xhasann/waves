@@ -700,6 +700,7 @@ body {
   background-image: url("./background-img.jpg");
   background-size: cover;
   background-position: center;
+  height: 100%;
 }
 
 /* MESSAGE */
