@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { sendResponse } from "../units/apiResponse";
 import * as repo from "./conn.repository"
+import * as conRepo from "../conversations/chat.repository";
 import { getSenderId } from "../units/reqSender";
 import { AppError } from "../units/app.errors";
 import { RequestStatus } from "../../shared/types";
@@ -32,6 +33,8 @@ export const processFriendRequest = async (req: Request, res: Response) => {
   if (result && req.body.status === RequestStatus.accepted) {
     const createFriend = repo.createFriends(sender_id, req.body);
     console.log(`Friend is created with id ${createFriend}`);
+    const conversationId = conRepo.getOrCreateConversation(sender_id, req.body);
+    console.log(`Conversation is ready with id ${conversationId}`);
   }
   sendResponse(res, 200, result, "Request has been processed Successfully");
 };

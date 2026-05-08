@@ -8,7 +8,7 @@ import type { ConversationSchema } from "./chat.schema";
 
 export const createConversation = async (req: Request, res: Response) => {
     const sender_id = getSenderId(req);
-    const result = await repo.getOrCreateConversation(sender_id, req.body);
+    const result = await repo.getOrCreateConversation(sender_id, req.query as ConversationSchema);
     sendResponse(res, 200, result, "Record has been processed successfully");
 };
 

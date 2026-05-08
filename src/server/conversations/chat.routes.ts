@@ -5,7 +5,7 @@ import { createConversation, fetchAllConversations, fetchConversations, fetchP2P
 
 export const router = Router();
 
-router.post("/createOrGetConversation", validate(conversationSchema), createConversation);
+router.get("/createOrGetConversation", validate(conversationSchema), createConversation);
 
 router.get("/fetchAllConversations", fetchAllConversations);
 router.get("/fetchP2PConversations", validate(conversationSchema), fetchP2PConversations);
