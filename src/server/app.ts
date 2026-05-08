@@ -14,23 +14,33 @@ export const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(authenticate);
 app.use(express.static(path.join(process.cwd(), "public")));
-// log incoming and outgoing body
+/**
+ * Public routes
+ */
+app.use("/api/auth", authRoutes);
+app.use("/auth/google", googleAuthRouter);
+
+// logger
 app.use((req, res, next) => {
     console.log("request:: ", req.body);
+
     const originalJson = res.json.bind(res);
+
     res.json = (body) => {
         console.log("response:: ", body);
         return originalJson(body);
     };
+
     next();
 });
-app.use("/api/auth", authRoutes);
+
+/**
+ * Protected routes
+ */
+app.use(authenticate);
 app.use("/api/friends", connection);
 app.use("/api/conversations", conversation);
-
-app.use("/auth/google", googleAuthRouter);
 
 // fallback
 app.use(notFound);
