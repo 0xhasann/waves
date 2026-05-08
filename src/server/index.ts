@@ -27,6 +27,10 @@ const wsServer = new WebSocketServer({
 const websocketConnections: Map<Name, ExtendedWebSocket> = new Map()
 const peerToPeer: Map<Name, Name> = new Map();
 
+function sendWsError(websocket: ExtendedWebSocket, message: string) {
+    websocket.send(JSON.stringify({ type: "error", data: { message } }));
+}
+
 function hangupCall(webServer: ExtendedWebSocket) {
     const firstPeer = webServer.userName;
     if (!firstPeer) {
@@ -49,7 +53,9 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
     websocket.on("close", (code: number, reason: Buffer) => {
         hangupCall(websocket);
         if (!websocket.userName) return;
-        websocketConnections.delete(websocket.userName);
+        const existingSocket = websocketConnections.get(websocket.userName);
+        if (existingSocket === websocket)
+            websocketConnections.delete(websocket.userName);
     })
 
     websocket.on("message", (data: Buffer) => {
@@ -65,16 +71,16 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                 case "video-answer":
                 case "video-offer":
                     if (!websocket.userName) {
-                        websocket.send("Login First");
+                        sendWsError(websocket, "Login First");
                     } else {
 
                         const peer = peerToPeer.get(websocket.userName);
                         if (!peer) {
-                            websocket.send("Peer Not Found Please Call Them First.");
+                            sendWsError(websocket, "Peer Not Found Please Call Them First.");
                         } else {
                             const peerWebsocket = websocketConnections.get(peer);
                             if (!peerWebsocket) {
-                                websocket.send("Peer Not Found or Disconnected");
+                                sendWsError(websocket, "Peer Not Found or Disconnected");
                             } else {
                                 peerWebsocket.send(JSON.stringify(parsedMessage));
                             }
@@ -86,20 +92,21 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                 case "login":
                     websocketConnections.set(parsedMessage.data.name, websocket);
                     websocket.userName = parsedMessage.data.name;
+                    const onlineUsers = Array.from(websocketConnections.keys());
                     websocketConnections.forEach((list) =>
                         list.send(JSON.stringify({
                             type: "user-list", data:
-                                { names: websocketConnections.keys().toArray() }
+                                { names: onlineUsers }
                         })))
                     break
                 // If call is coming from user to server then name is callee
                 // If call is coming from server to user then name is caller
                 case "call":
                     if (!websocket.userName) {
-                        websocket.send("Login First");
+                        sendWsError(websocket, "Login First");
                     } else {
                         if (!websocketConnections.has(parsedMessage.data.name)) {
-                            websocket.send("Callee does not exist");
+                            sendWsError(websocket, "Callee does not exist");
                         } else {
                             const callee = websocketConnections.get(parsedMessage.data.name)!;
                             callee.send(JSON.stringify({ type: "call", data: { name: websocket.userName } }));
@@ -108,13 +115,13 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                     break
                 case "direct-message":
                     if (!websocket.userName) {
-                        websocket.send("Login First");
+                        sendWsError(websocket, "Login First");
                     } else if (!parsedMessage.data.to) {
-                        websocket.send("Receiver not provided");
+                        sendWsError(websocket, "Receiver not provided");
                     } else {
                         const receiverSocket = websocketConnections.get(parsedMessage.data.to);
                         if (!receiverSocket) {
-                            websocket.send("Receiver is offline");
+                            sendWsError(websocket, "Receiver is offline");
                         } else {
                             receiverSocket.send(JSON.stringify({
                                 type: "direct-message",
@@ -130,7 +137,7 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                     break;
                 case "accept":
                     if (!websocket.userName) {
-                        websocket.send("Login First");
+                        sendWsError(websocket, "Login First");
                     } else {
                         peerToPeer.set(parsedMessage.data.name, websocket.userName);
                         peerToPeer.set(websocket.userName, parsedMessage.data.name);
