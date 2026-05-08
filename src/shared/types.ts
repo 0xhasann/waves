@@ -72,3 +72,19 @@ export type Conversations = {
   sender_id: number | null;
   updated_at: string | null;
 };
+
+export type MessageDTO = {
+  // message info
+  id: number;
+  content: string;
+  type: "text" | "image" | "video";
+  sender_id: number;
+  updated_at: string | null;
+
+  // user2_id info
+  peer_id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string | null;
+};

@@ -16,8 +16,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(authenticate);
 app.use(express.static(path.join(process.cwd(), "public")));
-app.use((req, res,next) => {
-    console.log("route logs:: ", req.body);
+// log incoming and outgoing body
+app.use((req, res, next) => {
+    console.log("request:: ", req.body);
+    const originalJson = res.json.bind(res);
+    res.json = (body) => {
+        console.log("response:: ", body);
+        return originalJson(body);
+    };
     next();
 });
 app.use("/api/auth", authRoutes);

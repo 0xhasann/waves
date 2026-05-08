@@ -4,6 +4,7 @@ import { AppError } from "../units/app.errors";
 import * as repo from "./chat.repository"
 import type { Conversation } from "../../shared/types";
 import { getSenderId } from "../units/reqSender";
+import type { ConversationSchema } from "./chat.schema";
 
 export const createConversation = async (req: Request, res: Response) => {
     const sender_id = getSenderId(req);
@@ -45,7 +46,13 @@ export const sendConversationMessages = async (req: Request, res: Response) => {
 export const fetchAllConversations = async (req: Request, res: Response) => {
     const sender_id = getSenderId(req);
     const result = await repo.fetchAllConversations(sender_id);
-    sendResponse(res, 200, result, "Record has been processed successfully");
+    sendResponse(res, 200, result, "Records has been fetched successfully");
 };
+
+export const fetchP2PConversations = async (req: Request, res: Response) => {
+    const user1_id = getSenderId(req);
+    const result = await repo.fetchP2PConversations(user1_id, req.query as ConversationSchema);
+    sendResponse(res, 200, result, "Records has been fetched successfully");
+}
 
 

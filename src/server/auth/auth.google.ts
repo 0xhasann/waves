@@ -163,8 +163,6 @@ export const getTokenFromCookie = async (req: Request, res: Response) => {
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies?.auth_token;
-  console.log("req.cookies", req.cookies);
-  console.log("req.cookies.auth_token", req.cookies.auth_token);
 
   if (!token) {
     return res.status(401).json({ message: "Not authenticated" });

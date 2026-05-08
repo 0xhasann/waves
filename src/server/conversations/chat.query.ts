@@ -51,3 +51,25 @@ LEFT JOIN messages m ON m.id = (
 WHERE c.user1_id = ? OR c.user2_id = ?
 
 ORDER BY m.updated_at DESC;`
+
+export const prepareP2PConversationsSchema = `SELECT 
+    m.id,
+    m.content,
+    m.type,
+    m.sender_id,
+    m.updated_at,
+    
+    u.id AS peer_id,
+    u.username,
+    u.first_name,
+    u.last_name,
+    u.avatar_url
+FROM messages m
+JOIN users u ON u.id = ?
+WHERE m.conversation_id = (
+    SELECT id FROM conversations
+    WHERE (user1_id = ? AND user2_id = ?)
+    OR (user1_id = ? AND user2_id = ?)
+)
+ORDER BY m.updated_at ASC
+LIMIT 20;`

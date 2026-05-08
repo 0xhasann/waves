@@ -1,9 +1,8 @@
 import * as z from "zod";
 
 export const conversationSchema = z.object({
-    body: z.object({
-        user1_id: z.number().min(1),
-        user2_id: z.number().min(1),
+    query: z.object({
+        user2_id: z.string().min(1),
     }),
 });
 
@@ -23,6 +22,6 @@ export const sendConversationMessageSchema = z.object({
     }),
 });
 
-export type ConversationSchema = z.infer<typeof conversationSchema>["body"];
+export type ConversationSchema = z.infer<typeof conversationSchema>["query"];
 export type FetchConversationSchema = z.infer<typeof fetchConversationSchema>["body"];
 export type SendConversationMessageSchema = z.infer<typeof sendConversationMessageSchema>["body"];

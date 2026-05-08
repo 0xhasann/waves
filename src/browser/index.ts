@@ -21,7 +21,7 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 import { pageLoader, showForm, signup } from "./auth.user.dom";
 import { ChatUI } from "./chat";
 import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, setRemoteNameLabel, localStream } from "./dom";
-import { conversations, searchUser } from "./friends/conversation.dom";
+import { conversations, fetchUserConversations, searchUser } from "./friends/conversation.dom";
 import { recordStream } from "./recordStream";
 import { shareScreen } from "./shareScreen";
 import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
@@ -38,7 +38,13 @@ googleButtons.forEach((btn) => {
   });
 });
 
-window?.addEventListener("DOMContentLoaded", pageLoader);
+window?.addEventListener("DOMContentLoaded", async () => {
+  await pageLoader();
+
+  if (window.location.pathname === "/conversation_timeline.html") {
+    await fetchUserConversations();
+  }
+});
 
 const signupForm = document.getElementById("signupForm") as HTMLFormElement;
 
@@ -61,10 +67,10 @@ document.getElementById("signupTab")?.addEventListener("click", () => {
 });
 
 const search = document.getElementById("search") as HTMLInputElement;
-const friends = document.getElementById("friends") as HTMLDivElement;
+export const friends = document.getElementById("friends") as HTMLDivElement;
 
-search?.addEventListener("keyup", () => searchUser(search, friends));
-friends?.addEventListener("click", async (e) => conversations(e, friends));
+search?.addEventListener("keyup", () => searchUser(search));
+friends?.addEventListener("click", async (e) => conversations(e));
 
 
 let audioEnabled = true;
