@@ -46,7 +46,7 @@ export function setRemoteNameLabel(remoteName: string) {
 }
 
 // hides the form, shows welcome text, calls ws.login()
-export function login(name: string) {
+export function login(name: string, wsName?: string, shouldRedirect = true) {
 	const ws = WebSocketHandler.getInstance();
 	const authContainer = document.querySelector(
 		".auth-container",
@@ -59,10 +59,14 @@ export function login(name: string) {
 
 	const localLabel = document.getElementById(
 		"local-name-label",
-	) as HTMLSpanElement;
-	localLabel.textContent = name;
-	ws.login(name);
-	window.location.href = "/conversation_timeline.html";
+	) as HTMLSpanElement | null;
+	if (localLabel) {
+		localLabel.textContent = name;
+	}
+	ws.login(wsName || name);
+	if (shouldRedirect && window.location.pathname !== "/conversation_timeline.html") {
+		window.location.href = "/conversation_timeline.html";
+	}
 }
 
 //builds the user list with a "Call" button per user
@@ -70,7 +74,6 @@ export function renderUserList(data: { names: Name[] }) {
     const ws = WebSocketHandler.getInstance();
     const userListDiv = document.getElementById("user-list");
     if (!userListDiv) {
-        console.log("userListDiv not found");
         return;
     }
 

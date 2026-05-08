@@ -186,6 +186,8 @@ ws.on("video-offer", async (event) => {
 });
 
 
-ws.on("call", renderIncomingCall);
+if (window.location.pathname !== "/conversation_timeline.html") {
+  ws.on("call", renderIncomingCall);
+}
 ws.on("user-list", renderUserList);
 
