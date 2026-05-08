@@ -52,7 +52,9 @@ WHERE c.user1_id = ? OR c.user2_id = ?
 
 ORDER BY m.updated_at DESC;`
 
-export const prepareP2PConversationsSchema = `SELECT 
+export const prepareP2PConversationsSchema = `SELECT *
+FROM (
+    SELECT 
     m.id,
     m.content,
     m.type,
@@ -71,5 +73,7 @@ WHERE m.conversation_id = (
     WHERE (user1_id = ? AND user2_id = ?)
     OR (user1_id = ? AND user2_id = ?)
 )
-ORDER BY m.updated_at ASC
-LIMIT 20;`
+ORDER BY m.updated_at DESC
+LIMIT 20
+) AS last_20
+ORDER BY updated_at ASC;`
