@@ -34,3 +34,10 @@ export const SignalMessageSchema = z.discriminatedUnion("type",[
         type: z.literal("hang-up"),
     }),
 ]);
+
+export const ErrorMessageSchema = z.object({
+    type: z.literal("error"),
+    data: z.object({
+      message: z.string(),
+    }),
+  });
