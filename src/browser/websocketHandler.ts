@@ -129,6 +129,7 @@ export class WebSocketHandler {
     private handleWsMessages(event: MessageEvent) {
         try {
             const json = this.parseWebSocketData(event.data);
+            console.log("raw ws message", json);
             if (json === null) {
                 return;
             }

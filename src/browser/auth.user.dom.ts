@@ -60,11 +60,19 @@ export async function pageLoader() {
     });
 
     if (!res.ok) {
-      console.error("Res check failed");
+      return;
     }
-    const user = await res.json();
 
-    login(user.first_name || user.username);
+    const user = await res.json();
+    if (!user?.id) return;
+
+    localStorage.setItem("userId", String(user.id));
+    const isConversationPage = window.location.pathname === "/conversation_timeline.html";
+    login(
+      user.first_name || user.username,
+      user.username || user.first_name,
+      !isConversationPage,
+    );
   } catch (err) {
     console.error("Auth check failed");
   }
