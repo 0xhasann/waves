@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { processFriendRequest, search, sendFriendRequest, unfollowFriend } from "./conn.controller";
+import { processFriendRequest, search, sendFriendRequest, unfollowFriend } from "./conn.service";
 import { validate } from "../units/validate";
-import {  friendsSchema, processFriendRequestSchema, searchSchema, sendFriendRequestSchema } from "./conn.schema";
+import { friendsSchema, processFriendRequestSchema, searchSchema, sendFriendRequestSchema } from "./conn.schema";
 
 export const router = Router();
 

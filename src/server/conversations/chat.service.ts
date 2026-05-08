@@ -1,17 +1,18 @@
-import type { ConversationSchema, FetchConversationSchema, SendConversationMessageSchema } from "./chat.schema";
-import * as repo from "./chat.repository"
+import type { Request, Response } from "express";
+import { sendResponse } from "../units/apiResponse";
 import { AppError } from "../units/app.errors";
+import * as repo from "./chat.repository"
 import type { Conversation } from "../../shared/types";
+import { getSenderId } from "../units/reqSender";
 
-export const conversation = async (body: ConversationSchema) => {
-    const result = await repo.getOrCreateConversation(body);
-    if (!result)
-        throw new AppError("Request failed");
-    return result;
-}
+export const createConversation = async (req: Request, res: Response) => {
+    const sender_id = getSenderId(req);
+    const result = await repo.getOrCreateConversation(sender_id, req.body);
+    sendResponse(res, 200, result, "Record has been processed successfully");
+};
 
-export const fetchConvs = async (body: FetchConversationSchema) => {
-    const rows = await repo.fetchConversations(body);
+export const fetchConversations = async (req: Request, res: Response) => {
+    const rows = await repo.fetchConversations(req.body);
     if (!rows)
         throw new AppError("Request failed");
 
@@ -32,12 +33,19 @@ export const fetchConvs = async (body: FetchConversationSchema) => {
         }
     }
     result.messages.reverse();
-    return result;
-}
+    sendResponse(res, 200, result, "Conversation fetched");
+};
 
-export const sendConvs = async (body: SendConversationMessageSchema) => {
-    const result = await repo.sendConversationMessages(body);
-    if (!result)
-        throw new AppError("Request failed");
-    return result;
-}
+export const sendConversationMessages = async (req: Request, res: Response) => {
+    const sender_id = getSenderId(req);
+    const result = await repo.sendConversationMessages(sender_id, req.body);
+    sendResponse(res, 200, result, "Message is sent Successfully");
+};
+
+export const fetchAllConversations = async (req: Request, res: Response) => {
+    const sender_id = getSenderId(req);
+    const result = await repo.fetchAllConversations(sender_id);
+    sendResponse(res, 200, result, "Record has been processed successfully");
+};
+
+

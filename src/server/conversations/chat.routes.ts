@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { validate } from "../units/validate";
 import { conversationSchema, fetchConversationSchema, sendConversationMessageSchema } from "./chat.schema";
-import { createConversation, fetchAllConversations, fetchConversations, sendConversationMessages } from "./chat.controller";
+import { createConversation, fetchAllConversations, fetchConversations, sendConversationMessages } from "./chat.service";
 
 export const router = Router();
 

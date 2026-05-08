@@ -1,35 +1,29 @@
-import { database } from "../../db/utils";
-import * as repo from "./auth.repository";
-import type { SigninInput, SignupInput } from "./auth.schema";
+import type { Request, Response } from "express";
+import { sendResponse } from "../units/apiResponse";
+import { tokenCookie } from "./auth.google";
+import * as repo from "./auth.repository"
 import { AppError } from "../units/app.errors";
 import { verifyPassword } from "../units/validate";
 
-export const signup = async (body: SignupInput) => {
-
-  const user = repo.findByUsername(body.username);
-  if (user) {
+export const signup = async (req: Request, res: Response) => {
+  const user = repo.findByUsername(req.body.username);
+  if (user)
     throw new AppError("User Already Exists", 403);
-  }
 
-  const userId = repo.createUser(database, body);
-
-  return {
-    id: userId
-  };
+  const userId = repo.createUser(req.body);
+  tokenCookie(userId as number, req, res);
+  sendResponse(res, 201, user, "User Created Successfully");
 };
 
-export const signin = async (body: SigninInput) => {
-
-  const user = repo.findByUsername(body.username); 
-  if (!user) {
+export const signin = async (req: Request, res: Response) => {
+  const user = repo.findByUsername(req.body.username);
+  if (!user)
     throw new AppError("Invalid Credentials", 401);
-  }
 
-  const isValid = verifyPassword(body.password, user.user_pass);
-  if (!isValid) {
+  const isValid = verifyPassword(req.body.password, user.user_pass);
+  if (!isValid)
     throw new AppError("Invalid Credentials", 401);
-  }
 
-  return {id: user.id};
-
-}
+  tokenCookie(user.id, req, res);
+  sendResponse(res, 200, user, "Welcome to Waves");
+};

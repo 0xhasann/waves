@@ -1,21 +1,19 @@
 import { z } from "zod";
 
 export const searchSchema = z.object({
-	query: z.object({
-		query: z.string().trim(),
-	}),
+    query: z.object({
+        query: z.string().trim(),
+    }),
 });
 
 export const sendFriendRequestSchema = z.object({
     body: z.object({
-        sender_id: z.number().min(1, "sender id is required"),
         receiver_id: z.number().min(1, "receiver id is required"),
     }),
 });
 
 export const processFriendRequestSchema = z.object({
     body: z.object({
-        sender_id: z.number().min(1, "sender id is required"),
         receiver_id: z.number().min(1, "receiver id is required"),
         status: z.string().min(1, "status is requred"),
     }),
@@ -24,9 +22,8 @@ export const processFriendRequestSchema = z.object({
 
 export const friendsSchema = z.object({
     body: z.object({
-        user1_id: z.number().min(1, "user1_id id is required"),
         user2_id: z.number().min(1, "user2_id id is required"),
-       
+
     }),
 });
 

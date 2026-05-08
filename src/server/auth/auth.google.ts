@@ -11,13 +11,6 @@ const db = database;
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtUser;
-    }
-  }
-}
 export const googleSignup = async (req: Request, res: Response) => {
   const state = crypto.randomBytes(16).toString("hex");
 
@@ -179,9 +172,6 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
-    const user = await db
-      .prepare(`SELECT id, username, first_name FROM users WHERE id = ?`)
-      .get(decoded.userId);
     req.user = decoded;
     next();
   } catch (err) {

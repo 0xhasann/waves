@@ -18,7 +18,6 @@ export const fetchConversationSchema = z.object({
 export const sendConversationMessageSchema = z.object({
     body: z.object({
         conversation_id: z.number(),
-        sender_id: z.number(),
         type: z.enum(["text"]),
         content: z.string(),
     }),

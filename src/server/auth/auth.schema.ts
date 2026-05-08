@@ -8,7 +8,7 @@ export const signupSchema = z.object({
 
         password: z.string().min(6).max(15),
 
-        email:  z.string().regex(/^\S+@\S+\.\S+$/, { message: "Invalid email", }).optional(),
+        email: z.string().regex(/^\S+@\S+\.\S+$/, { message: "Invalid email", }).optional(),
 
         mobileNo: z
             .string()

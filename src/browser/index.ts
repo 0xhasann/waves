@@ -20,7 +20,7 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 
 import { pageLoader, showForm, signup } from "./auth.user.dom";
 import { ChatUI } from "./chat";
-import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, login, setRemoteNameLabel, localStream } from "./dom";
+import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, setRemoteNameLabel, localStream } from "./dom";
 import { conversations, searchUser } from "./friends/conversation.dom";
 import { recordStream } from "./recordStream";
 import { shareScreen } from "./shareScreen";
