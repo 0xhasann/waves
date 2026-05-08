@@ -7,3 +7,24 @@ export const now = () => {
     }).format(new Date()).replace(",", "");
     //  "05/05/2026 01:23:45"
 };
+
+export const formatMessageTime = (dateStr: string): string => {
+    const msgDate = new Date(dateStr);
+    const now = new Date();
+
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const msgDay = new Date(msgDate.getFullYear(), msgDate.getMonth(), msgDate.getDate());
+
+    if (msgDay.getTime() === today.getTime()) {
+        return msgDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: false });
+    }
+
+    if (msgDay.getTime() === yesterday.getTime()) {
+        return "Yesterday";
+    }
+
+    return msgDate.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric" });
+};

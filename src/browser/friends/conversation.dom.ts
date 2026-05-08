@@ -1,14 +1,13 @@
-import type { User } from "../../shared/types";
+import type { ApiResponse } from "../../server/units/apiResponse";
+import type { Conversations, User } from "../../shared/types";
 import { friendCard } from "./friendCard";
 
 let timeout: number;
 export function searchUser(search: HTMLInputElement, friends: HTMLDivElement) {
 
   clearTimeout(timeout);
-  console.log("hello onclick112");
 
   timeout = window.setTimeout(async () => {
-    console.log("hello onclick");
     const query = search.value;
 
     if (query.length < 1) {
@@ -26,8 +25,8 @@ export function searchUser(search: HTMLInputElement, friends: HTMLDivElement) {
 
     let html = "";
 
-    result.data.forEach((user: User) => {
-      html += friendCard(user);
+    result.data.forEach((conv: Conversations) => {
+      html += friendCard(conv);
     });
 
     friends.innerHTML = html;
@@ -36,14 +35,14 @@ export function searchUser(search: HTMLInputElement, friends: HTMLDivElement) {
 
 
 
-export function conversations(e: PointerEvent, friends: HTMLDivElement) {
+export async function conversations(e: PointerEvent, friends: HTMLDivElement) {
+  let html = "";
   document
     .querySelectorAll(".friend")
     .forEach((el) => el.classList.remove("active"));
 
   friends.classList.add("active");
   const chat = document.querySelector(".chat") as HTMLDivElement;
-  console.log("friends.addEventListener");
   const target = e.target as HTMLElement;
 
   const friend = target.closest(".friend") as HTMLElement;
@@ -54,41 +53,59 @@ export function conversations(e: PointerEvent, friends: HTMLDivElement) {
 
   console.log("clicked user:", userId);
 
-  // API call here
-  // const response = await fetch(...)
 
-  if (!friend) return;
+  const response = await fetch(
+    `http://localhost:3000/api/conversations/fetchAllConversations`,
+  );
 
-  chat.innerHTML = `
-  <div class="chat-header">
+  const records: ApiResponse<Conversations[]> = await response.json();
 
-    <img src="https://i.pravatar.cc/150" />
+  const allConversations = await records.data;
 
-    <div class="chat-user">
-      <h3>
-        ${friend.querySelector(".friends-name")?.textContent}
-      </h3>
+  if(!allConversations) return;
 
-      <small>online</small>
-    </div>
+  console.log(allConversations);
 
-  </div>
 
-  <div class="messages">
+  allConversations.forEach((convs: Conversations) => {
+    html += friendCard(convs);
+  });
 
-    <div class="message received">
-      Hi bro
-    </div>
+  friends.innerHTML = html;
 
-    <div class="message sent">
-      Hello
-    </div>
 
-  </div>
 
-  <div class="chat-input">
-    <input type="text" placeholder="Type a message">
-    <button>Send</button>
-  </div>
-`;
+
+//   chat.innerHTML = `
+//   <div class="chat-header">
+
+//     <img src="https://i.pravatar.cc/150" />
+
+//     <div class="chat-user">
+//       <h3>
+//         ${friend.querySelector(".friends-name")?.textContent}
+//       </h3>
+
+//       <small>online</small>
+//     </div>
+
+//   </div>
+
+//   <div class="messages">
+
+//     <div class="message received">
+//       Hi bro
+//     </div>
+
+//     <div class="message sent">
+//       Hello
+//     </div>
+
+//   </div>
+
+//   <div class="chat-input">
+//     <input type="text" placeholder="Type a message">
+//     <button>Send</button>
+//   </div>
+// `;
 }
