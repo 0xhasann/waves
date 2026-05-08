@@ -4,7 +4,7 @@ import type { Conversations} from "../../shared/types";
 export function friendCard(conv: Conversations) {
   console.log("friendCard");
   const fullName = `${conv.first_name || ""} ${conv.last_name || ""}`.trim();
-  const displayName =  `${fullName || ""} ${conv.username || ""}`.trim();
+  const displayName =  `${fullName || conv.username}`.trim();
 	return `
     <div
       class="friend"
