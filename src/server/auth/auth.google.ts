@@ -1,22 +1,30 @@
 import axios from "axios";
 import crypto from "crypto";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 import { database } from "../../db/utils";
 import type { JwtUser, User } from "../../shared/types";
+import { now } from "../units/timeUtils";
 
 const db = database;
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JwtUser;
+    }
+  }
+}
 export const googleSignup = async (req: Request, res: Response) => {
   const state = crypto.randomBytes(16).toString("hex");
-    
-    res.cookie("oauth_state", state, {
-      httpOnly: true,
-      sameSite: "lax",
-    });
+
+  res.cookie("oauth_state", state, {
+    httpOnly: true,
+    sameSite: "lax",
+  });
 
 
   const url =
@@ -34,11 +42,11 @@ export const googleSignup = async (req: Request, res: Response) => {
   res.redirect(url.toString());
 };
 
-export const callbackRoute = async (req: Request, res: Response) => {    
-    if (!req.cookies?.oauth_state || req.query.state !== req.cookies.oauth_state ) {
+export const callbackRoute = async (req: Request, res: Response) => {
+  if (!req.cookies?.oauth_state || req.query.state !== req.cookies.oauth_state) {
     return res.status(403).send("Invalid state");
-    }
-    res.clearCookie("oauth_state");
+  }
+  res.clearCookie("oauth_state");
 
   try {
     const { code } = req.query;
@@ -111,9 +119,9 @@ export const callbackRoute = async (req: Request, res: Response) => {
     } else if (!user.google_id) {
       await db
         .prepare(
-          `UPDATE users SET google_id = ?, provider = 'google' WHERE id = ?;`,
+          `UPDATE users SET google_id = ?, provider = 'google', updated_at WHERE id = ?;`,
         )
-        .run(sub, user.id);
+        .run(sub, user.id, now());
 
       user = (await db
         .prepare(`SELECT * FROM users WHERE id = ?;`)
@@ -126,36 +134,62 @@ export const callbackRoute = async (req: Request, res: Response) => {
 
     tokenCookie(user.id, req, res);
     res.redirect("http://localhost:3000/conversation_timeline.html");
-    
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Auth failed");
   }
 };
-export const tokenCookie = async(id: number, req: Request, res: Response) => {  
-    const token = jwt.sign({ userId: id }, process.env.JWT_SECRET!, {
-      expiresIn: "7d",
-    });
-      
-    res.cookie("auth_token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+export const tokenCookie = async (id: number, req: Request, res: Response) => {
+  const token = jwt.sign({ userId: id }, process.env.JWT_SECRET!, {
+    expiresIn: "7d",
+  });
+
+  res.cookie("auth_token", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 }
 
 export const getTokenFromCookie = async (req: Request, res: Response) => {
-    const token = req.cookies.auth_token;
-    if (!token) return res.status(401).send("Unauthorized");
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
-        const user = await db
-        .prepare(`SELECT id, username, first_name FROM users WHERE id = ?`)
-        .get(decoded.userId);
-        if (!user) return res.status(404).send("User not found");
-        res.json(user);
-    } catch {
-        res.status(401).send("Invalid token");
-    }
+  const token = req.cookies.auth_token;
+  if (!token) return res.status(401).send("Unauthorized");
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
+    const user = await db
+      .prepare(`SELECT id, username, first_name FROM users WHERE id = ?`)
+      .get(decoded.userId);
+    if (!user) return res.status(404).send("User not found");
+    res.json(user);
+  } catch {
+    res.status(401).send("Invalid token");
+  }
+};
+
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies?.auth_token;
+  console.log("req.cookies", req.cookies);
+  console.log("req.cookies.auth_token", req.cookies.auth_token);
+
+  if (!token) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
+    const user = await db
+      .prepare(`SELECT id, username, first_name FROM users WHERE id = ?`)
+      .get(decoded.userId);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.clearCookie("auth_token");
+    if (err instanceof jwt.TokenExpiredError)
+      return res.status(401).json({ message: "Session expired, please sign in again" });
+    if (err instanceof jwt.JsonWebTokenError)
+      return res.status(401).json({ message: "Invalid token" });
+    return res.status(500).json({ message: "Authentication failed" });
+  }
 };

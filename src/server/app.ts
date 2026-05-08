@@ -8,30 +8,23 @@ import path from "node:path";
 import { notFound } from "./units/notFound";
 import { errorHandler } from "./units/errorHandler";
 import cookieParser from "cookie-parser";
-
-
-
+import { authenticate } from "./auth/auth.google";
 
 export const app = express();
+
 app.use(express.json());
+app.use(cookieParser());
+app.use(authenticate);
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use((req, res,next) => {
-    console.log(req.body);
+    console.log("route logs:: ", req.body);
     next();
-
-} )
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/friends", connection);
 app.use("/api/conversations", conversation);
 
-// OAuth 2.0 signup will google
-app.use(cookieParser());
 app.use("/auth/google", googleAuthRouter);
-
-// static files like html and index.js
-app.use(express.static(path.join(process.cwd(), "public")));
-
-
 
 // fallback
 app.use(notFound);
