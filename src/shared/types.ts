@@ -57,3 +57,18 @@ export type Row = {
 export type JwtUser = jwt.JwtPayload & {
   userId: number;
 };
+
+export type Conversations = {
+  peer_id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string | null;
+
+  conversation_id: number;
+
+  last_message: string | null;
+  type: "text" | "image" | "video" | null;
+  sender_id: number | null;
+  updated_at: string | null;
+};

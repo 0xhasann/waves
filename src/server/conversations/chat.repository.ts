@@ -1,6 +1,6 @@
 import { database } from "../../db/utils";
-import type { Conversation } from "../../shared/types";
-import { prepareCreateConvQuery, prepareFetchConvQuery, prepareSendMessageQuery } from "./chat.query";
+import type { Conversation, Conversations } from "../../shared/types";
+import { prepareCreateConvQuery, prepareFetchAllConversations, prepareFetchConvQuery, prepareSendMessageQuery } from "./chat.query";
 import type { ConversationSchema, FetchConversationSchema, SendConversationMessageSchema } from "./chat.schema";
 
 export const getOrCreateConversation = (query: ConversationSchema): number => {
@@ -24,4 +24,8 @@ export const fetchConversations = (query: FetchConversationSchema): any[] | unde
 export const sendConversationMessages = (query: SendConversationMessageSchema): number => {
     const result = database.prepare(prepareSendMessageQuery).run(query.conversation_id, query.sender_id, query.type, query.content);
     return result.lastInsertRowid as number;
+}
+
+export const fetchAllConversations = (sender_id: number): any[] | undefined => {
+    return database.prepare(prepareFetchAllConversations).all(sender_id, sender_id, sender_id) as Conversations[] | undefined;
 }

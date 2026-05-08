@@ -19,3 +19,35 @@ export const prepareCreateConvQuery = `INSERT INTO conversations (user1_id, user
                 RETURNING id;`
 
 export const prepareSendMessageQuery = `INSERT INTO messages(conversation_id, sender_id, type, content) VALUES (?, ?, ?, ?);`
+
+export const prepareFetchAllConversations = `SELECT 
+    u.id AS peer_id,
+    u.username,
+    u.first_name,
+    u.last_name,
+    u.avatar_url,
+    
+    c.id AS conversation_id,
+    
+    m.content AS last_message,
+    m.type,
+    m.sender_id,
+    m.updated_at
+
+FROM conversations c
+
+JOIN users u ON u.id = CASE 
+    WHEN c.user1_id = ? THEN c.user2_id 
+    ELSE c.user1_id 
+END
+
+LEFT JOIN messages m ON m.id = (
+    SELECT id FROM messages
+    WHERE conversation_id = c.id
+    ORDER BY updated_at DESC
+    LIMIT 1
+)
+
+WHERE c.user1_id = ? OR c.user2_id = ?
+
+ORDER BY m.updated_at DESC;`
