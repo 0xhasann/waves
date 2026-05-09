@@ -254,9 +254,6 @@ export async function fetchUserConversations() {
   friends.innerHTML = html;
 }
 
-
-
-
 export const sendCurrentMessage = async () => {
   const input = document.getElementById("p2p-chat-input") as HTMLInputElement | null;
   const message = input?.value.trim();

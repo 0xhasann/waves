@@ -1,11 +1,12 @@
 import { Database } from "bun:sqlite";
 import { readdirSync, readFileSync } from "fs";
-import { join } from "path";
+import path, { join  } from "path";
 import { createHash } from "crypto";
 
-export const database = new Database("./wavesChat.db");
+export const database = new Database("./wavesDev.db");
 export type DB = typeof database;
-const dir = "./migrations";
+
+const dir = path.resolve(process.cwd(), "migrations");
 
 
 export function runMigration() {
