@@ -15,8 +15,12 @@ export const prepareFetchConvQuery = `SELECT
 
 
 export const prepareCreateConvQuery = `INSERT INTO conversations (user1_id, user2_id)VALUES (?, ?) ON CONFLICT(user1_id, user2_id)
+                WHERE deleted = 0
                 DO UPDATE SET user1_id = excluded.user1_id
                 RETURNING id;`
+
+export const deleteConvQuery = `UPDATE conversations SET deleted = 1, updated_at = ? WHERE user1_id = ? AND user2_id = ?;`
+
 
 export const prepareSendMessageQuery = `INSERT INTO messages(conversation_id, sender_id, type, content) VALUES (?, ?, ?, ?);`
 

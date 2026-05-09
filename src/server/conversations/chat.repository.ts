@@ -1,16 +1,25 @@
 import { database } from "../../db/utils";
 import type { Conversation, Conversations, MessageDTO } from "../../shared/types";
-import { prepareCreateConvQuery, prepareFetchAllConversations, prepareFetchConvQuery, prepareP2PConversationsSchema, prepareSendMessageQuery } from "./chat.query";
+import { now } from "../units/timeUtils";
+import { getUserPair } from "../units/userPair";
+import { deleteConvQuery, prepareCreateConvQuery, prepareFetchAllConversations, prepareFetchConvQuery, prepareP2PConversationsSchema, prepareSendMessageQuery } from "./chat.query";
 import type { ConversationSchema, FetchConversationSchema, SendConversationMessageSchema } from "./chat.schema";
 
-export const getOrCreateConversation = (user1_id: number, query: ConversationSchema): number => {
-    const u1 = Math.min(user1_id, Number(query.user2_id));
-    const u2 = Math.max(user1_id, Number(query.user2_id));
+export const getOrCreateConversation = (user1_id: number, user2_id: number): number => {
+    const { u1, u2 } = getUserPair(user1_id, user2_id);
     const conversation = database.
         prepare(prepareCreateConvQuery)
         .get(u1, u2) as Conversation;
 
     return conversation.id;
+}
+
+export const deleteConversation = (user1_id: number, user2_id: number): number => {
+    const { u1, u2 } = getUserPair(user1_id, user2_id);
+    const result = database.
+        prepare(deleteConvQuery)
+        .run(now(), u1, u2);
+    return result.changes;
 }
 
 export const fetchConversations = (query: FetchConversationSchema): any[] | undefined => {
@@ -31,6 +40,6 @@ export const fetchAllConversations = (sender_id: number): Conversations[] | unde
 }
 
 export const fetchP2PConversations = (user1_id: number, query: ConversationSchema): MessageDTO[] | undefined => {
-    const user2_id = Number(query.user2_id);
-    return database.prepare(prepareP2PConversationsSchema).all(user2_id, user1_id, user2_id, user2_id, user1_id) as MessageDTO[] | undefined;
+    const { u1, u2 } = getUserPair(user1_id, Number(query.user2_id));
+    return database.prepare(prepareP2PConversationsSchema).all(u2, u1, u2, u2, u1) as MessageDTO[] | undefined;
 } 
