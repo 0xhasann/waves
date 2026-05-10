@@ -108,47 +108,53 @@ export function renderUserList(data: { names: Name[] }) {
 // inserts an "Accept" prompt when a call comes in
 export function renderIncomingCall(data: { name: Name }) {
     const ws = WebSocketHandler.getInstance();
-    const userListDiv = document.getElementById("user-list");
-    if (!userListDiv) return;
 
-    let prevPrompt = document.getElementById("incoming-call-prompt");
-    if (prevPrompt) prevPrompt.remove();
+    let prompt = document.getElementById("incoming-call-prompt");
 
-    const promptDiv = document.createElement("div");
-    promptDiv.id = "incoming-call-prompt";
-    promptDiv.style.margin = "8px 0";
+    if (!prompt) {
+        prompt = document.createElement("div");
+        prompt.id = "incoming-call-prompt";
 
-    const message = document.createElement("span");
-    message.textContent = `Incoming call from ${data.name}.`;
+        prompt.innerHTML = `
+        <div class="incoming-call-modal">
+            <h3>Incoming Call</h3>
+    
+            <p>
+                ${data.name} is calling...
+            </p>
+    
+            <div class="incoming-call-actions">
+                <button id="accept-call-btn" class="accept-btn">
+                    Accept
+                </button>
+    
+                <button id="reject-call-btn" class="reject-btn">
+                    Reject
+                </button>
+            </div>
+        </div>
+    `;
 
-    const acceptBtn = document.createElement("button");
-    if(acceptBtn)
-        acceptBtn.textContent = "Accept";
+        document.body.appendChild(prompt);
+    }
+
+    const text = document.getElementById("incoming-call-text");
+    const acceptBtn = document.getElementById("accept-call-btn");
+    const rejectBtn = document.getElementById("reject-call-btn");
+
+    if (text) {
+        text.textContent = `Incoming call from ${data.name}`;
+    }
+
     acceptBtn?.addEventListener("click", () => {
         ws.accept(data.name);
-        promptDiv.remove();
-        const userListDiv = document.getElementById("user-list");
-        if (userListDiv) {
-            const callButtons = userListDiv.querySelectorAll("button");
-            callButtons.forEach((btn) => {
-                const li = btn.closest("li");
-                if (li) {
-                    const span = li.querySelector("span");
-                    if (span && span.textContent === data.name) {
-                        btn.textContent = "Call";
-                        btn.disabled = true;
-                    }
-                }
-            });
-        }
         setRemoteNameLabel(data.name);
-
+        prompt?.remove();
     });
 
-    promptDiv.appendChild(message);
-    promptDiv.appendChild(document.createTextNode(" "));
-    promptDiv.appendChild(acceptBtn);
-    userListDiv.parentElement?.insertBefore(promptDiv, userListDiv);
+    rejectBtn?.addEventListener("click", () => {
+        prompt?.remove();
+    });
 }
 
 export function disableCallButton(name: Name) {
@@ -189,26 +195,42 @@ export function enableCallbutton() {
 
 //  stops media tracks, closes RTCPeerConnection, calls ws.hangUp()
 export function hangUpCall() {
+    console.log("hangup1");
     const ws = WebSocketHandler.getInstance();
     const localVideo = document.getElementById("local_video") as HTMLVideoElement | null;
     const remoteVideo = document.getElementById("received_video") as HTMLVideoElement | null;
     ws.hangUp();
 
-    RTCPeerConnectionHandler.close();
+    console.log("hangup2");
     if (localVideo && localVideo.srcObject instanceof MediaStream) {
+    console.log("hangup3");
+
         localVideo.pause();
         localVideo.srcObject.getTracks().forEach((track) => {
+    console.log("hangup4");
+            
             track.stop();
         });
+
         localVideo.srcObject = null;
+        localVideo.classList.remove("pip-mode");
     }
 
     if (remoteVideo && remoteVideo.srcObject instanceof MediaStream) {
+    console.log("hangup11");
+
         remoteVideo.srcObject.getTracks().forEach((track) => {
+    console.log("hangup12");
+
             track.stop();
         });
         remoteVideo.srcObject = null;
+        remoteVideo.style.objectFit = "cover";
     }
+    console.log("hangup13");
+    RTCPeerConnectionHandler.close();
+
+
     enableCallbutton();
     disableRemoteNameLabel();
 
@@ -223,7 +245,7 @@ export function hangUpCall() {
 
 // gets camera/mic, adds tracks to the peer connection
 export async function attachUserMedia(audio: boolean, video: boolean): Promise<boolean> {
-    const pc = RTCPeerConnectionHandler.pc;
+    // const pc = RTCPeerConnectionHandler.pc;
     const shareBtn = document.getElementById("shareBtn");
     if (shareBtn)
         shareBtn.style.display = "flex";
@@ -258,9 +280,9 @@ export async function attachUserMedia(audio: boolean, video: boolean): Promise<b
         if (!localStream) return false;
         localStream.getTracks().forEach((track) => {
             if (localStream) {
-                const alreadyAdded = pc.getSenders().some(s => s.track === track);
+                const alreadyAdded = RTCPeerConnectionHandler.pc.getSenders().some(s => s.track === track);
                 if (!alreadyAdded) {
-                    pc.addTrack(track, localStream);
+                    RTCPeerConnectionHandler.pc.addTrack(track, localStream);
                 }
             }
         });
