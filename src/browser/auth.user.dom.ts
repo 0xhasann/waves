@@ -60,11 +60,15 @@ export async function pageLoader() {
     });
 
     if (!res.ok) {
-      return;
+      window.location.replace("/");
+      return false;
     }
 
     const user = await res.json();
-    if (!user?.id) return;
+    if (!user?.id) {
+      window.location.replace("/");
+      return false;
+    }
 
     localStorage.setItem("userId", String(user.id));
     const isConversationPage = window.location.pathname === "/conversation_timeline.html";
@@ -73,6 +77,7 @@ export async function pageLoader() {
       "Guest",
       !isConversationPage,
     );
+    return true;
   } catch (err) {
     console.error("Auth check failed");
   }

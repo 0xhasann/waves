@@ -69,41 +69,6 @@ export function login(wsName: string, name: string, shouldRedirect = true) {
 	}
 }
 
-//builds the user list with a "Call" button per user
-export function renderUserList(data: { names: Name[] }) {
-    const ws = WebSocketHandler.getInstance();
-    const userListDiv = document.getElementById("user-list");
-    if (!userListDiv) {
-        return;
-    }
-
-    userListDiv.innerHTML = "";
-
-    const ul = document.createElement("ul");
-    data.names.forEach((name: string) => {
-        if (ws.myUserName == name) return;
-        const li = document.createElement("li");
-
-        const nameSpan = document.createElement("span");
-        nameSpan.textContent = name;
-
-        const callBtn = document.createElement("button");
-        callBtn.textContent = "Call";
-        callBtn?.addEventListener("click", () => {
-            ws.call(name);
-            callBtn.textContent = "Calling...";
-            callBtn.disabled = true;
-        });
-
-        li.appendChild(nameSpan);
-        li.appendChild(document.createTextNode(" "));
-        li.appendChild(callBtn);
-
-        ul.appendChild(li);
-    });
-
-    userListDiv.appendChild(ul);
-}
 
 // inserts an "Accept" prompt when a call comes in
 export function renderIncomingCall(data: { name: Name }) {
@@ -157,42 +122,6 @@ export function renderIncomingCall(data: { name: Name }) {
     });
 }
 
-export function disableCallButton(name: Name) {
-    const userListDiv = document.getElementById("user-list");
-    if (userListDiv) {
-        const callButtons = userListDiv.querySelectorAll("button");
-        callButtons.forEach((btn) => {
-            const li = btn.closest("li");
-            if (li) {
-                const span = li.querySelector("span");
-                if (span && span.textContent === name) {
-                    btn.textContent = "Call";
-                    btn.disabled = true;
-                }
-            }
-        });
-    }
-}
-
-export function enableCallbutton() {
-    const userListDiv = document.getElementById("user-list");
-    if (userListDiv) {
-        const callButtons = userListDiv.querySelectorAll("button");
-        callButtons.forEach((btn) => {
-            const li = btn.closest("li");
-            if (li) {
-                btn.textContent = "Call";
-                btn.disabled = false;
-
-            }
-        });
-    }
-    const btn = document.getElementById("HangupBtn");
-    if (btn) {
-        btn.style.display = "none";
-    }
-}
-
 //  stops media tracks, closes RTCPeerConnection, calls ws.hangUp()
 export function hangUpCall() {
     console.log("hangup1");
@@ -229,10 +158,6 @@ export function hangUpCall() {
     }
     console.log("hangup13");
     RTCPeerConnectionHandler.close();
-
-
-    enableCallbutton();
-    disableRemoteNameLabel();
 
     const loginPage = document.querySelector(".container");
     if (loginPage)

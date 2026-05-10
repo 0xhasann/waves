@@ -12,7 +12,6 @@ type WsEvents = {
     "hang-up": () => void;
     "call": (data: { name: Name }) => void;
     "accept": (data: { name: Name }) => void;
-    "user-list": (data: { names: Name[] }) => void;
     "direct-message": (data: { from?: Name; content: string; conversationId?: number; sentAt?: string }) => void;
 };
 // websocket client
@@ -139,7 +138,6 @@ export class WebSocketHandler {
                 case "video-answer":
                 case "new-ice-candidate":
                 case "call":
-                case "user-list":
                 case "accept":
                 case "direct-message":
                     this.emit(parsedMessage.type, parsedMessage.data);
