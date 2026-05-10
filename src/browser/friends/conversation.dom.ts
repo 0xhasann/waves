@@ -1,4 +1,4 @@
-import { friends } from "..";
+import { friends, search } from "..";
 import type { ApiResponse } from "../../server/units/apiResponse";
 import type { Conversations, MessageDTO } from "../../shared/types";
 import { setRemoteNameLabel } from "../dom";
@@ -68,14 +68,19 @@ function bindRealtimeMessaging() {
   });
 }
 
-export function searchUser(search: HTMLInputElement) {
+const searchResults = document.getElementById(
+  "search-results",
+) as HTMLDivElement;
+
+export function searchUser() {
   clearTimeout(timeout);
 
   timeout = window.setTimeout(async () => {
     const query = search.value;
 
-    if (query.length < 1) {
-      friends.innerHTML = "";
+    if (!query) {
+      searchResults.innerHTML = "";
+      searchResults.style.display = "none";
       return;
     }
 
@@ -88,7 +93,8 @@ export function searchUser(search: HTMLInputElement) {
     result.data.forEach((conv: Conversations) => {
       html += friendCard(conv);
     });
-    friends.innerHTML = html;
+    searchResults.innerHTML = html;
+    searchResults.style.display = "block";
   }, 500);
 }
 

@@ -7,7 +7,6 @@ export type Name = string;
 login client → server register a username
 call  client → server initiate a call to someone
 accept client → server accept an incoming call 
-user-list server → client broadcast online users 
 logout client → server disconnect
 */
 export type ChatMessage =
@@ -15,7 +14,6 @@ export type ChatMessage =
     { type: "call"; data: { name: Name } } |
     { type: "accept"; data: { name: Name } }
     | { type: "direct-message"; data: { to?: Name; from?: Name; content: string; conversationId?: number; sentAt?: string } }
-    | { type: "user-list"; data: {names: string[]} }
     | { type: "logout" };
 
 const nameSchema = z.string();
@@ -23,7 +21,6 @@ const loginSchema = z.object({ type: z.literal("login"), data: z.object({ name: 
 const callSchema = z.object({ type: z.literal("call"), data: z.object({ name: nameSchema }) });
 const acceptSchema = z.object({ type: z.literal("accept"), data: z.object({ name: nameSchema }) });
 const logoutSchema = z.object({ type: z.literal("logout") });
-const userListSchema = z.object({ type: z.literal("user-list"), data: z.object({ names: z.array(nameSchema) }) });
 const directMessageSchema = z.object({
     type: z.literal("direct-message"),
     data: z.object({
@@ -39,5 +36,5 @@ const directMessageSchema = z.object({
 
 
 export const ChatMessageSchema = z.discriminatedUnion("type", [
-    loginSchema, callSchema, acceptSchema, logoutSchema, userListSchema, directMessageSchema
+    loginSchema, callSchema, acceptSchema, logoutSchema, directMessageSchema
 ])

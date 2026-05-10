@@ -93,13 +93,7 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                 case "login":
                     websocketConnections.set(parsedMessage.data.name, websocket);
                     websocket.userName = parsedMessage.data.name;
-                    const onlineUsers = Array.from(websocketConnections.keys());
-                    websocketConnections.forEach((list) =>
-                        list.send(JSON.stringify({
-                            type: "user-list", data:
-                                { names: onlineUsers }
-                        })))
-                    break
+                    break;
                 // If call is coming from user to server then name is callee
                 // If call is coming from server to user then name is caller
                 case "call":
@@ -113,7 +107,7 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
                             callee.send(JSON.stringify({ type: "call", data: { name: websocket.userName } }));
                         }
                     }
-                    break
+                    break;
                 case "direct-message":
                     if (!websocket.userName) {
                         sendWsError(websocket, "Login First");
