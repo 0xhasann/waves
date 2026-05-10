@@ -152,7 +152,7 @@ export const getTokenFromCookie = async (req: Request, res: Response) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
     const user = await db
-      .prepare(`SELECT id, username, first_name FROM users WHERE id = ?`)
+      .prepare(`SELECT id, username, first_name, last_name FROM users WHERE id = ?`)
       .get(decoded.userId);
     if (!user) return res.status(404).send("User not found");
     res.json(user);

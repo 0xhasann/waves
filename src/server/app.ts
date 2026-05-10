@@ -15,11 +15,6 @@ export const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(process.cwd(), "public")));
-/**
- * Public routes
- */
-app.use("/api/auth", authRoutes);
-app.use("/auth/google", googleAuthRouter);
 
 // logger
 app.use((req, res, next) => {
@@ -35,12 +30,16 @@ app.use((req, res, next) => {
     next();
 });
 
-/**
- * Protected routes
- */
-app.use(authenticate);
-app.use("/api/friends", connection);
-app.use("/api/conversations", conversation);
+//Public routes
+app.use("/api/auth", authRoutes);
+app.use("/auth/google", googleAuthRouter);
+
+
+// Protected routes 
+app.use("/api/friends",authenticate, connection);
+app.use("/api/conversations",authenticate, conversation);
+
+
 
 // fallback
 app.use(notFound);

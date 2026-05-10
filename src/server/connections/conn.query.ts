@@ -1,8 +1,16 @@
 
-export const searchUserQuery = `SELECT id, username  FROM users WHERE email_id = ? OR mobile_no = ? 
-    OR username = ? OR first_name = ? OR last_name = ? AND deleted = 0;`
+export const searchUserQuery = `SELECT id, first_name, last_name, username  FROM users WHERE (email_id = ? OR mobile_no = ? 
+    OR username = ? OR first_name = ? OR last_name = ?) AND id != ? AND deleted = 0;`
 
 export const  sendRequestQuery =  `INSERT into friend_requests (status, sender_id, receiver_id) VALUES('pending', ?, ?);`
+
+export const  pastFriendRequestQuery =  `SELECT 1 from friend_requests where sender_id = ? and receiver_id = ? and deleted = 1;`
+
+export const processpastFriendRequestQuery = `UPDATE friend_requests SET
+      status = 'pending',
+      updated_at = ?,
+      deleted = 0 where sender_id = ? and receiver_id = ?;`
+
 
 export const searchFriendRequestQuery  = `SELECT status FROM friend_requests WHERE sender_id = ? AND receiver_id = ? AND deleted = 0;`
 
@@ -16,6 +24,11 @@ export const processRequestQuery = `UPDATE friend_requests SET
 
 export const createFriendQuery = `INSERT into friends (user1_id, user2_id) VALUES(?, ?);`
 
+export const fetchPastFriendQuery = `SELECT 1 from friends where user1_id = ? and user2_id = ? and deleted = 1;`
+
+export const updatePastFriendQuery = `UPDATE friends SET
+      updated_at = ?,
+      deleted = 0 where user1_id = ? and user2_id = ?;`
 
 export const searchFriendQuery = `SELECT 1 FROM friends WHERE user1_id = ? AND user2_id = ? AND deleted = 0;`
 

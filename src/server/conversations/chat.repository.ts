@@ -2,7 +2,7 @@ import { database } from "../../db/utils";
 import type { Conversation, Conversations, MessageDTO } from "../../shared/types";
 import { now } from "../units/timeUtils";
 import { getUserPair } from "../units/userPair";
-import { deleteConvQuery, prepareCreateConvQuery, prepareFetchAllConversations, prepareFetchConvQuery, prepareP2PConversationsSchema, prepareSendMessageQuery } from "./chat.query";
+import { prepareCreateConvQuery, prepareFetchAllConversations, prepareFetchConvQuery, prepareP2PConversationsSchema, prepareSendMessageQuery } from "./chat.query";
 import type { ConversationSchema, FetchConversationSchema, SendConversationMessageSchema } from "./chat.schema";
 
 export const getOrCreateConversation = (user1_id: number, user2_id: number): number => {
@@ -12,14 +12,6 @@ export const getOrCreateConversation = (user1_id: number, user2_id: number): num
         .get(u1, u2) as Conversation;
 
     return conversation.id;
-}
-
-export const deleteConversation = (user1_id: number, user2_id: number): number => {
-    const { u1, u2 } = getUserPair(user1_id, user2_id);
-    const result = database.
-        prepare(deleteConvQuery)
-        .run(now(), u1, u2);
-    return result.changes;
 }
 
 export const fetchConversations = (query: FetchConversationSchema): any[] | undefined => {
