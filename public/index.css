@@ -244,7 +244,7 @@ h2 {
     height: 400px;
     max-height: 420px;
     flex-direction: column;
-    background-image: url("background-img.jpg");
+    background-image: url("bg-img.jpg");
     border: 1px solid #ccc;
     border-radius: 12px;
     overflow: hidden;
@@ -697,7 +697,7 @@ body {
   flex-direction: column;
   gap: 10px;
 
-  background-image: url("./background-img.jpg");
+  background-image: url("./bg-img.jpg");
   background-size: cover;
   background-position: center;
   height: 100%;

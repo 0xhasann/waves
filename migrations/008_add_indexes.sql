@@ -11,7 +11,3 @@ WHERE deleted = 0;
 CREATE UNIQUE INDEX unique_active_friends
 ON friends(user1_id, user2_id)
 WHERE deleted = 0;
-
-CREATE UNIQUE INDEX unique_active_conversations
-ON conversations(user1_id, user2_id)
-WHERE deleted = 0;
