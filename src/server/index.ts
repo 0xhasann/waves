@@ -62,6 +62,7 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
         try {
             const json = JSON.parse(data.toString());
             const parsedMessage = z.parse(WebSocketMessageSchema, json);
+            console.log("type, parsedMessage ::", parsedMessage.type, parsedMessage);
 
             switch (parsedMessage.type) {
                 case "hang-up":

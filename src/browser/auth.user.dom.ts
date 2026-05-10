@@ -69,8 +69,8 @@ export async function pageLoader() {
     localStorage.setItem("userId", String(user.id));
     const isConversationPage = window.location.pathname === "/conversation_timeline.html";
     login(
-      user.first_name || user.username,
-      user.username || user.first_name,
+      user.full_name || user.username ,
+      "Guest",
       !isConversationPage,
     );
   } catch (err) {

@@ -9,7 +9,6 @@ let timeout: number;
 
 type SelectedConversation = {
   peerId: number;
-  peerName: string;
   displayName: string;
   avatarUrl: string;
   conversationId?: number;
@@ -155,8 +154,7 @@ export async function conversations(e: PointerEvent) {
 
 
   const currentUserId = parseInt(localStorage.getItem("userId") || "0", 10);
-  const displayName = friend.dataset.displayName || "Unknown";
-  const peerName = friend.dataset.username || displayName;
+  const displayName = friend.dataset.displayName || friend.dataset.username || "Unknown";
   const avatarUrl = friend.dataset.avatarUrl || "https://i.pravatar.cc/150";
   const conversationIdRaw = friend.dataset.conversationId;
   const parsedConversationId = conversationIdRaw ? Number(conversationIdRaw) : undefined;
@@ -164,7 +162,6 @@ export async function conversations(e: PointerEvent) {
 
   selectedConversation = {
     peerId: Number(userId),
-    peerName,
     displayName,
     avatarUrl,
     conversationId,
@@ -219,9 +216,9 @@ setTimeout(() => {
   const input = document.getElementById("p2p-chat-input") as HTMLInputElement | null;
 
   callBtn?.addEventListener("click", () => {
-    if (!selectedConversation?.peerName) return;
-    setRemoteNameLabel(selectedConversation.peerName);
-    WebSocketHandler.getInstance().call(selectedConversation.peerName);
+    if (!selectedConversation?.displayName) return;
+    setRemoteNameLabel(selectedConversation.displayName);
+    WebSocketHandler.getInstance().call(selectedConversation.displayName);
   });
 
 
@@ -276,7 +273,7 @@ export const sendCurrentMessage = async () => {
 
     await sendMessages(selectedConversation.conversationId, message);
     WebSocketHandler.getInstance().directMessage(
-      selectedConversation.peerName,
+      selectedConversation.displayName,
       message,
       selectedConversation.conversationId,
     );

@@ -46,7 +46,7 @@ export function setRemoteNameLabel(remoteName: string) {
 }
 
 // hides the form, shows welcome text, calls ws.login()
-export function login(name: string, wsName?: string, shouldRedirect = true) {
+export function login(wsName: string, name: string, shouldRedirect = true) {
 	const ws = WebSocketHandler.getInstance();
 	const authContainer = document.querySelector(
 		".auth-container",
@@ -55,13 +55,13 @@ export function login(name: string, wsName?: string, shouldRedirect = true) {
 	if (authContainer) {
 		authContainer.style.display = "none";
 	}
-	if (!name) return;
+	if (!wsName) return;
 
 	const localLabel = document.getElementById(
 		"local-name-label",
 	) as HTMLSpanElement | null;
 	if (localLabel) {
-		localLabel.textContent = name;
+		localLabel.textContent = wsName || name;
 	}
 	ws.login(wsName || name);
 	if (shouldRedirect && window.location.pathname !== "/conversation_timeline.html") {
