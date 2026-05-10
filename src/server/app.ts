@@ -9,6 +9,7 @@ import { notFound } from "./units/notFound";
 import { errorHandler } from "./units/errorHandler";
 import cookieParser from "cookie-parser";
 import { authenticate } from "./auth/auth.google";
+import { logger } from "./units/logger";
 
 export const app = express();
 
@@ -18,15 +19,17 @@ app.use(express.static(path.join(process.cwd(), "public")));
 
 // logger
 app.use((req, res, next) => {
-    console.log("request:: ", req.body);
+    const start = Date.now();
 
+    logger.info(`[${req.method}] ${req.originalUrl} | body=${JSON.stringify(req.body)}`);
     const originalJson = res.json.bind(res);
-
+  
     res.json = (body) => {
-        console.log("response:: ", body);
-        return originalJson(body);
+      const time = Date.now() - start;
+      logger.info( `[${req.method}] ${req.originalUrl} | status=${res.statusCode} | ${time}ms | response=${JSON.stringify(body)}`);
+      return originalJson(body);
     };
-
+  
     next();
 });
 
