@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS friends (
   user1_id INTEGER NOT NULL,
   user2_id INTEGER NOT NULL,
   deleted INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
-  updated_at TEXT NOT NULL DEFAULT (strftime('%d/%m/%Y %H:%M:%S', 'now', '+5 hours', '30 minutes')),
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '+5 hours', '30 minutes')),
+  updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '+5 hours', '30 minutes')),
 
   FOREIGN KEY (user1_id) REFERENCES users(id),
   FOREIGN KEY (user2_id) REFERENCES users(id)
