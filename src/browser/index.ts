@@ -20,7 +20,7 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 
 import { pageLoader, showForm, signup } from "./auth.user.dom";
 import { ChatUI } from "./chat";
-import { disableCallButton, attachUserMedia, hangUpCall, renderIncomingCall, renderUserList, setRemoteNameLabel, localStream } from "./dom";
+import { attachUserMedia, hangUpCall, renderIncomingCall, setRemoteNameLabel, localStream } from "./dom";
 import { conversations, fetchUserConversations, searchUser } from "./friends/conversation.dom";
 import { recordStream } from "./recordStream";
 import { shareScreen } from "./shareScreen";
@@ -40,9 +40,13 @@ googleButtons.forEach((btn) => {
 });
 
 window?.addEventListener("DOMContentLoaded", async () => {
-  await pageLoader();
+  const isProtectedPage =
+    window.location.pathname === "/conversation_timeline.html";
 
-  if (window.location.pathname === "/conversation_timeline.html") {
+  if (isProtectedPage) {
+    const isAuthenticated = await pageLoader();
+
+    if (!isAuthenticated) return;
     await fetchUserConversations();
   }
 });
@@ -67,11 +71,16 @@ document.getElementById("signupTab")?.addEventListener("click", () => {
   showForm("signup");
 });
 
-const search = document.getElementById("search") as HTMLInputElement;
+export const search = document.getElementById("search") as HTMLInputElement;
 export const friends = document.getElementById("friends") as HTMLDivElement;
+export const searchUsers = document.getElementById("search-results") as HTMLDivElement;
 
-search?.addEventListener("keyup", () => searchUser(search));
-friends?.addEventListener("click", async (e) => conversations(e));
+
+search?.addEventListener("keyup", searchUser);
+
+[friends, searchUsers].forEach((element)  => {
+  element?.addEventListener("click", conversations);
+});
 
 
 let audioEnabled = true;
@@ -130,7 +139,6 @@ ws.on("video-answer", async (event) => {
 })
 
 ws.on("accept", async ({ name }) => {
-  disableCallButton(name);
   const dc = RTCPeerConnectionHandler.pc.createDataChannel("chat");
   RTCPeerConnectionHandler.dataChannel = dc;
   attachDataChannelHandlers(dc);
@@ -159,15 +167,12 @@ chatToggleBtn?.addEventListener("click", () => {
 ws.on("video-offer", async (event) => {
 
   await RTCPeerConnectionHandler.pc.setRemoteDescription(event.sdp);
-
   // Get media and use addTrack (not addTransceiver)
   const granted = await attachUserMedia(audioEnabled, videoEnabled);
   if (!granted) {
     hangUpCall();
     return;
   }
-
-
 
   const answer = await RTCPeerConnectionHandler.pc.createAnswer();
   await RTCPeerConnectionHandler.pc.setLocalDescription(answer);
@@ -182,5 +187,3 @@ ws.on("video-offer", async (event) => {
 
 
 ws.on("call", renderIncomingCall);
-ws.on("user-list", renderUserList);
-

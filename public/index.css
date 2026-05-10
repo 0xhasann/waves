@@ -834,3 +834,36 @@ body {
         opacity: 1;
     }
 }
+
+.sidebar-content {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sidebar {
+    position: relative;
+}
+
+#friends,
+#search-results {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.search-overlay {
+    position: absolute;
+
+    top: 110px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: white;
+    z-index: 5;
+
+    overflow-y: auto;
+
+    display: none;
+}
+
