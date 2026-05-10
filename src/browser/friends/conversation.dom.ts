@@ -18,33 +18,6 @@ let selectedConversation: SelectedConversation | null = null;
 let realtimeBound = false;
 let incomingPromptBound = false;
 
-function ensureIncomingCallPrompt() {
-  if (incomingPromptBound) return;
-  incomingPromptBound = true;
-
-  const app = document.querySelector(".app");
-  if (!app) return;
-
-  const prompt = document.createElement("div");
-  prompt.id = "timeline-incoming-call";
-  prompt.style.display = "none";
-  prompt.style.position = "fixed";
-  prompt.style.top = "16px";
-  prompt.style.left = "50%";
-  prompt.style.transform = "translateX(-50%)";
-  prompt.style.zIndex = "2000";
-  prompt.style.background = "#fff";
-  prompt.style.padding = "12px 16px";
-  prompt.style.border = "1px solid #ddd";
-  prompt.style.borderRadius = "10px";
-  prompt.style.boxShadow = "0 4px 14px rgba(0,0,0,0.18)";
-  prompt.innerHTML = `
-    <span id="timeline-incoming-call-text"></span>
-    <button id="timeline-accept-call" style="margin-left:10px;">Accept</button>
-    <button id="timeline-reject-call" style="margin-left:8px;">Reject</button>
-  `;
-  document.body.appendChild(prompt);
-}
 
 async function sendMessages(conversationId: number, content: string) {
   const response = await fetch("http://localhost:3000/api/conversations/messages", {
@@ -81,7 +54,6 @@ function appendIncomingMessage(content: string, sentAt?: string) {
 function bindRealtimeMessaging() {
   if (realtimeBound) return;
   realtimeBound = true;
-  ensureIncomingCallPrompt();
 
   const ws = WebSocketHandler.getInstance();
   ws.on("direct-message", ({ conversationId, content, sentAt }) => {
@@ -93,26 +65,6 @@ function bindRealtimeMessaging() {
   
     appendIncomingMessage(content, sentAt);
     
-  });
-  ws.on("call", ({ name }) => {
-    const prompt = document.getElementById("timeline-incoming-call");
-    const text = document.getElementById("timeline-incoming-call-text");
-    const acceptBtn = document.getElementById("timeline-accept-call") as HTMLButtonElement | null;
-    const rejectBtn = document.getElementById("timeline-reject-call") as HTMLButtonElement | null;
-    if (!prompt || !text || !acceptBtn || !rejectBtn) return;
-
-    text.textContent = `Incoming video call from ${name}`;
-    prompt.style.display = "block";
-
-    acceptBtn.onclick = () => {
-      setRemoteNameLabel(name);
-      ws.accept(name);
-      prompt.style.display = "none";
-    };
-
-    rejectBtn.onclick = () => {
-      prompt.style.display = "none";
-    };
   });
 }
 

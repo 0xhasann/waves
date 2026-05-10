@@ -25,6 +25,17 @@ export class RTCPeerConnectionHandler {
     public static close():void {
         this.dataChannel?.close();
         this.dataChannel = null;
+        this.pc.getSenders().forEach(sender => {
+            if (sender.track) {
+                sender.track.stop();
+            }
+        });
+    
+        this.pc.getReceivers().forEach(receiver => {
+            if (receiver.track) {
+                receiver.track.stop();
+            }
+        });
         this.pc.ondatachannel = null;
         this.pc.getTransceivers().forEach(t => t.stop());
         this.pc.ontrack = null;

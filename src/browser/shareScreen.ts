@@ -4,11 +4,10 @@ const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement | null
 
 let shareStream: MediaStream | null = null;
 let isSharing = false;
-const pc = RTCPeerConnectionHandler.pc;
 const dc = RTCPeerConnectionHandler.dataChannel;
 
 async function replaceVideoTrack(track: MediaStreamTrack): Promise<boolean> {
-    const senders = pc.getSenders();
+    const senders = RTCPeerConnectionHandler.pc.getSenders();
 
     senders.forEach((s, i) => {
         console.log(`Sender ${i}:`, s.track?.kind, s.track?.label, s.transport);
@@ -70,8 +69,8 @@ export async function shareScreen() {
     // Attach onended before replacing the track
     screenTrack.onended = () => stopSharing();
 
-    console.log("Senders:", pc.getSenders());
-    console.log("PC state:", pc.signalingState, pc.connectionState);
+    console.log("Senders:", RTCPeerConnectionHandler.pc.getSenders());
+    console.log("PC state:", RTCPeerConnectionHandler.pc.signalingState, RTCPeerConnectionHandler.pc.connectionState);
 
     const success = await replaceVideoTrack(screenTrack);
     if (!success) {

@@ -28,6 +28,7 @@ import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEve
 import { WebSocketHandler } from "./websocketHandler";
 
 const ws = WebSocketHandler.getInstance();
+ws.on("hang-up", hangUpCall);
 document.getElementById("HangupBtn")?.addEventListener("click", hangUpCall);
 //Frontend -> Backend -> Google -> Redirect -> backend -> Frontend
 const googleButtons = document.querySelectorAll(".google-btn",) as NodeListOf<HTMLButtonElement>;
@@ -116,26 +117,24 @@ shareBtn?.addEventListener("click", async () => {
 });
 
 ChatUI.init();
-const pc = RTCPeerConnectionHandler.pc;
+// const pc = RTCPeerConnectionHandler.pc;
+
 
 ws.on("new-ice-candidate", async (event) => {
-  await pc.addIceCandidate(event.candidate);
+  // await pc.addIceCandidate(event.candidate);
+  await RTCPeerConnectionHandler.pc.addIceCandidate(event.candidate);
 });
 ws.on("video-answer", async (event) => {
-  if (pc.signalingState !== "have-local-offer") return;
-  await pc.setRemoteDescription(event.sdp);
+  if (RTCPeerConnectionHandler.pc.signalingState !== "have-local-offer") return;
+  await RTCPeerConnectionHandler.pc.setRemoteDescription(event.sdp);
 })
 
 ws.on("accept", async ({ name }) => {
   disableCallButton(name);
-  const dc = pc.createDataChannel("chat");
+  const dc = RTCPeerConnectionHandler.pc.createDataChannel("chat");
   RTCPeerConnectionHandler.dataChannel = dc;
   attachDataChannelHandlers(dc);
 
-  ws.on("hang-up", () => {
-    hangUpCall();
-
-  })
 
   const granted = await attachUserMedia(audioEnabled, videoEnabled);
   if (!granted) {
@@ -158,12 +157,8 @@ chatToggleBtn?.addEventListener("click", () => {
 });
 
 ws.on("video-offer", async (event) => {
-  ws.on("hang-up", () => {
-    hangUpCall();
 
-  });
-
-  await pc.setRemoteDescription(event.sdp);
+  await RTCPeerConnectionHandler.pc.setRemoteDescription(event.sdp);
 
   // Get media and use addTrack (not addTransceiver)
   const granted = await attachUserMedia(audioEnabled, videoEnabled);
@@ -174,10 +169,10 @@ ws.on("video-offer", async (event) => {
 
 
 
-  const answer = await pc.createAnswer();
-  await pc.setLocalDescription(answer);
-  if (!pc.localDescription) return;
-  ws.videoAnswer(pc.localDescription);
+  const answer = await RTCPeerConnectionHandler.pc.createAnswer();
+  await RTCPeerConnectionHandler.pc.setLocalDescription(answer);
+  if (!RTCPeerConnectionHandler.pc.localDescription) return;
+  ws.videoAnswer(RTCPeerConnectionHandler.pc.localDescription);
   const camerabox = document.getElementById("camerabox") as HTMLElement | null;
   camerabox?.classList.add("active");
   const loginPage = document.querySelector(".container");
@@ -186,8 +181,6 @@ ws.on("video-offer", async (event) => {
 });
 
 
-if (window.location.pathname !== "/conversation_timeline.html") {
-  ws.on("call", renderIncomingCall);
-}
+ws.on("call", renderIncomingCall);
 ws.on("user-list", renderUserList);
 
