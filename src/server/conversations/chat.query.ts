@@ -11,15 +11,13 @@ export const prepareFetchConvQuery = `SELECT
       ON m.conversation_id = c.id
     WHERE c.id = ?
     ORDER BY m.created_at DESC
-    LIMIT ?;`
-
+    LIMIT ?;`;
 
 export const prepareCreateConvQuery = `INSERT INTO conversations (user1_id, user2_id)VALUES (?, ?) ON CONFLICT(user1_id, user2_id)
                 DO UPDATE SET user1_id = excluded.user1_id
-                RETURNING id;`
+                RETURNING id;`;
 
-
-export const prepareSendMessageQuery = `INSERT INTO messages(conversation_id, sender_id, type, content) VALUES (?, ?, ?, ?);`
+export const prepareSendMessageQuery = `INSERT INTO messages(conversation_id, sender_id, type, content) VALUES (?, ?, ?, ?);`;
 
 export const prepareFetchAllConversations = `SELECT 
     u.id AS peer_id,
@@ -51,7 +49,7 @@ LEFT JOIN messages m ON m.id = (
 
 WHERE c.user1_id = ? OR c.user2_id = ?
 
-ORDER BY m.updated_at DESC;`
+ORDER BY m.updated_at DESC;`;
 
 export const prepareP2PConversationsSchema = `SELECT *
 FROM (
@@ -77,4 +75,4 @@ WHERE m.conversation_id = (
 ORDER BY m.updated_at DESC
 LIMIT 20
 ) AS last_20
-ORDER BY updated_at ASC;`
+ORDER BY updated_at ASC;`;

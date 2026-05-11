@@ -1,42 +1,36 @@
-import type { PendingFriendRequests } from "../../shared/types";
+import type { ApiResponse } from '../../server/units/apiResponse';
+import type { PendingFriendRequests } from '../../shared/types';
 
 export async function fetchPendingRequests() {
-    try {
-      const res = await fetch(
-        "http://localhost:3000/api/friends/pendingRequets",
-        {
-          credentials: "include",
-        },
-      );
-  
-      if (!res.ok) {
-        throw new Error("Failed to fetch requests");
-      }
-  
-      const requests = await res.json();
-      console.log("requests::", requests);
-  
-      renderPendingRequests(requests.data);
-  
-    } catch (err) {
-      console.error(err);
+  try {
+    const res = await fetch('http://localhost:3000/api/friends/pendingRequets', {
+      credentials: 'include',
+    });
+
+    const result = (await res.json()) as ApiResponse<PendingFriendRequests[]>;
+
+    if (!res.ok || !result.success || result.error || !result.data) {
+      throw new Error(`Failed to fetch requests ${result.message} ${result.error}`);
     }
+
+    renderPendingRequests(result.data);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderPendingRequests(requests: PendingFriendRequests[]) {
+  const container = document.getElementById('connections-list') as HTMLDivElement;
+  if (!container) {
+    console.error('connections-list not found');
+    return;
   }
 
-  function renderPendingRequests(requests: PendingFriendRequests[]) {
+  container.innerHTML = requests
+    .map((request) => {
+      const fullName = `${request.first_name || ''} ${request.last_name || ''}`.trim();
 
-    const container = document.getElementById("connections-list") as HTMLDivElement;
-    if (!container) {
-      console.error("connections-list not found");
-      return;
-    }
-  
-    container.innerHTML = requests
-      .map((request) => {
-        const fullName =
-          `${request.first_name || ""} ${request.last_name || ""}`.trim();
-  
-        return `
+      return `
           <div class="request-card">
   
             <div>
@@ -45,14 +39,14 @@ export async function fetchPendingRequests() {
   
             <div class="request-actions">
               <button
-                class="accept-requets-btn"
+                class="accept-btn"
                 data-sender-id="${request.sender_id}"
               >
                 Accept
               </button>
   
               <button
-                class="reject-request-btn"
+                class="reject-btn"
                 data-sender-id="${request.sender_id}"
               >
                 Reject
@@ -61,6 +55,6 @@ export async function fetchPendingRequests() {
   
           </div>
         `;
-      })
-      .join("");
-  }
+    })
+    .join('');
+}

@@ -7,193 +7,184 @@
 // onicegatheringstatechange -> update the dom to reflect ine gathering states
 // onsignalingstatechange -> update the dom to reflect rtc signaling states
 
-import { ChatUI } from "./chat";
-import { WebSocketHandler } from "./websocketHandler";
+import { ChatUI, type DataChannelMessageBody } from './chat';
+import { WebSocketHandler } from './websocketHandler';
 
 // the webrtc event handler
 // singleton class
 export class RTCPeerConnectionHandler {
-    private static rtcPeerConnectionHandler: RTCPeerConnectionHandler | null;
-    public static dataChannel: RTCDataChannel | null = null;
-    private rtcPeerConnection: RTCPeerConnection;
+  private static rtcPeerConnectionHandler: RTCPeerConnectionHandler | null;
+  public static dataChannel: RTCDataChannel | null = null;
+  private rtcPeerConnection: RTCPeerConnection;
 
-    private constructor() {
-        this.rtcPeerConnection = createPeerConnection();
-    }
+  private constructor() {
+    this.rtcPeerConnection = createPeerConnection();
+  }
 
-    //cleanly nulls all handlers and closes the connection.
-    public static close():void {
-        this.dataChannel?.close();
-        this.dataChannel = null;
-        this.pc.getSenders().forEach(sender => {
-            if (sender.track) {
-                sender.track.stop();
-            }
-        });
-    
-        this.pc.getReceivers().forEach(receiver => {
-            if (receiver.track) {
-                receiver.track.stop();
-            }
-        });
-        this.pc.ondatachannel = null;
-        this.pc.getTransceivers().forEach(t => t.stop());
-        this.pc.ontrack = null;
-        this.pc.onicecandidate = null;
-        this.pc.oniceconnectionstatechange = null;
-        this.pc.onsignalingstatechange = null;
-        this.pc.onicegatheringstatechange = null;
-        this.pc.onnegotiationneeded = null;
-        this.pc.close();
-        this.rtcPeerConnectionHandler = null;
- 
-    }
+  //cleanly nulls all handlers and closes the connection.
+  public static close(): void {
+    this.dataChannel?.close();
+    this.dataChannel = null;
+    this.pc.getSenders().forEach((sender) => {
+      if (sender.track) {
+        sender.track.stop();
+      }
+    });
 
-    public static get pc(): RTCPeerConnection {
-        if (this.rtcPeerConnectionHandler) return this.rtcPeerConnectionHandler.rtcPeerConnection;
-        this.rtcPeerConnectionHandler = new RTCPeerConnectionHandler();
-        return this.rtcPeerConnectionHandler.rtcPeerConnection;
-    }
+    this.pc.getReceivers().forEach((receiver) => {
+      if (receiver.track) {
+        receiver.track.stop();
+      }
+    });
+    this.pc.ondatachannel = null;
+    this.pc.getTransceivers().forEach((t) => t.stop());
+    this.pc.ontrack = null;
+    this.pc.onicecandidate = null;
+    this.pc.oniceconnectionstatechange = null;
+    this.pc.onsignalingstatechange = null;
+    this.pc.onicegatheringstatechange = null;
+    this.pc.onnegotiationneeded = null;
+    this.pc.close();
+    this.rtcPeerConnectionHandler = null;
+  }
 
+  public static get pc(): RTCPeerConnection {
+    if (this.rtcPeerConnectionHandler) return this.rtcPeerConnectionHandler.rtcPeerConnection;
+    this.rtcPeerConnectionHandler = new RTCPeerConnectionHandler();
+    return this.rtcPeerConnectionHandler.rtcPeerConnection;
+  }
 }
 
 function createPeerConnection(): RTCPeerConnection {
-    const ws = WebSocketHandler.getInstance();
-    const pc = new RTCPeerConnection({
-        iceServers: [
-            {
-                urls: "stun:stun.stunprotocol.org",
-            },
-        ],
-    });
-    // sends gathered ICE candidates to the other peer via ws.newIceCandidate()
-    pc.onicecandidate = (e) => {
-        if (!e.candidate) return;
-        ws.newIceCandidate(e.candidate);
+  const ws = WebSocketHandler.getInstance();
+  const pc = new RTCPeerConnection({
+    iceServers: [
+      {
+        urls: 'stun:stun.stunprotocol.org',
+      },
+    ],
+  });
+  // sends gathered ICE candidates to the other peer via ws.newIceCandidate()
+  pc.onicecandidate = (e) => {
+    if (!e.candidate) return;
+    ws.newIceCandidate(e.candidate);
+  };
+  // creates an SDP offer, sets local description, sends video-offer via ws
+  // this fires automatically when tracks are added
+  pc.onnegotiationneeded = () => {
+    if (pc.signalingState != 'stable' && pc.signalingState != 'have-remote-offer') return;
+    //only caller should create offer
+    if (!RTCPeerConnectionHandler.dataChannel) return;
+    pc.createOffer()
+      .then((offer) => pc.setLocalDescription(offer))
+      .then(() => {
+        if (!pc.localDescription) throw new Error('local description not found');
+        ws.videoOffer(pc.localDescription);
+      })
+      .catch(window.reportError);
+  };
+  // shows the hang-up button when connected
+
+  pc.onconnectionstatechange = () => {
+    const btn = document.getElementById('HangupBtn');
+    if (!btn) return;
+    if (pc.connectionState === 'connected') {
+      btn.style.display = 'block';
     }
-    // creates an SDP offer, sets local description, sends video-offer via ws
-    // this fires automatically when tracks are added
-    pc.onnegotiationneeded = () => {
-        if (pc.signalingState != "stable" && pc.signalingState != "have-remote-offer") return;
-        //only caller should create offer
-        if (!RTCPeerConnectionHandler.dataChannel) return;
-        pc
-            .createOffer()
-            .then((offer) => pc.setLocalDescription(offer))
-            .then(() => {
-                if (!pc.localDescription) throw new Error("local description not found");
-                ws.videoOffer(pc.localDescription);
-            })
-            .catch(window.reportError);
+  };
+  //  receives the remote video stream and plugs it into the <video#received_video> element
+  pc.ontrack = (event) => {
+    const receivedVideo = document.getElementById('received_video') as HTMLVideoElement | null;
+    const localVideo = document.getElementById('local_video') as HTMLVideoElement | null;
+    if (!receivedVideo || !event.streams?.[0]) return;
+
+    const track = event.track;
+
+    if (track.kind === 'video') {
+      const stream = event.streams[0];
+
+      // Screen share tracks have contentHint "detail" or "text",
+      // or we detect via label — getDisplayMedia tracks are never from a camera
+      const isScreenShare =
+        track.label.toLowerCase().includes('screen') || track.contentHint === 'detail' || track.contentHint === 'text';
+
+      if (isScreenShare) {
+        // Put screen share in the main big video
+        receivedVideo.srcObject = stream;
+        receivedVideo.style.objectFit = 'contain';
+
+        // Push local camera to PiP position
+        localVideo?.classList.add('pip-mode');
+      } else {
+        // Regular camera — assign normally
+        receivedVideo.srcObject = stream;
+        receivedVideo.style.objectFit = 'cover';
+
+        // Restore local video from PiP if it was in PiP mode
+        localVideo?.classList.remove('pip-mode');
+      }
     }
-    // shows the hang-up button when connected
-    
-    pc.onconnectionstatechange = () => {
-        const btn = document.getElementById("HangupBtn");
-        if (!btn) return;
-        if (pc.connectionState === "connected") {
-            btn.style.display = "block";
-        }
-    };
-    //  receives the remote video stream and plugs it into the <video#received_video> element
-    pc.ontrack = (event) => {
-        const receivedVideo = document.getElementById("received_video") as HTMLVideoElement | null;
-        const localVideo = document.getElementById("local_video") as HTMLVideoElement | null;
-        if (!receivedVideo || !event.streams?.[0]) return;
 
-        const track = event.track;
+    const hangupBtn = document.getElementById('HangupBtn') as HTMLButtonElement | null;
+    if (hangupBtn) hangupBtn.disabled = false;
+  };
 
-        if (track.kind === "video") {
-            const stream = event.streams[0];
+  pc.ondatachannel = (event) => {
+    const dc = event.channel;
+    RTCPeerConnectionHandler.dataChannel = dc;
+    attachDataChannelHandlers(dc);
+  };
 
-            // Screen share tracks have contentHint "detail" or "text",
-            // or we detect via label — getDisplayMedia tracks are never from a camera
-            const isScreenShare = track.label.toLowerCase().includes("screen") ||
-                track.contentHint === "detail" ||
-                track.contentHint === "text";
-
-            if (isScreenShare) {
-                // Put screen share in the main big video
-                receivedVideo.srcObject = stream;
-                receivedVideo.style.objectFit = "contain"; 
-
-                // Push local camera to PiP position
-                localVideo?.classList.add("pip-mode");
-            } else {
-                // Regular camera — assign normally
-                receivedVideo.srcObject = stream;
-                receivedVideo.style.objectFit = "cover";
-
-                // Restore local video from PiP if it was in PiP mode
-                localVideo?.classList.remove("pip-mode");
-            }
-        }
-
-        const hangupBtn = document.getElementById("HangupBtn") as HTMLButtonElement | null;
-        if (hangupBtn) hangupBtn.disabled = false;
-    };
-
-    pc.ondatachannel = (event) => {
-        const dc = event.channel;
-        RTCPeerConnectionHandler.dataChannel = dc;
-        attachDataChannelHandlers(dc);
-    };
-    
-    return pc;
+  return pc;
 }
 
 export function attachDataChannelHandlers(dc: RTCDataChannel) {
-    dc.onopen = () => {
-        const input = document.getElementById("chat-input") as HTMLInputElement;
-        const btn = document.getElementById("send-btn") as HTMLButtonElement;
+  dc.onopen = () => {
+    const input = document.getElementById('chat-input') as HTMLInputElement;
+    const btn = document.getElementById('send-btn') as HTMLButtonElement;
 
-        input.removeAttribute("disabled");
-        // btn.removeAttribute("disabled");
-        btn.disabled = false;
-    };
+    input.removeAttribute('disabled');
+    // btn.removeAttribute("disabled");
+    btn.disabled = false;
+  };
 
-    dc.onclose = () => {
-        const input = document.getElementById("chat-input") as HTMLInputElement;
-        const btn = document.getElementById("send-btn") as HTMLButtonElement;
+  dc.onclose = () => {
+    const input = document.getElementById('chat-input') as HTMLInputElement;
+    const btn = document.getElementById('send-btn') as HTMLButtonElement;
 
-        input.setAttribute("disabled", "true");
-        // btn.setAttribute("disabled", "true");
-        btn.disabled = true;
-    };
+    input.setAttribute('disabled', 'true');
+    // btn.setAttribute("disabled", "true");
+    btn.disabled = true;
+  };
 
-    dc.onmessage = (event) => {
-        try {
+  dc.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data as string) as DataChannelMessageBody;
 
-            const msg = JSON.parse(event.data);
+      switch (msg.type) {
+        case 'screen-share': {
+          const receivedVideo = document.getElementById('received_video') as HTMLVideoElement;
+          const localVideo = document.getElementById('local_video') as HTMLVideoElement;
 
-            switch (msg.type) {
-                case "screen-share":
-                    const receivedVideo = document.getElementById("received_video") as HTMLVideoElement;
-                    const localVideo = document.getElementById("local_video") as HTMLVideoElement;
-
-                    if (msg.active) {
-                        receivedVideo.style.objectFit = "contain";
-                        localVideo?.classList.add("pip-mode");
-                    } else {
-                        receivedVideo.style.objectFit = "cover";
-                        localVideo?.classList.remove("pip-mode");
-                    }
-                    break;
-                case "chat":
-                    ChatUI.appendMessage(msg.data, "remote");
-                    break;
-                default:
-                    console.error("no valid type found", msg.type);
-                    break;
-
-
-
-            }
-        } catch(e) {
-            console.error("Screen capture JSON error:", e);
-            return;
+          if (msg.active) {
+            receivedVideo.style.objectFit = 'contain';
+            localVideo?.classList.add('pip-mode');
+          } else {
+            receivedVideo.style.objectFit = 'cover';
+            localVideo?.classList.remove('pip-mode');
+          }
+          break;
         }
-       
-
-    };
+        case 'chat':
+          ChatUI.appendMessage(msg.data, 'remote');
+          break;
+        default:
+          console.error('no valid type found');
+          break;
+      }
+    } catch (e) {
+      console.error('Screen capture JSON error:', e);
+      return;
+    }
+  };
 }

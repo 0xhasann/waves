@@ -1,51 +1,42 @@
-import type { Request, Response, NextFunction } from "express";
-import { ZodError } from "zod";
-import { AppError } from "../units/app.errors";
-import { parseSqliteError } from "../units/parseSqliteError";
+import type { Request, Response } from 'express';
+import { ZodError } from 'zod';
+import { AppError } from '../units/app.errors';
+import { parseSqliteError } from '../units/parseSqliteError';
+import { SQLiteError } from 'bun:sqlite';
+import { logger } from './logger';
 
-export const errorHandler = (
-    err: any,
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+import * as z from 'zod';
 
-    console.error("ERROR:", {
-        path: req.path,
-        method: req.method,
-        body: req.body,
-        error: err,
+export const errorHandler = (err: unknown, req: Request, res: Response) => {
+  let status = 500;
+  let message = 'Internal Server Error';
+  let error: string = '';
+
+  if (err instanceof ZodError) {
+    status = 400;
+    message = 'Validation error';
+    error = z.treeifyError(err).errors.join('\n');
+  } else if (err instanceof AppError) {
+    status = err.status;
+    message = err.message;
+  } else if (err instanceof SQLiteError) {
+    message = parseSqliteError(err.message);
+  } else if (err instanceof Error) {
+    message = err.message || message;
+  }
+
+  if (status >= 500) {
+    logger.error({
+      path: req.path,
+      method: req.method,
+      body: req.body as unknown,
+      error: err,
     });
-    
-    let status = 500;
-    let message = "Internal Server Error";
-    let errors: any = null;
+  }
 
-    if (err instanceof ZodError) {
-        status = 400;
-        message = "Validation error";
-        errors = err.issues;
-    }
-
-    else if (err instanceof AppError) {
-        status = err.status;
-        message = err.message;
-    }
-
-    else if (err?.code === "SQLITE_CONSTRAINT") {
-        status = 400;
-        message = parseSqliteError(err.message);
-    }
-
-    // fallback
-    else {
-        message = err.message || message;
-    }
-
-    return res.status(status).json({
-        success: false,
-        message,
-        errors,
-        ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-    });
+  return res.status(status).json({
+    success: false,
+    message,
+    error,
+  });
 };

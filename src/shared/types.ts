@@ -1,35 +1,36 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
 export type User = {
-	id: number;
-	username: string | null;
-	google_id: string | null;
-	provider: string;
-	user_pass: string;
-	mobile_no: string | null;
-	email_id: string | null;
-	avatar_url: string | null;
-	first_name: string | null;
-	last_name: string | null;
-	last_chat?: string;
-	created_at: string | null;
-	updated_at: string | null;
+  id: number;
+  username: string | null;
+  google_id: string | null;
+  provider: string;
+  user_pass: string;
+  mobile_no: string | null;
+  email_id: string | null;
+  avatar_url: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  last_chat?: string;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export const RequestStatus = {
-  pending: "pending",
-  accepted: "accepted",
-  rejected: "rejected",
+  pending: 'pending',
+  accepted: 'accepted',
+  rejected: 'rejected',
 } as const;
-export interface FriendRow {
+
+export type FriendRow = {
   id: number;
-}
+};
 export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus];
 
 export type Message = {
   id: number;
   sender_id: number;
-  type: "text";
+  type: string;
   content: string;
   created_at: string;
 };
@@ -38,10 +39,6 @@ export type Conversation = {
   id: number;
   messages: Message[];
   updated_at: string;
-};
-
-export type FetchConversationsResponse = {
-  conversations: Conversation[];
 };
 
 export type Row = {
@@ -68,7 +65,7 @@ export type Conversations = {
   conversation_id: number;
 
   last_message: string | null;
-  type: "text" | "image" | "video" | null;
+  type: 'text' | 'image' | 'video' | null;
   sender_id: number | null;
   updated_at: string | null;
 };
@@ -77,7 +74,7 @@ export type MessageDTO = {
   // message info
   id: number;
   content: string;
-  type: "text" | "image" | "video";
+  type: 'text' | 'image' | 'video';
   sender_id: number;
   updated_at: string | null;
 
@@ -89,7 +86,7 @@ export type MessageDTO = {
   avatar_url: string | null;
 };
 
-export interface SearchConversations {
+export type SearchConversations = {
   peer_id?: number;
   id?: number;
 
@@ -109,16 +106,16 @@ export interface SearchConversations {
   sender_id?: number;
 
   type?: string;
-}
+};
 
-export interface PendingFriendRequests {
+export type PendingFriendRequests = {
   id: number;
 
   sender_id: number;
 
   receiver_id: number;
 
-  status: "pending" | "accepted" | "rejected";
+  status: 'pending' | 'accepted' | 'rejected';
 
   created_at: string;
 
@@ -129,4 +126,24 @@ export interface PendingFriendRequests {
   last_name?: string;
 
   avatar_url?: string;
-}
+};
+export type FetchConversationsResponse = {
+  conversation_id: number;
+  updated_at: string;
+  message_id: number;
+  sender_id: number;
+  type: string;
+  content: string;
+  created_at: string;
+};
+
+export type UserMeta = {
+  id: number;
+  username: string;
+  full_name: string;
+};
+
+export type Users = {
+  id: number;
+  username: string;
+};

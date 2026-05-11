@@ -18,145 +18,135 @@ pc.createAnswer() → pc.setLocalDescription(answer) → sends video-answer
 ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
-import { pageLoader, showForm, signup } from "./auth.user.dom";
-import { ChatUI } from "./chat";
-import { attachUserMedia, hangUpCall, renderIncomingCall, setRemoteNameLabel, localStream } from "./dom";
-import { conversations, fetchUserConversations, searchUser } from "./friends/conversation.dom";
-import { fetchPendingRequests } from "./friends/conversationDetails";
-import { recordStream } from "./recordStream";
-import { shareScreen } from "./shareScreen";
-import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
-import { WebSocketHandler } from "./websocketHandler";
+import { pageLoader, showForm, signup } from './auth.user.dom';
+import { ChatUI } from './chat';
+import { attachUserMedia, hangUpCall, renderIncomingCall, setRemoteNameLabel, localStream } from './dom';
+import { conversations, fetchUserConversations, searchUserWithDelay } from './friends/conversation.dom';
+import { fetchPendingRequests } from './friends/conversationDetails';
+import { recordStream } from './recordStream';
+import { shareScreen } from './shareScreen';
+import { attachDataChannelHandlers, RTCPeerConnectionHandler } from './webrtcEventHandler';
+import { WebSocketHandler } from './websocketHandler';
 
 const ws = WebSocketHandler.getInstance();
-ws.on("hang-up", hangUpCall);
-document.getElementById("HangupBtn")?.addEventListener("click", hangUpCall);
+ws.on('hang-up', hangUpCall);
+document.getElementById('HangupBtn')?.addEventListener('click', hangUpCall);
 //Frontend -> Backend -> Google -> Redirect -> backend -> Frontend
-const googleButtons = document.querySelectorAll(".google-btn",) as NodeListOf<HTMLButtonElement>;
+const googleButtons = document.querySelectorAll('.google-btn');
 
 googleButtons.forEach((btn) => {
-  btn?.addEventListener("click", () => {
-    window.location.href = "http://localhost:3000/auth/google";
+  btn?.addEventListener('click', () => {
+    window.location.href = 'http://localhost:3000/auth/google';
+  });
+});
+window?.addEventListener('DOMContentLoaded', () => {
+  void pageLoader().then((isAuthenticated) => {
+    if (!isAuthenticated) return;
+    void fetchUserConversations();
   });
 });
 
-window?.addEventListener("DOMContentLoaded", async () => {
-  const isProtectedPage =
-    window.location.pathname === "/conversation_timeline.html";
-
-  if (isProtectedPage) {
-    const isAuthenticated = await pageLoader();
-
-    if (!isAuthenticated) return;
-    await fetchUserConversations();
-  }
-});
-
-const signupForm = document.getElementById("signupForm") as HTMLFormElement;
+const signupForm = document.getElementById('signupForm') as HTMLFormElement;
 
 if (signupForm) {
-  signupForm.addEventListener("submit", signup);
+  signupForm.addEventListener('submit', (e) => {
+    void signup(e);
+  });
 }
 
-document.querySelectorAll(".controls button").forEach((btn) => {
-  btn?.addEventListener("click", () => {
-    btn.classList.toggle("active");
+document.querySelectorAll('.controls button').forEach((btn) => {
+  btn?.addEventListener('click', () => {
+    btn.classList.toggle('active');
   });
 });
 
-document.getElementById("loginTab")?.addEventListener("click", () => {
-  showForm("login");
+document.getElementById('loginTab')?.addEventListener('click', () => {
+  showForm('login');
 });
 
-document.getElementById("signupTab")?.addEventListener("click", () => {
-  showForm("signup");
+document.getElementById('signupTab')?.addEventListener('click', () => {
+  showForm('signup');
 });
-const connectionsToggle = document.getElementById("connections-toggle") as HTMLButtonElement;
+const connectionsToggle = document.getElementById('connections-toggle') as HTMLButtonElement;
 
-console.log("connections-list", document.getElementById("connections-list"));
+const connectionsDropdown = document.getElementById('connections-dropdown') as HTMLDivElement;
 
-const connectionsDropdown = document.getElementById("connections-dropdown") as HTMLDivElement;
+connectionsToggle?.addEventListener('click', () => {
+  connectionsDropdown.classList.toggle('hidden');
 
-connectionsToggle?.addEventListener("click", async () => {
-
-  connectionsDropdown.classList.toggle("hidden");
-
-  if (!connectionsDropdown.classList.contains("hidden")) {
-    await fetchPendingRequests();
+  if (!connectionsDropdown.classList.contains('hidden')) {
+    void fetchPendingRequests();
   }
 });
-export const search = document.getElementById("search") as HTMLInputElement;
-export const friends = document.getElementById("friends") as HTMLDivElement;
-export const searchUsers = document.getElementById("search-results") as HTMLDivElement;
+export const search = document.getElementById('search') as HTMLInputElement;
+export const friends = document.getElementById('friends') as HTMLDivElement;
+export const searchUsers = document.getElementById('search-results') as HTMLDivElement;
 
+search?.addEventListener('keyup', searchUserWithDelay);
 
-search?.addEventListener("keyup", searchUser);
-
-[friends, searchUsers].forEach((element)  => {
-  element?.addEventListener("click", conversations);
+[friends, searchUsers].forEach((element) => {
+  element?.addEventListener('click', (e) => {
+    void conversations(e);
+  });
 });
-
 
 let audioEnabled = true;
 let videoEnabled = true;
 
-const micButton = document.getElementById("micBtn") as HTMLButtonElement | null;
+const micButton = document.getElementById('micBtn') as HTMLButtonElement | null;
 
-micButton?.addEventListener("click", () => {
+micButton?.addEventListener('click', () => {
   audioEnabled = !audioEnabled;
-  micButton?.classList.toggle("active");
-  const tooltip = micButton?.querySelector(".tooltip");
-  if (tooltip) tooltip.textContent = audioEnabled ? "Mute" : "Unmute";
-  (localStream as unknown as MediaStream | null)?.getAudioTracks().forEach(track => {
+  micButton?.classList.toggle('active');
+  const tooltip = micButton?.querySelector('.tooltip');
+  if (tooltip) tooltip.textContent = audioEnabled ? 'Mute' : 'Unmute';
+  localStream?.getAudioTracks().forEach((track) => {
     track.enabled = audioEnabled;
   });
-  micButton?.classList.toggle("active");
+  micButton?.classList.toggle('active');
 });
 
-const videoButton = document.getElementById("videoBtn") as HTMLButtonElement | null;
+const videoButton = document.getElementById('videoBtn') as HTMLButtonElement | null;
 
-videoButton?.addEventListener("click", () => {
+videoButton?.addEventListener('click', () => {
   videoEnabled = !videoEnabled;
-  videoButton?.classList.toggle("active");
-  const tooltip = videoButton?.querySelector(".tooltip");
-  if (tooltip) tooltip.textContent = videoEnabled ? "Stop Video" : "Start Video";
-  (localStream as unknown as MediaStream | null)?.getVideoTracks().forEach(track => {
+  videoButton?.classList.toggle('active');
+  const tooltip = videoButton?.querySelector('.tooltip');
+  if (tooltip) tooltip.textContent = videoEnabled ? 'Stop Video' : 'Start Video';
+  localStream?.getVideoTracks().forEach((track) => {
     track.enabled = videoEnabled;
   });
-  videoButton?.classList.toggle("active");
-
+  videoButton?.classList.toggle('active');
 });
 
-// Record Stream 
-const recordBtn = document.getElementById("recordBtn") as HTMLDivElement | null;
-recordBtn?.addEventListener("click", async () => {
-  await recordStream();
+// Record Stream
+const recordBtn = document.getElementById('recordBtn') as HTMLDivElement | null;
+recordBtn?.addEventListener('click', () => {
+  void recordStream();
 });
 
 // Share Screen
-const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement | null;
-shareBtn?.addEventListener("click", async () => {
-  await shareScreen();
+const shareBtn = document.getElementById('shareBtn') as HTMLButtonElement | null;
+shareBtn?.addEventListener('click', () => {
+  void shareScreen();
 });
 
 ChatUI.init();
 // const pc = RTCPeerConnectionHandler.pc;
 
-
-ws.on("new-ice-candidate", async (event) => {
+ws.on('new-ice-candidate', async (event) => {
   // await pc.addIceCandidate(event.candidate);
   await RTCPeerConnectionHandler.pc.addIceCandidate(event.candidate);
 });
-ws.on("video-answer", async (event) => {
-  if (RTCPeerConnectionHandler.pc.signalingState !== "have-local-offer") return;
+ws.on('video-answer', async (event) => {
+  if (RTCPeerConnectionHandler.pc.signalingState !== 'have-local-offer') return;
   await RTCPeerConnectionHandler.pc.setRemoteDescription(event.sdp);
-})
+});
 
-ws.on("accept", async ({ name }) => {
-  const dc = RTCPeerConnectionHandler.pc.createDataChannel("chat");
+ws.on('accept', async ({ name }) => {
+  const dc = RTCPeerConnectionHandler.pc.createDataChannel('chat');
   RTCPeerConnectionHandler.dataChannel = dc;
   attachDataChannelHandlers(dc);
-
 
   const granted = await attachUserMedia(audioEnabled, videoEnabled);
   if (!granted) {
@@ -164,22 +154,19 @@ ws.on("accept", async ({ name }) => {
     return;
   }
   setRemoteNameLabel(name);
-  const camerabox = document.getElementById("camerabox") as HTMLElement | null;
-  camerabox?.classList.add("active");
-  const loginPage = document.querySelector(".container");
-  if (loginPage)
-    loginPage.classList.add('active');
-
+  const camerabox = document.getElementById('camerabox');
+  camerabox?.classList.add('active');
+  const loginPage = document.querySelector('.container');
+  if (loginPage) loginPage.classList.add('active');
 });
-const chatToggleBtn = document.getElementById("chatToggleBtn");
-const chatContainer = document.getElementById("chat-container");
+const chatToggleBtn = document.getElementById('chatToggleBtn');
+const chatContainer = document.getElementById('chat-container');
 
-chatToggleBtn?.addEventListener("click", () => {
-  chatContainer?.classList.toggle("active");
+chatToggleBtn?.addEventListener('click', () => {
+  chatContainer?.classList.toggle('active');
 });
 
-ws.on("video-offer", async (event) => {
-
+ws.on('video-offer', async (event) => {
   await RTCPeerConnectionHandler.pc.setRemoteDescription(event.sdp);
   // Get media and use addTrack (not addTransceiver)
   const granted = await attachUserMedia(audioEnabled, videoEnabled);
@@ -192,12 +179,10 @@ ws.on("video-offer", async (event) => {
   await RTCPeerConnectionHandler.pc.setLocalDescription(answer);
   if (!RTCPeerConnectionHandler.pc.localDescription) return;
   ws.videoAnswer(RTCPeerConnectionHandler.pc.localDescription);
-  const camerabox = document.getElementById("camerabox") as HTMLElement | null;
-  camerabox?.classList.add("active");
-  const loginPage = document.querySelector(".container");
-  if (loginPage)
-    loginPage.classList.add('active');
+  const camerabox = document.getElementById('camerabox');
+  camerabox?.classList.add('active');
+  const loginPage = document.querySelector('.container');
+  if (loginPage) loginPage.classList.add('active');
 });
 
-
-ws.on("call", renderIncomingCall);
+ws.on('call', renderIncomingCall);

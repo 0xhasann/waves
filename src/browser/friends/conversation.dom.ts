@@ -1,9 +1,9 @@
-import { friends, search } from "..";
-import type { ApiResponse } from "../../server/units/apiResponse";
-import type { Conversations, MessageDTO } from "../../shared/types";
-import { setRemoteNameLabel } from "../dom";
-import { WebSocketHandler } from "../websocketHandler";
-import { friendCard } from "./friendCard";
+import { friends, search } from '..';
+import type { ApiResponse } from '../../server/units/apiResponse';
+import type { Conversations, MessageDTO } from '../../shared/types';
+import { setRemoteNameLabel } from '../dom';
+import { WebSocketHandler } from '../websocketHandler';
+import { friendCard } from './friendCard';
 
 let timeout: number;
 
@@ -16,36 +16,36 @@ type SelectedConversation = {
 
 let selectedConversation: SelectedConversation | null = null;
 let realtimeBound = false;
-let incomingPromptBound = false;
-
 
 async function sendMessages(conversationId: number, content: string) {
-  const response = await fetch("http://localhost:3000/api/conversations/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const res = await fetch('http://localhost:3000/api/conversations/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       conversation_id: conversationId,
-      type: "text",
+      type: 'text',
       content,
     }),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to save message");
+  const result = (await res.json()) as ApiResponse;
+
+  if (!res.ok || !result.success || result.error || !result.data) {
+    throw new Error(`Failed to save message ${result.message} ${result.error}`);
   }
 
-  return response.json();
+  return result;
 }
 
 function appendIncomingMessage(content: string, sentAt?: string) {
-  const messagesNode = document.getElementById("p2p-messages");
+  const messagesNode = document.getElementById('p2p-messages');
   if (!messagesNode) return;
 
-  const msgDiv = document.createElement("div");
-  msgDiv.className = "message received";
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'message received';
   msgDiv.innerHTML = `
     <div class="text">${content}</div>
-    <div class="time">${new Date(sentAt || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
+    <div class="time">${new Date(sentAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
   `;
   messagesNode.appendChild(msgDiv);
   messagesNode.scrollTop = messagesNode.scrollHeight;
@@ -56,67 +56,69 @@ function bindRealtimeMessaging() {
   realtimeBound = true;
 
   const ws = WebSocketHandler.getInstance();
-  ws.on("direct-message", ({ conversationId, content, sentAt }) => {
+  ws.on('direct-message', ({ conversationId, content, sentAt }) => {
     if (!selectedConversation?.conversationId) return;
 
     if (selectedConversation.conversationId !== conversationId) {
       return;
     }
-  
+
     appendIncomingMessage(content, sentAt);
-    
   });
 }
 
-const searchResults = document.getElementById(
-  "search-results",
-) as HTMLDivElement;
+const searchResults = document.getElementById('search-results') as HTMLDivElement;
 
-export function searchUser() {
+async function searchUser() {
+  const query = search.value;
+
+  if (!query) {
+    searchResults.innerHTML = '';
+    searchResults.style.display = 'none';
+    return;
+  }
+
+  const res = await fetch(`http://localhost:3000/api/friends/search?query=${encodeURIComponent(query)}`);
+  const result = (await res.json()) as ApiResponse<Conversations[]>;
+
+  if (!res.ok || !result.success || result.error || !result.data) {
+    throw new Error(`Failed to save message ${result.message} ${result.error}`);
+  }
+
+  let html = '';
+  result.data.forEach((conv: Conversations) => {
+    html += friendCard(conv);
+  });
+  searchResults.innerHTML = html;
+  searchResults.style.display = 'block';
+}
+
+export function searchUserWithDelay() {
   clearTimeout(timeout);
-
-  timeout = window.setTimeout(async () => {
-    const query = search.value;
-
-    if (!query) {
-      searchResults.innerHTML = "";
-      searchResults.style.display = "none";
-      return;
-    }
-
-    const response = await fetch(
-      `http://localhost:3000/api/friends/search?query=${encodeURIComponent(query)}`,
-    );
-    const result = await response.json();
-
-    let html = "";
-    result.data.forEach((conv: Conversations) => {
-      html += friendCard(conv);
-    });
-    searchResults.innerHTML = html;
-    searchResults.style.display = "block";
+  timeout = window.setTimeout(() => {
+    void searchUser();
   }, 500);
 }
 
 export async function conversations(e: PointerEvent) {
-  document.querySelectorAll(".friend").forEach((el) => el.classList.remove("active"));
-  const chat = document.querySelector(".chat") as HTMLDivElement;
+  document.querySelectorAll('.friend').forEach((el) => el.classList.remove('active'));
+  const chat = document.querySelector('.chat') as HTMLDivElement;
   const target = e.target as HTMLElement;
-  const friend = target.closest(".friend") as HTMLElement;
+  const friend = target.closest('.friend') as HTMLElement;
 
   if (!friend) return;
-  friend.classList.add("active");
+  friend.classList.add('active');
 
   const userId = friend.dataset.userId;
   if (!userId) return;
 
-
-  const currentUserId = parseInt(localStorage.getItem("userId") || "0", 10);
-  const displayName = friend.dataset.displayName || friend.dataset.username || "Unknown";
-  const avatarUrl = friend.dataset.avatarUrl || "https://i.pravatar.cc/150";
+  const currentUserId = parseInt(localStorage.getItem('userId') || '0', 10);
+  const displayName = friend.dataset.displayName || friend.dataset.username || 'Unknown';
+  const avatarUrl = friend.dataset.avatarUrl || 'https://i.pravatar.cc/150';
   const conversationIdRaw = friend.dataset.conversationId;
   const parsedConversationId = conversationIdRaw ? Number(conversationIdRaw) : undefined;
-  const conversationId = parsedConversationId && Number.isFinite(parsedConversationId) ? parsedConversationId : undefined;
+  const conversationId =
+    parsedConversationId && Number.isFinite(parsedConversationId) ? parsedConversationId : undefined;
 
   selectedConversation = {
     peerId: Number(userId),
@@ -124,14 +126,14 @@ export async function conversations(e: PointerEvent) {
     avatarUrl,
     conversationId,
   };
-  console.log("selectedConversation ::", selectedConversation);
+  console.log('selectedConversation ::', selectedConversation);
 
+  const res = await fetch(`http://localhost:3000/api/conversations/fetchP2PConversations?user2_id=${userId}`);
+  const result = (await res.json()) as ApiResponse<MessageDTO[]>;
 
-  const response = await fetch(
-    `http://localhost:3000/api/conversations/fetchP2PConversations?user2_id=${userId}`,
-  );
-  const res = await response.json();
-  const result = (res.data || []) as MessageDTO[];
+  if (!res.ok || !result.success || result.error || !result.data) {
+    throw new Error(`Failed to save message ${result.message} ${result.error}`);
+  }
 
   chat.innerHTML = `
   <div class="chat-header">
@@ -143,18 +145,18 @@ export async function conversations(e: PointerEvent) {
     <button id="call-btn" style="margin-left:auto;">Call</button>
   </div>
   <div class="messages" id="p2p-messages">
-    ${result
+    ${result.data
       .map(
         (msg) => `
-      <div class="message ${msg.sender_id === currentUserId ? "sent" : "received"}">
+      <div class="message ${msg.sender_id === currentUserId ? 'sent' : 'received'}">
         <div class="text">${msg.content}</div>
         <div class="time">
-          ${new Date(msg.updated_at || "").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          ${new Date(msg.updated_at || '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
       </div>
     `,
       )
-      .join("")}
+      .join('')}
   </div>
   <div class="chat-input">
     <input id="p2p-chat-input" type="text" placeholder="Type a message">
@@ -162,29 +164,28 @@ export async function conversations(e: PointerEvent) {
   </div>
 `;
 
-setTimeout(() => {
-  const messagesNode = document.getElementById("p2p-messages");
-  if (messagesNode) {
-    messagesNode.scrollTop = messagesNode.scrollHeight;
-  }
-}, 0);
+  setTimeout(() => {
+    const messagesNode = document.getElementById('p2p-messages');
+    if (messagesNode) {
+      messagesNode.scrollTop = messagesNode.scrollHeight;
+    }
+  }, 0);
 
-  const callBtn = document.getElementById("call-btn") as HTMLButtonElement | null;
-  const sendBtn = document.getElementById("p2p-send-btn") as HTMLButtonElement | null;
-  const input = document.getElementById("p2p-chat-input") as HTMLInputElement | null;
+  const callBtn = document.getElementById('call-btn') as HTMLButtonElement | null;
+  const sendBtn = document.getElementById('p2p-send-btn') as HTMLButtonElement | null;
+  const input = document.getElementById('p2p-chat-input') as HTMLInputElement | null;
 
-  callBtn?.addEventListener("click", () => {
+  callBtn?.addEventListener('click', () => {
     if (!selectedConversation?.displayName) return;
     setRemoteNameLabel(selectedConversation.displayName);
     WebSocketHandler.getInstance().call(selectedConversation.displayName);
   });
 
-
-  sendBtn?.addEventListener("click", () => {
+  sendBtn?.addEventListener('click', () => {
     void sendCurrentMessage();
   });
-  input?.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
+  input?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
       event.preventDefault();
       void sendCurrentMessage();
     }
@@ -193,13 +194,15 @@ setTimeout(() => {
 
 export async function fetchUserConversations() {
   bindRealtimeMessaging();
-  let html = "";
-  const response = await fetch(
-    `http://localhost:3000/api/conversations/fetchAllConversations`,
-  );
+  let html = '';
+  const res = await fetch(`http://localhost:3000/api/conversations/fetchAllConversations`);
 
-  const records: ApiResponse<Conversations[]> = await response.json();
-  const allConversations = records.data;
+  const result = (await res.json()) as ApiResponse<Conversations[]>;
+
+  if (!res.ok || !result.success || result.error || !result.data) {
+    throw new Error(`Failed to save message ${result.message} ${result.error}`);
+  }
+  const allConversations = result.data;
   if (!allConversations) return;
 
   allConversations.forEach((convs: Conversations) => {
@@ -210,21 +213,22 @@ export async function fetchUserConversations() {
 }
 
 export const sendCurrentMessage = async () => {
-  const input = document.getElementById("p2p-chat-input") as HTMLInputElement | null;
+  const input = document.getElementById('p2p-chat-input') as HTMLInputElement | null;
   const message = input?.value.trim();
   if (!message || !selectedConversation) return;
-  console.log("sendCurrentMessage ", message, selectedConversation);
-
+  console.log('sendCurrentMessage ', message, selectedConversation);
 
   try {
-
     if (!selectedConversation.conversationId) {
-      const conversationResponse = await fetch(
+      const res = await fetch(
         `http://localhost:3000/api/conversations/createOrGetConversation?user2_id=${selectedConversation.peerId}`,
       );
-      const conversationResult = await conversationResponse.json();
-      selectedConversation.conversationId = Number(conversationResult.data);
+      const result = (await res.json()) as ApiResponse;
 
+      if (!res.ok || !result.success || result.error || !result.data) {
+        throw new Error(`Failed to save message ${result.message} ${result.error}`);
+      }
+      selectedConversation.conversationId = Number(result.data);
     }
 
     if (!selectedConversation.conversationId) return;
@@ -236,19 +240,19 @@ export const sendCurrentMessage = async () => {
       selectedConversation.conversationId,
     );
 
-    const messagesNode = document.getElementById("p2p-messages");
-    const msgDiv = document.createElement("div");
-    msgDiv.className = "message sent";
+    const messagesNode = document.getElementById('p2p-messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message sent';
     msgDiv.innerHTML = `
       <div class="text">${message}</div>
-      <div class="time">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
+      <div class="time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
     `;
     messagesNode?.appendChild(msgDiv);
     if (messagesNode) {
       messagesNode.scrollTop = messagesNode.scrollHeight;
     }
-    if (input) input.value = "";
+    if (input) input.value = '';
   } catch (error) {
-    console.error("failed to send message", error);
+    console.error('failed to send message', error);
   }
 };
