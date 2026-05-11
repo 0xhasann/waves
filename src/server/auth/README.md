@@ -2,14 +2,13 @@
 
 This project implements **Google OAuth2 authentication** with a secure, production-aligned flow using:
 
-* Express (backend)
-* Google OAuth2
-* JWT (session)
-* HTTP-only cookies
-* SQLite (user persistence)
+- Express (backend)
+- Google OAuth2
+- JWT (session)
+- HTTP-only cookies
+- SQLite (user persistence)
 
 ---
-
 
 ## Setup
 
@@ -39,7 +38,7 @@ Go to **Google Cloud Console**
 
 #### Create OAuth Client
 
-* Type: Web application
+- Type: Web application
 
 #### Add redirect URI:
 
@@ -51,9 +50,9 @@ http://localhost:3000/auth/google/callback
 
 ### 4. OAuth Consent Screen
 
-* User type: **External**
-* Publishing status: **Testing**
-* Add your email under **Test Users**
+- User type: **External**
+- Publishing status: **Testing**
+- Add your email under **Test Users**
 
 ---
 
@@ -62,9 +61,9 @@ http://localhost:3000/auth/google/callback
 ### Routes
 
 ```ts
-GET /auth/google
-GET /auth/google/callback
-GET /auth/google/me
+GET / auth / google;
+GET / auth / google / callback;
+GET / auth / google / me;
 ```
 
 ---
@@ -72,11 +71,11 @@ GET /auth/google/me
 ## Cookie Strategy
 
 ```ts
-res.cookie("auth_token", token, {
+res.cookie('auth_token', token, {
   httpOnly: true,
-  secure: false,      // true in production (HTTPS)
-  sameSite: "lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000 // 7d expiry
+  secure: false, // true in production (HTTPS)
+  sameSite: 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7d expiry
 });
 ```
 
@@ -103,9 +102,9 @@ googleButtons.forEach((btn) => {
 ### Restore session on load
 
 ```js
-document.addEventListener("DOMContentLoaded", async () => {
-  const res = await fetch("http://localhost:3000/auth/google/me", {
-    credentials: "include"
+document.addEventListener('DOMContentLoaded', async () => {
+  const res = await fetch('http://localhost:3000/auth/google/me', {
+    credentials: 'include',
   });
 
   if (!res.ok) return;
@@ -121,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 ```js
 function login(name) {
-  document.getElementById("welcome-text").textContent = `Welcome ${name}`;
+  document.getElementById('welcome-text').textContent = `Welcome ${name}`;
 }
 ```
 

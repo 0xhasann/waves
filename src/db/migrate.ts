@@ -1,4 +1,5 @@
-import { runMigration } from "./utils";
+import { logger } from '../server/units/logger';
+import { runMigration } from './utils';
 
 runMigration();
-console.log("Migration is completed");
+logger.info('Migration is completed');

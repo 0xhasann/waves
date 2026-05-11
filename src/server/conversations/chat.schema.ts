@@ -1,27 +1,26 @@
-import * as z from "zod";
+import * as z from 'zod';
 
 export const conversationSchema = z.object({
-    query: z.object({
-        user2_id: z.string().min(1),
-    }),
+  query: z.object({
+    user2_id: z.string().min(1),
+  }),
 });
 
 export const fetchConversationSchema = z.object({
-    body: z.object({
-        conversation_id: z.number(),
-        limit: z.number().optional(),
-    }),
+  body: z.object({
+    conversation_id: z.number(),
+    limit: z.number().optional(),
+  }),
 });
-
 
 export const sendConversationMessageSchema = z.object({
-    body: z.object({
-        conversation_id: z.number(),
-        type: z.enum(["text"]),
-        content: z.string(),
-    }),
+  body: z.object({
+    conversation_id: z.number(),
+    type: z.enum(['text']),
+    content: z.string(),
+  }),
 });
 
-export type ConversationSchema = z.infer<typeof conversationSchema>["query"];
-export type FetchConversationSchema = z.infer<typeof fetchConversationSchema>["body"];
-export type SendConversationMessageSchema = z.infer<typeof sendConversationMessageSchema>["body"];
+export type ConversationSchema = z.infer<typeof conversationSchema>['query'];
+export type FetchConversationSchema = z.infer<typeof fetchConversationSchema>['body'];
+export type SendConversationMessageSchema = z.infer<typeof sendConversationMessageSchema>['body'];
