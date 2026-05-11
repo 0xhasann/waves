@@ -22,6 +22,7 @@ import { pageLoader, showForm, signup } from "./auth.user.dom";
 import { ChatUI } from "./chat";
 import { attachUserMedia, hangUpCall, renderIncomingCall, setRemoteNameLabel, localStream } from "./dom";
 import { conversations, fetchUserConversations, searchUser } from "./friends/conversation.dom";
+import { fetchPendingRequests } from "./friends/conversationDetails";
 import { recordStream } from "./recordStream";
 import { shareScreen } from "./shareScreen";
 import { attachDataChannelHandlers, RTCPeerConnectionHandler } from "./webrtcEventHandler";
@@ -70,7 +71,20 @@ document.getElementById("loginTab")?.addEventListener("click", () => {
 document.getElementById("signupTab")?.addEventListener("click", () => {
   showForm("signup");
 });
+const connectionsToggle = document.getElementById("connections-toggle") as HTMLButtonElement;
 
+console.log("connections-list", document.getElementById("connections-list"));
+
+const connectionsDropdown = document.getElementById("connections-dropdown") as HTMLDivElement;
+
+connectionsToggle?.addEventListener("click", async () => {
+
+  connectionsDropdown.classList.toggle("hidden");
+
+  if (!connectionsDropdown.classList.contains("hidden")) {
+    await fetchPendingRequests();
+  }
+});
 export const search = document.getElementById("search") as HTMLInputElement;
 export const friends = document.getElementById("friends") as HTMLDivElement;
 export const searchUsers = document.getElementById("search-results") as HTMLDivElement;
