@@ -1,9 +1,9 @@
 import 'express-async-errors';
 import express from 'express';
-import authRoutes from './auth/auth.routes';
-import connection from './connections/conn.routes';
-import googleAuthRouter from './auth/auth.google.router';
-import conversation from './conversations/chat.routes';
+import authRoutes from './routes/auth.routes';
+import connection from './routes/conn.routes';
+import googleAuthRouter from './routes/auth.google.router';
+import conversation from './routes/chat.routes';
 import path from 'node:path';
 import { notFound } from './units/notFound';
 import { errorHandler } from './units/errorHandler';

@@ -1,4 +1,4 @@
-import type { ApiResponse } from '../../server/units/apiResponse';
+import type { ApiResponse } from '../../shared/apiResponse';
 import type { PendingFriendRequests } from '../../shared/types';
 
 export async function fetchPendingRequests() {

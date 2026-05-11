@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { callbackRoute, getTokenFromCookie, googleSignup } from './auth.google';
+import { callbackRoute, getTokenFromCookie, googleSignup } from '../auth/auth.google';
 
 export const router = Router();
 

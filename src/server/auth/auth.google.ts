@@ -5,8 +5,8 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { database } from '../../db/utils';
 import type { JwtUser, User, UserMeta } from '../../shared/types';
-import { now } from '../units/timeUtils';
-import { sendResponse } from '../units/apiResponse';
+import { now } from '../../shared/timeUtils';
+import { sendResponse } from '../../shared/apiResponse';
 import { AppError } from '../units/app.errors';
 import { logger } from '../units/logger';
 

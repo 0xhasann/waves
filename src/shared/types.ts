@@ -25,6 +25,7 @@ export const RequestStatus = {
 export type FriendRow = {
   id: number;
 };
+
 export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus];
 
 export type Message = {
@@ -39,16 +40,6 @@ export type Conversation = {
   id: number;
   messages: Message[];
   updated_at: string;
-};
-
-export type Row = {
-  conversation_id: number;
-  updated_at: string;
-  message_id: number | null;
-  sender_id: number | null;
-  type: string | null;
-  content: string | null;
-  created_at: string | null;
 };
 
 export type JwtUser = jwt.JwtPayload & {
@@ -127,6 +118,7 @@ export type PendingFriendRequests = {
 
   avatar_url?: string;
 };
+
 export type FetchConversationsResponse = {
   conversation_id: number;
   updated_at: string;

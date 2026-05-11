@@ -1,4 +1,4 @@
-import { formatMessageTime } from '../../server/units/timeUtils';
+import { formatMessageTime } from '../../shared/timeUtils';
 import type { Conversations } from '../../shared/types';
 
 export function friendCard(conv: Conversations) {

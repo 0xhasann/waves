@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
-import { sendResponse } from '../units/apiResponse';
+import { sendResponse } from '../../shared/apiResponse';
 import { tokenCookie } from './auth.google';
-import * as repo from './auth.repository';
+import * as repo from '../repositories/auth.repository';
 import { AppError } from '../units/app.errors';
 import { verifyPassword } from '../units/validate';
-import type { SigninInput, SignupInput } from './auth.schema';
+import type { SigninInput, SignupInput } from '../schemas/auth.schema';
 
 export const signup = (req: Request, res: Response) => {
   const user = repo.findByUsername((req.body as SignupInput).username);

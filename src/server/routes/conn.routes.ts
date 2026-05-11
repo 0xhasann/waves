@@ -1,7 +1,18 @@
 import { Router } from 'express';
-import { fetchPendingRequests, processFriendRequest, search, sendFriendRequest, unfollowFriend } from './conn.service';
+import {
+  fetchPendingRequests,
+  processFriendRequest,
+  search,
+  sendFriendRequest,
+  unfollowFriend,
+} from '../connections/conn.service';
 import { validate } from '../units/validate';
-import { friendsSchema, processFriendRequestSchema, searchSchema, sendFriendRequestSchema } from './conn.schema';
+import {
+  friendsSchema,
+  processFriendRequestSchema,
+  searchSchema,
+  sendFriendRequestSchema,
+} from '../schemas/conn.schema';
 
 export const router = Router();
 

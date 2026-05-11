@@ -1,5 +1,5 @@
 import { friends, search } from '..';
-import type { ApiResponse } from '../../server/units/apiResponse';
+import type { ApiResponse } from '../../shared/apiResponse';
 import type { Conversations, MessageDTO } from '../../shared/types';
 import { setRemoteNameLabel } from '../dom';
 import { WebSocketHandler } from '../websocketHandler';

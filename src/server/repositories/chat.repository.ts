@@ -7,8 +7,12 @@ import {
   prepareFetchConvQuery,
   prepareP2PConversationsSchema,
   prepareSendMessageQuery,
-} from './chat.query';
-import type { ConversationSchema, FetchConversationSchema, SendConversationMessageSchema } from './chat.schema';
+} from '../../db/queries/chat.query';
+import type {
+  ConversationSchema,
+  FetchConversationSchema,
+  SendConversationMessageSchema,
+} from '../schemas/chat.schema';
 
 export const getOrCreateConversation = (user1_id: number, user2_id: number): number => {
   const { u1, u2 } = getUserPair(user1_id, user2_id);

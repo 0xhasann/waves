@@ -2,7 +2,7 @@ import { scryptSync, randomBytes } from 'crypto';
 
 import { database } from '../../db/utils';
 import type { User } from '../../shared/types';
-import type { SignupInput } from './auth.schema';
+import type { SignupInput } from '../schemas/auth.schema';
 
 export const findByUsername = (username: string): User | undefined => {
   return database.prepare(`SELECT * FROM users WHERE username = ?`).get(username) as User | undefined;

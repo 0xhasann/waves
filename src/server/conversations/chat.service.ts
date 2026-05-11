@@ -1,10 +1,14 @@
 import type { Request, Response } from 'express';
-import { sendResponse } from '../units/apiResponse';
+import { sendResponse } from '../../shared/apiResponse';
 import { AppError } from '../units/app.errors';
-import * as repo from './chat.repository';
+import * as repo from '../repositories/chat.repository';
 import type { Conversation } from '../../shared/types';
 import { getSenderId } from '../units/reqSender';
-import type { ConversationSchema, FetchConversationSchema, SendConversationMessageSchema } from './chat.schema';
+import type {
+  ConversationSchema,
+  FetchConversationSchema,
+  SendConversationMessageSchema,
+} from '../schemas/chat.schema';
 
 export const createConversation = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);

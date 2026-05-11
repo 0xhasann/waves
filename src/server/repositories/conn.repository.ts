@@ -1,6 +1,6 @@
 import { database } from '../../db/utils';
 import type { Conversations, FriendRow, PendingFriendRequests, RequestStatus } from '../../shared/types';
-import { now } from '../units/timeUtils';
+import { now } from '../../shared/timeUtils';
 import { getUserPair } from '../units/userPair';
 import {
   createFriendQuery,
@@ -16,8 +16,8 @@ import {
   searchUserQuery,
   sendRequestQuery,
   updatePastFriendQuery,
-} from './conn.query';
-import type { FriendsSchema, ProcessFriendRequestSchema, SendFriendRequestSchema } from './conn.schema';
+} from '../../db/queries/conn.query';
+import type { FriendsSchema, ProcessFriendRequestSchema, SendFriendRequestSchema } from '../schemas/conn.schema';
 
 export const searchUser = (sender_id: number, q: string): Conversations[] | undefined => {
   const result = database.prepare(searchUserQuery).all(sender_id, sender_id, q, q, q, q, q, sender_id) as

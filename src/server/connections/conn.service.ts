@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
-import { sendResponse } from '../units/apiResponse';
-import * as repo from './conn.repository';
-import * as conRepo from '../conversations/chat.repository';
+import { sendResponse } from '../../shared/apiResponse';
+import * as repo from '../repositories/conn.repository';
+import * as conRepo from '../repositories/chat.repository';
 import { getSenderId } from '../units/reqSender';
 import { AppError } from '../units/app.errors';
 import { RequestStatus } from '../../shared/types';
 import { withTransaction } from '../../db/transaction.helper';
-import type { FriendsSchema, ProcessFriendRequestSchema, SendFriendRequestSchema } from './conn.schema';
+import type { FriendsSchema, ProcessFriendRequestSchema, SendFriendRequestSchema } from '../schemas/conn.schema';
 
 export const search = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);

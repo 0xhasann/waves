@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { validate } from '../units/validate';
-import { conversationSchema, fetchConversationSchema, sendConversationMessageSchema } from './chat.schema';
+import { conversationSchema, fetchConversationSchema, sendConversationMessageSchema } from '../schemas/chat.schema';
 import {
   createConversation,
   fetchAllConversations,
   fetchConversations,
   fetchP2PConversations,
   sendConversationMessages,
-} from './chat.service';
+} from '../conversations/chat.service';
 
 export const router = Router();
 

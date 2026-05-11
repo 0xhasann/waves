@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
-import { signinSchema, signupSchema } from './auth.schema';
-import { signin, signup } from './auth.service';
+import { signinSchema, signupSchema } from '../schemas/auth.schema';
+import { signin, signup } from '../auth/auth.service';
 import { validate } from '../units/validate';
 
 export const router = Router();

@@ -1,4 +1,4 @@
-import type { ApiResponse } from '../server/units/apiResponse';
+import type { ApiResponse } from '../shared/apiResponse';
 import type { UserMeta } from '../shared/types';
 import { login } from './dom';
 import { conversations, fetchUserConversations, getFriendFromSearch } from './friends/conversation.dom';
