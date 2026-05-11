@@ -1,6 +1,7 @@
 import type { ApiResponse } from '../server/units/apiResponse';
 import type { UserMeta } from '../shared/types';
 import { login } from './dom';
+import { conversations, fetchUserConversations, getFriendFromSearch } from './friends/conversation.dom';
 
 export async function signup(e: SubmitEvent) {
   e.preventDefault();
@@ -26,7 +27,7 @@ export async function signup(e: SubmitEvent) {
     const data = (await response.json()) as ApiResponse;
 
     if (response.ok) {
-      window.location.href = '/conversation.timeline.html';
+      window.location.href = '/conversation.html';
       console.log(data);
     } else {
       alert(data.message || 'Signup failed');
@@ -71,8 +72,14 @@ export async function pageLoader() {
       return false;
     }
     localStorage.setItem('userId', String(user.data.id));
-    const isConversationPage = window.location.pathname === '/conversation.timeline.html';
+    const isConversationPage = window.location.pathname === '/conversation.html';
     login(user.data.full_name || user.data.username, 'Guest', !isConversationPage);
+    await fetchUserConversations();
+    const username = getFriendFromSearch();
+    if (username) {
+      const friend = document.querySelector(`.friend[data-username="${username}"]`) as HTMLElement | undefined;
+      if (friend) void conversations(friend);
+    }
     return true;
   } catch (err) {
     console.error('Auth check failed, Error :::', err);

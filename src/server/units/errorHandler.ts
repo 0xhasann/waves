@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { AppError } from '../units/app.errors';
 import { parseSqliteError } from '../units/parseSqliteError';
@@ -7,7 +7,9 @@ import { logger } from './logger';
 
 import * as z from 'zod';
 
-export const errorHandler = (err: unknown, req: Request, res: Response) => {
+// DO NOT REMOVE next
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
   let status = 500;
   let message = 'Internal Server Error';
   let error: string = '';

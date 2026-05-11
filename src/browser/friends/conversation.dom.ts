@@ -100,11 +100,9 @@ export function searchUserWithDelay() {
   }, 500);
 }
 
-export async function conversations(e: PointerEvent) {
+export async function conversations(friend: HTMLElement) {
   document.querySelectorAll('.friend').forEach((el) => el.classList.remove('active'));
   const chat = document.querySelector('.chat') as HTMLDivElement;
-  const target = e.target as HTMLElement;
-  const friend = target.closest('.friend') as HTMLElement;
 
   if (!friend) return;
   friend.classList.add('active');
@@ -256,3 +254,9 @@ export const sendCurrentMessage = async () => {
     console.error('failed to send message', error);
   }
 };
+
+export function getFriendFromSearch() {
+  const params = new URLSearchParams(window.location.search);
+  const username = params.get('username');
+  return username;
+}

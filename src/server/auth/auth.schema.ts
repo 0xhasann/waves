@@ -2,29 +2,30 @@ import { z } from 'zod';
 
 export const signupSchema = z.object({
   body: z.object({
-    username: z.string().min(3).max(15),
+    username: z.string().min(3).max(50),
 
     password: z.string().min(6).max(15),
 
-    email: z.email().optional(),
+    email: z.email().max(50).optional(),
 
     mobileNo: z
       .string()
       .regex(/^\+?[0-9\s]{10,15}$/, {
         message: 'Invalid mobile number',
       })
+      .max(15)
       .optional(),
 
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
+    firstName: z.string().min(3).max(50).optional(),
+    lastName: z.string().min(3).max(50).optional(),
 
-    avatarURL: z.string().url().optional(),
+    avatarURL: z.string().max(200).url().optional(),
   }),
 });
 
 export const signinSchema = z.object({
   body: z.object({
-    username: z.string().min(3).max(15),
+    username: z.string().min(3).max(50),
     password: z.string().min(6).max(15),
   }),
 });

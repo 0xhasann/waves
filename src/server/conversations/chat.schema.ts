@@ -17,7 +17,7 @@ export const sendConversationMessageSchema = z.object({
   body: z.object({
     conversation_id: z.number(),
     type: z.enum(['text']),
-    content: z.string(),
+    content: z.string().max(1000),
   }),
 });
 

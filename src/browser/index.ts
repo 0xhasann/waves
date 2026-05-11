@@ -21,7 +21,7 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 import { pageLoader, showForm, signup } from './auth.user.dom';
 import { ChatUI } from './chat';
 import { attachUserMedia, hangUpCall, renderIncomingCall, setRemoteNameLabel, localStream } from './dom';
-import { conversations, fetchUserConversations, searchUserWithDelay } from './friends/conversation.dom';
+import { conversations, searchUserWithDelay } from './friends/conversation.dom';
 import { fetchPendingRequests } from './friends/conversationDetails';
 import { recordStream } from './recordStream';
 import { shareScreen } from './shareScreen';
@@ -40,10 +40,7 @@ googleButtons.forEach((btn) => {
   });
 });
 window?.addEventListener('DOMContentLoaded', () => {
-  void pageLoader().then((isAuthenticated) => {
-    if (!isAuthenticated) return;
-    void fetchUserConversations();
-  });
+  void pageLoader();
 });
 
 const signupForm = document.getElementById('signupForm') as HTMLFormElement;
@@ -84,10 +81,22 @@ export const searchUsers = document.getElementById('search-results') as HTMLDivE
 
 search?.addEventListener('keyup', searchUserWithDelay);
 
-[friends, searchUsers].forEach((element) => {
-  element?.addEventListener('click', (e) => {
-    void conversations(e);
-  });
+// [friends, searchUsers].forEach((element) => {
+//   element?.addEventListener('click', (e) => {
+//     void conversations(e);
+//   });
+// });
+friends.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+  const friend = target.closest('.friend') as HTMLElement;
+  const url = new URL(window.location.href);
+  if (!friend.dataset.username) {
+    console.error('username not found in friend dataset');
+    return;
+  }
+  url.searchParams.set('username', friend.dataset.username);
+  window.history.pushState({}, '', url);
+  void conversations(friend);
 });
 
 let audioEnabled = true;

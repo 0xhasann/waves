@@ -106,7 +106,7 @@ export const callbackRoute = async (req: Request, res: Response) => {
     if (!user) throw new AppError('User creation failed');
 
     tokenCookie(user.id, req, res);
-    res.redirect('http://localhost:3000/conversation.timeline.html');
+    res.redirect('http://localhost:3000/conversation.html');
   } catch (err) {
     logger.error(err);
     throw new AppError('Authentication failed');

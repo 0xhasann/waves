@@ -58,7 +58,7 @@ export function login(wsName: string, name: string, shouldRedirect = true) {
   }
   ws.login(wsName || name);
   if (shouldRedirect) {
-    window.location.href = '/conversation.timeline.html';
+    window.location.href = '/conversation.html';
   }
 }
 
