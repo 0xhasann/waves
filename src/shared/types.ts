@@ -88,3 +88,45 @@ export type MessageDTO = {
   last_name: string;
   avatar_url: string | null;
 };
+
+export interface SearchConversations {
+  peer_id?: number;
+  id?: number;
+
+  username: string;
+
+  first_name?: string;
+  last_name?: string;
+
+  avatar_url?: string;
+
+  conversation_id?: number;
+
+  last_message?: string;
+
+  updated_at?: string;
+
+  sender_id?: number;
+
+  type?: string;
+}
+
+export interface PendingFriendRequests {
+  id: number;
+
+  sender_id: number;
+
+  receiver_id: number;
+
+  status: "pending" | "accepted" | "rejected";
+
+  created_at: string;
+
+  username: string;
+
+  first_name?: string;
+
+  last_name?: string;
+
+  avatar_url?: string;
+}

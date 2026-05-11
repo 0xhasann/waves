@@ -66,3 +66,11 @@ export const unfollowFriend = async (req: Request, res: Response) => {
 
   sendResponse(res, 200, result, "Request has been processed Successfully");
 };
+
+
+export const fetchPendingRequests = async (req: Request, res: Response) => {
+  const sender_id = getSenderId(req);
+  const result = await repo.findPendingRequests(sender_id);
+
+  sendResponse(res, 200, result, "pending Requests");
+};

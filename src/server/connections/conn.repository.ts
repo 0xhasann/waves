@@ -1,8 +1,8 @@
 import { database } from "../../db/utils";
-import type { FriendRow, RequestStatus } from "../../shared/types";
+import type { FriendRow, PendingFriendRequests, RequestStatus } from "../../shared/types";
 import { now } from "../units/timeUtils";
 import { getUserPair } from "../units/userPair";
-import { createFriendQuery, deleteFriendQuery, deleteFriendRequestQuery, fetchPastFriendQuery, pastFriendRequestQuery, processpastFriendRequestQuery, processRequestQuery, searchFriendQuery, searchFriendRequestQuery, searchUserQuery, sendRequestQuery, updatePastFriendQuery } from "./conn.query";
+import { createFriendQuery, deleteFriendQuery, deleteFriendRequestQuery, fetchPastFriendQuery, findAllPendingRequests, pastFriendRequestQuery, processpastFriendRequestQuery, processRequestQuery, searchFriendQuery, searchFriendRequestQuery, searchUserQuery, sendRequestQuery, updatePastFriendQuery } from "./conn.query";
 import type { FriendsSchema, ProcessFriendRequestSchema, SendFriendRequestSchema } from "./conn.schema";
 type Users = {
   id: number;
@@ -11,7 +11,7 @@ type Users = {
 export const searchUser = (sender_id: number, q: string): Users[] | undefined => {
   const result = database
     .prepare(searchUserQuery)
-    .all(q, q, q, q, q, sender_id) as Users[] | undefined;
+    .all(sender_id, sender_id, q, q, q, q, q, sender_id) as Users[] | undefined;
   return result;
 };
 
@@ -101,3 +101,10 @@ export const deleteFriendRequest = (sender_id: number, query: FriendsSchema): nu
     .run(now(), u1, u2);
   return result.changes;
 };
+
+export const findPendingRequests = (received_id: number): PendingFriendRequests[] | undefined=> {
+  const result = database.
+    prepare(findAllPendingRequests)
+    .all(received_id) as PendingFriendRequests[] | undefined;
+  return result;
+}
