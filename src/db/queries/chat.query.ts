@@ -74,6 +74,5 @@ WHERE m.conversation_id = (
     OR (user1_id = ? AND user2_id = ?)
 )
 ORDER BY m.updated_at DESC
-LIMIT 20
-) AS last_20
+) AS pastConverations
 ORDER BY updated_at ASC;`;
