@@ -15,6 +15,6 @@ declare global {
 export function getSenderId(req: Request): number {
   const sender_id = req.user?.userId;
   if (!sender_id) throw new AppError('Unauthorised Request');
-  logger.debug('sender_id ::', sender_id);
+  logger.debug(`sender_id :: ${sender_id}`);
   return sender_id;
 }

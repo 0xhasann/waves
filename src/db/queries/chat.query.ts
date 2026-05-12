@@ -1,6 +1,7 @@
 export const prepareFetchConvQuery = `SELECT 
       c.id as conversation_id,
       c.updated_at,
+      c.deleted,
       m.id as message_id,
       m.sender_id,
       m.type,
@@ -14,7 +15,7 @@ export const prepareFetchConvQuery = `SELECT
     LIMIT ?;`;
 
 export const prepareCreateConvQuery = `INSERT INTO conversations (user1_id, user2_id)VALUES (?, ?) ON CONFLICT(user1_id, user2_id)
-                DO UPDATE SET user1_id = excluded.user1_id
+                DO UPDATE SET user1_id = excluded.user1_id, deleted = 0
                 RETURNING id;`;
 
 export const prepareSendMessageQuery = `INSERT INTO messages(conversation_id, sender_id, type, content) VALUES (?, ?, ?, ?);`;
@@ -27,7 +28,7 @@ export const prepareFetchAllConversations = `SELECT
     u.avatar_url,
     
     c.id AS conversation_id,
-    
+    c.deleted,
     m.content AS last_message,
     m.type,
     m.sender_id,
