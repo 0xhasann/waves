@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 import { sendResponse } from '../../shared/apiResponse';
 import { AppError } from '../units/app.errors';
 import * as repo from '../repositories/chat.repository';
+import * as connrepo from '../repositories/conn.repository';
+
 import type { Conversation } from '../../shared/types';
 import { getSenderId } from '../units/reqSender';
 import type {
@@ -43,6 +45,10 @@ export const fetchConversations = (req: Request, res: Response) => {
 
 export const sendConversationMessages = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);
+  const convoExist = connrepo.conversationExists((req.body as SendConversationMessageSchema).conversation_id);
+  if (!convoExist) {
+    throw new AppError("Sorry, Can't Sent Message Conversation Does Not Exists", 404);
+  }
   const result = repo.sendConversationMessages(sender_id, req.body as SendConversationMessageSchema);
   sendResponse(res, 200, result, 'Message is sent Successfully');
 };
@@ -50,6 +56,7 @@ export const sendConversationMessages = (req: Request, res: Response) => {
 export const fetchAllConversations = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);
   const result = repo.fetchAllConversations(sender_id);
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   sendResponse(res, 200, result, 'Records has been fetched successfully');
 };
 

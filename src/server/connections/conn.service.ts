@@ -56,6 +56,7 @@ export const unfollowFriend = (req: Request, res: Response) => {
     }
     const processed = repo.deleteFriends(sender_id, req.body as FriendsSchema);
     repo.deleteFriendRequest(sender_id, req.body as FriendsSchema);
+    repo.deleteConverstation(sender_id, req.body as FriendsSchema);
     return processed;
   });
 

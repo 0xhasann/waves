@@ -1,9 +1,9 @@
 import { friends, search } from '..';
 import type { ApiResponse } from '../../shared/apiResponse';
-import type { Conversations, MessageDTO } from '../../shared/types';
+import type { Conversations, MessageDTO, UserSearchResult } from '../../shared/types';
 import { setRemoteNameLabel } from '../dom';
 import { WebSocketHandler } from '../websocketHandler';
-import { friendCard } from './friendCard';
+import { conversationCard, searchResultCard } from './friendCard';
 
 let timeout: number;
 
@@ -79,15 +79,15 @@ async function searchUser() {
   }
 
   const res = await fetch(`http://localhost:3000/api/friends/search?query=${encodeURIComponent(query)}`);
-  const result = (await res.json()) as ApiResponse<Conversations[]>;
+  const result = (await res.json()) as ApiResponse<UserSearchResult[]>;
 
   if (!res.ok || !result.success || result.error || !result.data) {
     throw new Error(`Failed to save message ${result.message} ${result.error}`);
   }
 
   let html = '';
-  result.data.forEach((conv: Conversations) => {
-    html += friendCard(conv);
+  result.data.forEach((conv: UserSearchResult) => {
+    html += searchResultCard(conv);
   });
   searchResults.innerHTML = html;
   searchResults.style.display = 'block';
@@ -112,6 +112,7 @@ export async function conversations(friend: HTMLElement) {
 
   const currentUserId = parseInt(localStorage.getItem('userId') || '0', 10);
   const displayName = friend.dataset.displayName || friend.dataset.username || 'Unknown';
+  const conversationDeleted = Number(friend.dataset.conversationDeleted) === 1;
   const avatarUrl = friend.dataset.avatarUrl || 'https://i.pravatar.cc/150';
   const conversationIdRaw = friend.dataset.conversationId;
   const parsedConversationId = conversationIdRaw ? Number(conversationIdRaw) : undefined;
@@ -140,7 +141,7 @@ export async function conversations(friend: HTMLElement) {
       <h3>${displayName}</h3>
       <small>online</small>
     </div>
-    <button id="call-btn" style="margin-left:auto;">Call</button>
+  <button ${conversationDeleted ? 'disabled' : ''}id="call-btn" style="margin-left:auto;">Call</button>' 
   </div>
   <div class="messages" id="p2p-messages">
     ${result.data
@@ -157,8 +158,8 @@ export async function conversations(friend: HTMLElement) {
       .join('')}
   </div>
   <div class="chat-input">
-    <input id="p2p-chat-input" type="text" placeholder="Type a message">
-    <button id="p2p-send-btn">Send</button>
+    <input ${conversationDeleted ? 'disabled' : ''} id="p2p-chat-input" type="text" placeholder="Type a message">
+    <button id="p2p-send-btn" ${conversationDeleted ? 'disabled' : ''}>Send</button>
   </div>
 `;
 
@@ -204,7 +205,7 @@ export async function fetchUserConversations() {
   if (!allConversations) return;
 
   allConversations.forEach((convs: Conversations) => {
-    html += friendCard(convs);
+    html += conversationCard(convs);
   });
 
   friends.innerHTML = html;

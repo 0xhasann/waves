@@ -22,7 +22,7 @@ import { pageLoader, showForm, signup } from './auth.user.dom';
 import { ChatUI } from './chat';
 import { attachUserMedia, hangUpCall, renderIncomingCall, setRemoteNameLabel, localStream } from './dom';
 import { conversations, searchUserWithDelay } from './friends/conversation.dom';
-import { fetchPendingRequests } from './friends/conversationDetails';
+import { fetchPendingRequests, sendFriendRequest } from './friends/conversationDetails';
 import { recordStream } from './recordStream';
 import { shareScreen } from './shareScreen';
 import { attachDataChannelHandlers, RTCPeerConnectionHandler } from './webrtcEventHandler';
@@ -81,14 +81,27 @@ export const searchUsers = document.getElementById('search-results') as HTMLDivE
 
 search?.addEventListener('keyup', searchUserWithDelay);
 
-// [friends, searchUsers].forEach((element) => {
-//   element?.addEventListener('click', (e) => {
-//     void conversations(e);
-//   });
-// });
+searchUsers.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+
+  if (target.classList.contains('send-request-btn')) {
+    const receiverId = Number(target.dataset.receiverId);
+    void sendFriendRequest(receiverId, target as HTMLButtonElement);
+    return;
+  }
+
+  const friend = target.closest('.friend') as HTMLElement;
+  if (!friend) return;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('username', friend.dataset.username!);
+  window.history.pushState({}, '', url);
+  void conversations(friend);
+});
 friends.addEventListener('click', (e) => {
   const target = e.target as HTMLElement;
   const friend = target.closest('.friend') as HTMLElement;
+  if (!friend) return;
   const url = new URL(window.location.href);
   if (!friend.dataset.username) {
     console.error('username not found in friend dataset');
