@@ -1,9 +1,11 @@
 import { database } from '../../db/utils';
-import type { Conversations, FriendRow, PendingFriendRequests, RequestStatus } from '../../shared/types';
+import type { FriendRow, PendingFriendRequests, RequestStatus, UserSearchResult } from '../../shared/types';
 import { now } from '../../shared/timeUtils';
 import { getUserPair } from '../units/userPair';
 import {
+  conversationExistsQuery,
   createFriendQuery,
+  deleteConverstationQuery,
   deleteFriendQuery,
   deleteFriendRequestQuery,
   fetchPastFriendQuery,
@@ -19,10 +21,10 @@ import {
 } from '../../db/queries/conn.query';
 import type { FriendsSchema, ProcessFriendRequestSchema, SendFriendRequestSchema } from '../schemas/conn.schema';
 
-export const searchUser = (sender_id: number, q: string): Conversations[] | undefined => {
-  const result = database.prepare(searchUserQuery).all(sender_id, sender_id, q, q, q, q, q, sender_id) as
-    | Conversations[]
-    | undefined;
+export const searchUser = (sender_id: number, q: string): UserSearchResult[] | undefined => {
+  const result = database
+    .prepare(searchUserQuery)
+    .all(sender_id, sender_id, sender_id, sender_id, q, q, q, q, q, sender_id) as UserSearchResult[] | undefined;
   return result;
 };
 
@@ -33,6 +35,7 @@ export const sendRequest = (sender_id: number, query: SendFriendRequestSchema): 
 };
 export const pastFriendRequest = (sender_id: number, query: SendFriendRequestSchema): number => {
   const { u1, u2 } = getUserPair(sender_id, query.receiver_id);
+  console.log(u1, u2);
   const result = database.prepare(pastFriendRequestQuery).get(u1, u2) as number;
   return result;
 };
@@ -81,6 +84,12 @@ export const findFriends = (sender_id: number, query: FriendsSchema): boolean =>
   return !!result;
 };
 
+export const conversationExists = (conversation_id: number): boolean => {
+  const row = database.prepare(conversationExistsQuery).get(conversation_id) as { conversation_exists: number };
+  const exists = row?.conversation_exists === 1;
+  return exists;
+};
+
 export const deleteFriends = (sender_id: number, query: FriendsSchema): number => {
   const { u1, u2 } = getUserPair(sender_id, query.user2_id);
   const result = database.prepare(deleteFriendQuery).run(now(), u1, u2);
@@ -90,6 +99,12 @@ export const deleteFriends = (sender_id: number, query: FriendsSchema): number =
 export const deleteFriendRequest = (sender_id: number, query: FriendsSchema): number => {
   const { u1, u2 } = getUserPair(sender_id, query.user2_id);
   const result = database.prepare(deleteFriendRequestQuery).run(now(), u1, u2);
+  return result.changes;
+};
+
+export const deleteConverstation = (sender_id: number, query: FriendsSchema): number => {
+  const { u1, u2 } = getUserPair(sender_id, query.user2_id);
+  const result = database.prepare(deleteConverstationQuery).run(now(), u1, u2);
   return result.changes;
 };
 
