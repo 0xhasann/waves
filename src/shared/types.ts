@@ -53,12 +53,21 @@ export type Conversations = {
   last_name: string;
   avatar_url: string | null;
 
-  conversation_id: number;
+  conversation_id: number | null;
 
   last_message: string | null;
   type: 'text' | 'image' | 'video' | null;
   sender_id: number | null;
   updated_at: string | null;
+  deleted: boolean | null;
+};
+
+export type UserSearchResult = Conversations & FriendRequestStatus;
+
+export type FriendRequestStatus = {
+  friend_request_status: 'pending' | 'accepted' | 'rejected' | null;
+  friend_request_deleted: boolean | null;
+  friend_request_sender_id: number | null;
 };
 
 export type MessageDTO = {
