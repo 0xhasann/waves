@@ -2,7 +2,7 @@ import { scryptSync, randomBytes } from 'crypto';
 
 import { database } from '../../db/utils';
 import type { SignupInput } from '../schemas/auth.schema';
-import type { AuthUser } from '../../shared/types';
+import type { AuthUser, UserProfile } from '../../shared/types';
 
 export const findByUsername = (username: string): AuthUser | undefined => {
   return database.prepare(`SELECT id, user_pass FROM users WHERE username = ?`).get(username) as AuthUser | undefined;
@@ -40,4 +40,9 @@ export const createUser = (data: SignupInput) => {
     );
 
   return result.lastInsertRowid;
+};
+
+export const fetchUserProfile = (userId: string): UserProfile | undefined => {
+  const result = database.prepare('SELECT * from users where id=?').get(userId) as UserProfile | undefined;
+  return result;
 };

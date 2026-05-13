@@ -25,3 +25,8 @@ export const signin = (req: Request, res: Response) => {
   tokenCookie(user.id, req, res);
   sendResponse(res, 200, user.id, 'Welcome to Waves');
 };
+
+export const fetchUserProfile = (req: Request, res: Response) => {
+  const result = repo.fetchUserProfile(req.query.userId as string);
+  sendResponse(res, 200, result, 'User Profile Fetched Successfully');
+};

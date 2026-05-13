@@ -30,5 +30,12 @@ export const signinSchema = z.object({
   }),
 });
 
+export const userProfile = z.object({
+  query: z.object({
+    userId: z.string().min(1),
+  }),
+});
+
 export type SignupInput = z.infer<typeof signupSchema>['body'];
 export type SigninInput = z.infer<typeof signinSchema>['query'];
+export type UserProfile = z.infer<typeof userProfile>['query'];

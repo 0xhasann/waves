@@ -1,5 +1,5 @@
 import type { ApiResponse } from '../shared/apiResponse';
-import type { UserMeta } from '../shared/types';
+import type { UserMeta, UserProfile } from '../shared/types';
 import { login } from './dom';
 import { conversations, fetchUserConversations, getFriendFromSearch } from './friends/conversation.dom';
 
@@ -110,6 +110,7 @@ export async function pageLoader() {
     const isConversationPage = window.location.pathname === '/conversation.html';
     login(user.data.full_name || user.data.username, 'Guest', !isConversationPage);
     await fetchUserConversations();
+    await fetchUserProfile(user.data.id);
     const username = getFriendFromSearch();
     if (username) {
       const friend = document.querySelector(`.friend[data-username="${username}"]`) as HTMLElement | undefined;
@@ -118,5 +119,31 @@ export async function pageLoader() {
     return true;
   } catch (err) {
     console.error('Auth check failed, Error :::', err);
+  }
+}
+
+export async function fetchUserProfile(userId: number) {
+  const res = await fetch(`/api/auth/userProfile?userId=${userId}`);
+
+  const userProfile = (await res.json()) as ApiResponse<UserProfile>;
+
+  if (!res.ok || !userProfile.success || userProfile.error || !userProfile.data) {
+    console.error(`Failed to fetch User Details ${userProfile.message} ${userProfile.error}`);
+    return;
+  }
+  const fullName = `${userProfile.data.first_name || ''} ${userProfile.data.last_name || ''}`.trim();
+  const avatarUrl = userProfile.data.avatar_url || 'https://i.pravatar.cc/150';
+
+  const nameElem = document.querySelector('.current-user-name');
+  if (nameElem) nameElem.textContent = fullName;
+
+  const usernameElem = document.querySelector('.current-user-username');
+  if (usernameElem && userProfile.data.username) usernameElem.textContent = `@${userProfile.data.username}`;
+
+  const avatarElem = document.querySelector('.current-user-avatar');
+  if (avatarElem && userProfile.data.avatar_url) {
+    if ('src' in avatarElem) {
+      (avatarElem as HTMLImageElement).src = avatarUrl;
+    }
   }
 }
