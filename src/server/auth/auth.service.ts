@@ -12,16 +12,16 @@ export const signup = (req: Request, res: Response) => {
 
   const userId = repo.createUser(req.body as SignupInput);
   tokenCookie(userId as number, req, res);
-  sendResponse(res, 201, user, 'User Created Successfully');
+  sendResponse(res, 201, userId, 'User Created Successfully');
 };
 
 export const signin = (req: Request, res: Response) => {
-  const user = repo.findByUsername((req.body as SigninInput).username);
+  const user = repo.findByUsername((req.query as SigninInput).username);
   if (!user) throw new AppError('Invalid Credentials', 401);
 
-  const isValid = verifyPassword((req.body as SigninInput).password, user.user_pass);
+  const isValid = verifyPassword((req.query as SigninInput).password, user.user_pass);
   if (!isValid) throw new AppError('Invalid Credentials', 401);
 
   tokenCookie(user.id, req, res);
-  sendResponse(res, 200, user, 'Welcome to Waves');
+  sendResponse(res, 200, user.id, 'Welcome to Waves');
 };

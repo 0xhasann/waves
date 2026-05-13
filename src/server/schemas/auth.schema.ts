@@ -6,7 +6,7 @@ export const signupSchema = z.object({
 
     password: z.string().min(6).max(15),
 
-    email: z.email().max(50).optional(),
+    email: z.email().max(50),
 
     mobileNo: z
       .string()
@@ -24,11 +24,11 @@ export const signupSchema = z.object({
 });
 
 export const signinSchema = z.object({
-  body: z.object({
+  query: z.object({
     username: z.string().min(3).max(50),
     password: z.string().min(6).max(15),
   }),
 });
 
 export type SignupInput = z.infer<typeof signupSchema>['body'];
-export type SigninInput = z.infer<typeof signinSchema>['body'];
+export type SigninInput = z.infer<typeof signinSchema>['query'];

@@ -10,7 +10,7 @@ export async function signup(e: SubmitEvent) {
     username: (document.getElementById('username') as HTMLInputElement).value,
     firstName: (document.getElementById('firstName') as HTMLInputElement).value || undefined,
     lastName: (document.getElementById('lastName') as HTMLInputElement).value || undefined,
-    email: (document.getElementById('email') as HTMLInputElement).value || undefined,
+    email: (document.getElementById('email') as HTMLInputElement).value,
     password: (document.getElementById('password') as HTMLInputElement).value,
     avatarURL: (document.getElementById('avatarURL') as HTMLInputElement).value || undefined,
   };
@@ -28,13 +28,48 @@ export async function signup(e: SubmitEvent) {
 
     if (response.ok) {
       window.location.href = '/conversation.html';
-      console.log(data);
     } else {
       alert(data.message || 'Signup failed');
     }
   } catch (error) {
     console.error('Error:', error);
-    alert('Something went wrong');
+    alert(error);
+  }
+}
+
+export async function signin(e: SubmitEvent) {
+  e.preventDefault();
+
+  const username = (document.getElementById('username') as HTMLInputElement).value;
+  const password = (document.getElementById('password') as HTMLInputElement).value;
+
+  if (!username || !password) {
+    alert('Invaalid Input');
+    throw new Error('Invalid Input');
+  }
+
+  try {
+    const response = await fetch(`http://localhost:3000/api/auth/signin?username=${username}&password=${password}`);
+    const data = (await response.json()) as ApiResponse;
+
+    if (data) {
+      window.location.href = '/conversation.html';
+    } else {
+      alert('Signin failed');
+    }
+
+    if (!response.ok || data.error) {
+      throw new Error(`Authentication failed ${data.error}`);
+    }
+
+    if (response.ok) {
+      window.location.href = '/conversation.html';
+    } else {
+      alert(data.message || 'Signin failed');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert(error);
   }
 }
 

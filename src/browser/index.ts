@@ -18,7 +18,7 @@ pc.createAnswer() → pc.setLocalDescription(answer) → sends video-answer
 ws.on("new-ice-candidate") → pc.addIceCandidate()
 */
 
-import { pageLoader, showForm, signup } from './auth.user.dom';
+import { pageLoader, showForm, signin, signup } from './auth.user.dom';
 import { ChatUI } from './chat';
 import { attachUserMedia, hangUpCall, renderIncomingCall, setRemoteNameLabel, localStream } from './dom';
 import { conversations, searchUserWithDelay } from './friends/conversation.dom';
@@ -48,6 +48,14 @@ const signupForm = document.getElementById('signupForm') as HTMLFormElement;
 if (signupForm) {
   signupForm.addEventListener('submit', (e) => {
     void signup(e);
+  });
+}
+
+const loginForm = document.getElementById('loginForm') as HTMLFormElement;
+
+if (loginForm) {
+  loginForm.addEventListener('submit', (e) => {
+    void signin(e);
   });
 }
 

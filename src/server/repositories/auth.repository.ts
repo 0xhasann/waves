@@ -1,11 +1,11 @@
 import { scryptSync, randomBytes } from 'crypto';
 
 import { database } from '../../db/utils';
-import type { User } from '../../shared/types';
 import type { SignupInput } from '../schemas/auth.schema';
+import type { AuthUser } from '../../shared/types';
 
-export const findByUsername = (username: string): User | undefined => {
-  return database.prepare(`SELECT * FROM users WHERE username = ?`).get(username) as User | undefined;
+export const findByUsername = (username: string): AuthUser | undefined => {
+  return database.prepare(`SELECT id, user_pass FROM users WHERE username = ?`).get(username) as AuthUser | undefined;
 };
 
 export const createUser = (data: SignupInput) => {
@@ -30,7 +30,7 @@ export const createUser = (data: SignupInput) => {
   `,
     )
     .run(
-      data.email ?? null,
+      data.email,
       encryptedPassword,
       data.username,
       data.firstName ?? null,

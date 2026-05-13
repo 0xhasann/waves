@@ -46,6 +46,11 @@ export type JwtUser = jwt.JwtPayload & {
   userId: number;
 };
 
+export type AuthUser = {
+  id: number;
+  user_pass: string;
+};
+
 export type Conversations = {
   peer_id: number;
   username: string;
