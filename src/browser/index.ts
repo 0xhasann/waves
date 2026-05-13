@@ -36,7 +36,7 @@ const googleButtons = document.querySelectorAll('.google-btn');
 
 googleButtons.forEach((btn) => {
   btn?.addEventListener('click', () => {
-    window.location.href = 'http://localhost:3000/auth/google';
+    window.location.href = '/auth/google';
   });
 });
 window?.addEventListener('DOMContentLoaded', () => {

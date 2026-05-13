@@ -18,7 +18,7 @@ let selectedConversation: SelectedConversation | null = null;
 let realtimeBound = false;
 
 async function sendMessages(conversationId: number, content: string) {
-  const res = await fetch('http://localhost:3000/api/conversations/messages', {
+  const res = await fetch('/api/conversations/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -78,7 +78,7 @@ async function searchUser() {
     return;
   }
 
-  const res = await fetch(`http://localhost:3000/api/friends/search?query=${encodeURIComponent(query)}`);
+  const res = await fetch(`/api/friends/search?query=${encodeURIComponent(query)}`);
   const result = (await res.json()) as ApiResponse<UserSearchResult[]>;
 
   if (!res.ok || !result.success || result.error || !result.data) {
@@ -127,7 +127,7 @@ export async function conversations(friend: HTMLElement) {
   };
   console.log('selectedConversation ::', selectedConversation);
 
-  const res = await fetch(`http://localhost:3000/api/conversations/fetchP2PConversations?user2_id=${userId}`);
+  const res = await fetch(`/api/conversations/fetchP2PConversations?user2_id=${userId}`);
   const result = (await res.json()) as ApiResponse<MessageDTO[]>;
 
   if (!res.ok || !result.success || result.error || !result.data) {
@@ -194,7 +194,7 @@ export async function conversations(friend: HTMLElement) {
 export async function fetchUserConversations() {
   bindRealtimeMessaging();
   let html = '';
-  const res = await fetch(`http://localhost:3000/api/conversations/fetchAllConversations`);
+  const res = await fetch(`/api/conversations/fetchAllConversations`);
 
   const result = (await res.json()) as ApiResponse<Conversations[]>;
 
@@ -219,9 +219,7 @@ export const sendCurrentMessage = async () => {
 
   try {
     if (!selectedConversation.conversationId) {
-      const res = await fetch(
-        `http://localhost:3000/api/conversations/createOrGetConversation?user2_id=${selectedConversation.peerId}`,
-      );
+      const res = await fetch(`/api/conversations/createOrGetConversation?user2_id=${selectedConversation.peerId}`);
       const result = (await res.json()) as ApiResponse;
 
       if (!res.ok || !result.success || result.error || !result.data) {

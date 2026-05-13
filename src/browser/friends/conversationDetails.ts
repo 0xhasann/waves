@@ -3,7 +3,7 @@ import type { PendingFriendRequests } from '../../shared/types';
 
 export async function fetchPendingRequests() {
   try {
-    const res = await fetch('http://localhost:3000/api/friends/pendingRequets', {
+    const res = await fetch('/api/friends/pendingRequets', {
       credentials: 'include',
     });
 
@@ -70,7 +70,7 @@ async function handleAccept(senderId: string, btn: HTMLButtonElement) {
   btn.disabled = true;
 
   try {
-    const res = await fetch('http://localhost:3000/api/friends/processRequest', {
+    const res = await fetch('/api/friends/processRequest', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -94,7 +94,7 @@ async function handleReject(senderId: string, btn: HTMLButtonElement) {
   btn.disabled = true;
 
   try {
-    const res = await fetch('http://localhost:3000/api/friends/processRequest', {
+    const res = await fetch('/api/friends/processRequest', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -117,7 +117,7 @@ async function handleReject(senderId: string, btn: HTMLButtonElement) {
 export async function sendFriendRequest(receiverId: number, btn: HTMLButtonElement) {
   btn.disabled = true;
   try {
-    const res = await fetch('http://localhost:3000/api/friends/sendRequest', {
+    const res = await fetch('/api/friends/sendRequest', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -137,7 +137,7 @@ export async function sendFriendRequest(receiverId: number, btn: HTMLButtonEleme
 export async function unfollowFriend(user2Id: number, btn: HTMLButtonElement) {
   btn.disabled = true;
   try {
-    const res = await fetch('http://localhost:3000/api/friends/unfollowFriend', {
+    const res = await fetch('/api/friends/unfollowFriend', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },

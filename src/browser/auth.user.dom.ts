@@ -7,16 +7,16 @@ export async function signup(e: SubmitEvent) {
   e.preventDefault();
 
   const userData = {
-    username: (document.getElementById('username') as HTMLInputElement).value,
+    username: (document.getElementById('signup-username') as HTMLInputElement).value,
     firstName: (document.getElementById('firstName') as HTMLInputElement).value || undefined,
     lastName: (document.getElementById('lastName') as HTMLInputElement).value || undefined,
     email: (document.getElementById('email') as HTMLInputElement).value,
-    password: (document.getElementById('password') as HTMLInputElement).value,
+    password: (document.getElementById('signup-password') as HTMLInputElement).value,
     avatarURL: (document.getElementById('avatarURL') as HTMLInputElement).value || undefined,
   };
 
   try {
-    const response = await fetch('http://localhost:3000/api/auth/signup', {
+    const response = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -40,8 +40,8 @@ export async function signup(e: SubmitEvent) {
 export async function signin(e: SubmitEvent) {
   e.preventDefault();
 
-  const username = (document.getElementById('username') as HTMLInputElement).value;
-  const password = (document.getElementById('password') as HTMLInputElement).value;
+  const username = (document.getElementById('login-username') as HTMLInputElement).value;
+  const password = (document.getElementById('login-password') as HTMLInputElement).value;
 
   if (!username || !password) {
     alert('Invalid Input');
@@ -49,7 +49,7 @@ export async function signin(e: SubmitEvent) {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/api/auth/signin?username=${username}&password=${password}`);
+    const response = await fetch(`/api/auth/signin?username=${username}&password=${password}`);
     const data = (await response.json()) as ApiResponse;
 
     if (data) {
@@ -92,7 +92,7 @@ export function showForm(type: 'login' | 'signup') {
 
 export async function pageLoader() {
   try {
-    const res = await fetch('http://localhost:3000/auth/google/me', {
+    const res = await fetch('/auth/google/me', {
       credentials: 'include',
     });
 

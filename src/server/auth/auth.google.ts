@@ -9,10 +9,11 @@ import { now } from '../../shared/timeUtils';
 import { sendResponse } from '../../shared/apiResponse';
 import { AppError } from '../units/app.errors';
 import { logger } from '../units/logger';
+import { appEnv } from '../../shared/config/env';
 
 const db = database;
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(appEnv.GOOGLE_CLIENT_ID);
 
 export const googleSignup = (_req: Request, res: Response) => {
   const state = crypto.randomBytes(16).toString('hex');
@@ -25,11 +26,11 @@ export const googleSignup = (_req: Request, res: Response) => {
   const url =
     'https://accounts.google.com/o/oauth2/v2/auth?' +
     new URLSearchParams({
-      client_id: process.env.GOOGLE_CLIENT_ID!,
-      redirect_uri: 'http://localhost:3000/auth/google/callback',
+      client_id: appEnv.GOOGLE_CLIENT_ID,
+      redirect_uri: appEnv.APP_BASE_URL + '/auth/google/callback',
       response_type: 'code',
       scope: 'openid email profile',
-      access_type: 'offline',
+      access_type: appEnv.ACCESS_TYPE,
       prompt: 'consent',
       state,
     }).toString();
@@ -51,9 +52,9 @@ export const callbackRoute = async (req: Request, res: Response) => {
       'https://oauth2.googleapis.com/token',
       new URLSearchParams({
         code: String(code),
-        client_id: process.env.GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: 'http://localhost:3000/auth/google/callback',
+        client_id: appEnv.GOOGLE_CLIENT_ID,
+        client_secret: appEnv.GOOGLE_CLIENT_SECRET,
+        redirect_uri: '/auth/google/callback',
         grant_type: 'authorization_code',
       }),
       {
@@ -65,7 +66,7 @@ export const callbackRoute = async (req: Request, res: Response) => {
 
     const ticket = await client.verifyIdToken({
       idToken: id_token,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: appEnv.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -106,14 +107,14 @@ export const callbackRoute = async (req: Request, res: Response) => {
     if (!user) throw new AppError('User creation failed');
 
     tokenCookie(user.id, req, res);
-    res.redirect('http://localhost:3000/conversation.html');
+    res.redirect('/conversation.html');
   } catch (err) {
     logger.error(err);
     throw new AppError('Authentication failed');
   }
 };
 export const tokenCookie = (id: number, req: Request, res: Response) => {
-  const token = jwt.sign({ userId: id }, process.env.JWT_SECRET!, {
+  const token = jwt.sign({ userId: id }, appEnv.JWT_SECRET, {
     expiresIn: '7d',
   });
 
@@ -129,7 +130,7 @@ export const getTokenFromCookie = (req: Request, res: Response) => {
   const token = req.cookies.auth_token as string;
   if (!token) throw new AppError('Unauthorized', 401);
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
+    const decoded = jwt.verify(token, appEnv.JWT_SECRET) as JwtUser;
     const user = db
       .prepare(
         `SELECT id, username, TRIM(CONCAT(first_name, ' ', COALESCE(last_name, ''))) AS full_name FROM users WHERE id = ?`,
@@ -149,7 +150,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   if (!token) throw new AppError('Not authenticated', 403);
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtUser;
+    const decoded = jwt.verify(token, appEnv.JWT_SECRET) as JwtUser;
     req.user = decoded;
     next();
   } catch (err) {

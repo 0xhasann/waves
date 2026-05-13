@@ -9,9 +9,9 @@ import { logger } from './units/logger';
 // the singaling server
 const webServer = createServer(app);
 //listen http req and sends http res via PORT
-const PORT = process.env.PORT || 3000;
-webServer.listen(PORT, () => {
-  logger.info(`Server is listening on http://localhost:${PORT}`);
+import { appEnv } from '../shared/config/env';
+webServer.listen(appEnv.PORT, () => {
+  logger.info(`Server is listening on http://localhost:${appEnv.PORT}`);
 });
 
 interface ExtendedWebSocket extends WebSocket {

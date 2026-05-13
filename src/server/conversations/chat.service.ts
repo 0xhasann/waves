@@ -56,7 +56,7 @@ export const sendConversationMessages = (req: Request, res: Response) => {
 export const fetchAllConversations = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);
   const result = repo.fetchAllConversations(sender_id);
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+   
   sendResponse(res, 200, result, 'Records has been fetched successfully');
 };
 

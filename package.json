@@ -2,11 +2,12 @@
   "name": "waves",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/server/index.ts",
-    "start": "bun run src/server/index.ts",
-    "migrate": "bun run src/db/migrate.ts",
-    "build:browser:dev": "bun build ./src/browser/index.ts --outfile public/index.js --watch --target browser",
-    "build:browser:prod": "bun build ./src/browser/index.ts --outfile public/index.js --target browser"
+    "dev": "bun --env-file=.env.dev run --watch src/server/index.ts",
+    "start": "bun --env-file=.env.prod run src/server/index.ts",
+    "migrate": "bun --env-file=.env.dev run src/db/migrate.ts",
+    "migrate:prod": "bun --env-file=.env.prod run src/db/migrate.ts",
+    "build:browser:dev": "bun --env-file=.env.dev build ./src/browser/index.ts --outfile public/index.js --watch --target browser",
+    "build:browser:prod": "bun --env-file=.env.prod build ./src/browser/index.ts --outfile public/index.js --target browser"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -44,6 +44,8 @@ Go to **Google Cloud Console**
 
 ```text
 http://localhost:3000/auth/google/callback
+https://waves.cam/auth/google/callback
+
 ```
 
 ---
@@ -92,7 +94,7 @@ const googleButtons = document.querySelectorAll(
 
 googleButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-        window.location.href = "http://localhost:3000/auth/google";
+        window.location.href = "/auth/google";
     });
 });
 ```
@@ -103,7 +105,7 @@ googleButtons.forEach((btn) => {
 
 ```js
 document.addEventListener('DOMContentLoaded', async () => {
-  const res = await fetch('http://localhost:3000/auth/google/me', {
+  const res = await fetch('/auth/google/me', {
     credentials: 'include',
   });
 

@@ -1,7 +1,8 @@
 node_modules/
 dist/
 build/
-.env
+.env.dev
+.env.prod
 *.log
 .cursor
 public/index.js
