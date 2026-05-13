@@ -9,7 +9,7 @@ import { now } from '../../shared/timeUtils';
 import { sendResponse } from '../../shared/apiResponse';
 import { AppError } from '../units/app.errors';
 import { logger } from '../units/logger';
-import { appEnv } from '../../shared/config/env';
+import { appEnv } from '../config/env';
 
 const db = database;
 
@@ -54,7 +54,7 @@ export const callbackRoute = async (req: Request, res: Response) => {
         code: String(code),
         client_id: appEnv.GOOGLE_CLIENT_ID,
         client_secret: appEnv.GOOGLE_CLIENT_SECRET,
-        redirect_uri: '/auth/google/callback',
+        redirect_uri: appEnv.APP_BASE_URL + '/auth/google/callback',
         grant_type: 'authorization_code',
       }),
       {

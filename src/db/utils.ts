@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from 'fs';
 import path, { join } from 'path';
 import { createHash } from 'crypto';
 import { logger } from '../server/units/logger';
-import { appEnv } from '../shared/config/env';
+import { appEnv } from '../server/config/env';
 
 export const database = new Database(appEnv.DATABASE_URL);
 export type DB = typeof database;

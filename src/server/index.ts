@@ -9,7 +9,7 @@ import { logger } from './units/logger';
 // the singaling server
 const webServer = createServer(app);
 //listen http req and sends http res via PORT
-import { appEnv } from '../shared/config/env';
+import { appEnv } from './config/env';
 webServer.listen(appEnv.PORT, () => {
   logger.info(`Server is listening on http://localhost:${appEnv.PORT}`);
 });
