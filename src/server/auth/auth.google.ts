@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
@@ -109,8 +109,11 @@ export const callbackRoute = async (req: Request, res: Response) => {
     tokenCookie(user.id, req, res);
     res.redirect('/conversation.html');
   } catch (err) {
-    logger.error(err);
-    throw new AppError('Authentication failed');
+    const error = err as AxiosError;
+    logger.error(error);
+
+    console.log('GOOGLE RESPONSE DATA:', error?.response?.data);
+    console.log('GOOGLE STATUS:', error?.response?.status);
   }
 };
 export const tokenCookie = (id: number, req: Request, res: Response) => {
@@ -139,7 +142,12 @@ export const getTokenFromCookie = (req: Request, res: Response) => {
     if (!user) throw new AppError('User not found', 404);
 
     sendResponse(res, 200, user, 'User Meta');
-  } catch {
+  } catch (err) {
+    const error = err as AxiosError;
+    logger.error(error);
+
+    console.log('GOOGLE RESPONSE DATA:', error?.response?.data);
+    console.log('GOOGLE STATUS:', error?.response?.status);
     throw new AppError('Invalid Token', 403);
   }
 };
@@ -154,6 +162,12 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     req.user = decoded;
     next();
   } catch (err) {
+    const error = err as AxiosError;
+    logger.error(error);
+
+    console.log('GOOGLE RESPONSE DATA:', error?.response?.data);
+    console.log('GOOGLE STATUS:', error?.response?.status);
+
     res.clearCookie('auth_token');
     if (err instanceof jwt.TokenExpiredError) throw new AppError('Session expired, please sign in again', 401);
     if (err instanceof jwt.JsonWebTokenError) throw new AppError('Invalid Token', 403);

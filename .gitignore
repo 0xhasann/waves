@@ -10,3 +10,4 @@ webrtc.js
 test/
 wavesDev.db
 logs
+wavesApp.db
