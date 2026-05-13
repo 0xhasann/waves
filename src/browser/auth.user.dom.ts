@@ -44,7 +44,7 @@ export async function signin(e: SubmitEvent) {
   const password = (document.getElementById('password') as HTMLInputElement).value;
 
   if (!username || !password) {
-    alert('Invaalid Input');
+    alert('Invalid Input');
     throw new Error('Invalid Input');
   }
 
