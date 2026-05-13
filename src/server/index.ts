@@ -51,7 +51,7 @@ function hangupCall(webServer: ExtendedWebSocket) {
 
 wsServer.on('connection', (websocket: ExtendedWebSocket) => {
   websocket.on('close', (code: number, reason: Buffer) => {
-    logger.debug('webSocket close reason ::', code, reason);
+    logger.debug(`webSocket close reason :: ${code} ${reason.toString()}`);
     hangupCall(websocket);
     if (!websocket.userName) return;
     const existingSocket = websocketConnections.get(websocket.userName);
