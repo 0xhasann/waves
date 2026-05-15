@@ -131,18 +131,38 @@ Third-party identity provider. Backend validates the token returned by Google an
 | Offline messages    | DB fallback                | Message persisted to DB; receiver fetches on reconnect     |
 | Screen share        | Separate RTCPeerConnection | Keeps media tracks isolated and independently controllable |
 
-**getting started:**
+## getting started:
 
-1. install bun (https://bun.sh/)
-2. run `bun install`
-3. start dev server: `bun run dev`
-4. visit http://localhost:3000/
+### 1. Install Dependencies
 
-to build browser bundle:
-`bun run build:browser`
+Install bun (https://bun.sh/), then run:
+
+    bun install
+
+### 2. Configure Environment
+
+Create a .env.dev file in the root of the project:
+
+    PORT=3000
+    NODE_ENV=dev
+    ACCESS_TYPE=offline
+    DATABASE_URL=./whatever.db
+    APP_BASE_URL=http://localhost:3000
+    GOOGLE_CLIENT_ID=your_google_oauth2.0_client_id
+    GOOGLE_CLIENT_SECRET=your_google__oauth2.0_client_secret
+    JWT_SECRET=your_jwt_secret
+
+### 4. Run the App
+
+    bun run migrate            # create the database
+    bun run build:browser:dev  # build the browser bundle
+    bun run dev                # start the dev server
+
+Visit http://localhost:3000
 
 **tech stack:**
 
-- typescript
-- bun runtime
-- native web apis: [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API), [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API), [DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model), [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+- [typescript](https://www.typescriptlang.org/)
+- [Bun](https://bun.sh/)
+- [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API), [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API), [DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model), [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+- [SQLite](https://www.sqlite.org/)
