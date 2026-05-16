@@ -98,8 +98,6 @@ export const deleteConversation = (sender_id: number, query: FriendsSchema): num
 };
 
 export const findPendingRequests = (received_id: number): PendingFriendRequests[] | undefined => {
-  const result = database.prepare(findAllPendingRequests).all(received_id, received_id, received_id) as
-    | PendingFriendRequests[]
-    | undefined;
+  const result = database.prepare(findAllPendingRequests).all(received_id) as PendingFriendRequests[] | undefined;
   return result;
 };

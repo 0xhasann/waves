@@ -115,11 +115,8 @@ export const findAllPendingRequests = `SELECT
   u.last_name,
   u.avatar_url
 FROM friend_requests fr
-JOIN users u ON u.id = CASE
-  WHEN fr.receiver_id = ? THEN fr.sender_id  
-  ELSE fr.receiver_id                         
-END
-WHERE (fr.sender_id = ? OR fr.receiver_id = ?)
+JOIN users u ON u.id = fr.sender_id
+WHERE fr.receiver_id = ?
 AND fr.status = 'pending'
 AND fr.deleted = 0
 ORDER BY fr.created_at DESC;`;
