@@ -36,7 +36,7 @@ export const SignalMessageSchema = z.discriminatedUnion('type', [
 ]);
 
 export const ErrorMessageSchema = z.object({
-  type: z.literal('error'),
+  type: z.literal('duplicate'),
   data: z.object({
     message: z.string(),
   }),

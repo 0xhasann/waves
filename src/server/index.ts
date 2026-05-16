@@ -89,6 +89,9 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
 
           break;
         case 'login':
+          if (websocketConnections.has(parsedMessage.data.name)) {
+            throw new Error('Duplicate Entry: Kindly Use the Old Logged in Tab');
+          }
           websocketConnections.set(parsedMessage.data.name, websocket);
           websocket.userName = parsedMessage.data.name;
           break;
@@ -159,6 +162,8 @@ wsServer.on('connection', (websocket: ExtendedWebSocket) => {
             errors: z.treeifyError(err),
           }),
         );
+      } else if (err instanceof Error && err.message.startsWith('Duplicate Entry')) {
+        websocket.send(JSON.stringify({ type: 'duplicate', data: { message: err.message } }));
       } else {
         websocket.send(
           JSON.stringify({

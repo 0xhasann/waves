@@ -151,6 +151,9 @@ export class WebSocketHandler {
         case 'hang-up':
           this.emit('hang-up');
           break;
+        case 'duplicate':
+          alert(parsedMessage.data.message);
+          window.close();
       }
     } catch (error) {
       console.warn('Ignored invalid websocket payload', error);
