@@ -17,7 +17,7 @@ import {
 export const router = Router();
 
 router.get('/search', validate(searchSchema), search);
-router.get('/pendingRequets', fetchPendingRequests);
+router.get('/pendingRequests', fetchPendingRequests);
 router.post('/sendRequest', validate(sendFriendRequestSchema), sendFriendRequest);
 router.post('/processRequest', validate(processFriendRequestSchema), processFriendRequest);
 router.post('/unfollowFriend', validate(friendsSchema), unfollowFriend);

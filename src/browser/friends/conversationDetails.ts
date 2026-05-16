@@ -3,7 +3,7 @@ import type { PendingFriendRequests } from '../../shared/types';
 
 export async function fetchPendingRequests() {
   try {
-    const res = await fetch('/api/friends/pendingRequets', {
+    const res = await fetch('/api/friends/pendingRequests', {
       credentials: 'include',
     });
 

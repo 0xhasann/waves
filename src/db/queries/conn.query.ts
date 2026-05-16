@@ -25,9 +25,9 @@ ON (
 
 LEFT JOIN friend_requests fr
 ON (
-      (fr.sender_id = ? AND fr.receiver_id = u.id)
-      OR
-      (fr.sender_id = u.id AND fr.receiver_id = ?)
+    (fr.sender_id = ? AND fr.receiver_id = u.id)
+    OR
+    (fr.sender_id = u.id AND fr.receiver_id = ?)
 
 )
 
@@ -40,81 +40,102 @@ LEFT JOIN messages m ON m.id = (
 )
 
 WHERE (
-    u.email_id = ?
-    OR u.mobile_no = ?
-    OR u.username = ?
-    OR u.first_name = ?
-    OR u.last_name = ?
+    u.email_id   LIKE ? COLLATE NOCASE
+    OR u.mobile_no    = ?
+    OR u.username     LIKE ? COLLATE NOCASE
+    OR u.first_name   LIKE ? COLLATE NOCASE
+    OR u.last_name    LIKE ? COLLATE NOCASE
 )
 AND u.id != ?
 AND u.deleted = 0;`;
 
-export const sendRequestQuery = `INSERT into friend_requests (status, sender_id, receiver_id) VALUES('pending', ?, ?);`;
+export const upsertFriendRequestQuery = `
+  INSERT INTO friend_requests (sender_id, receiver_id, status, deleted)
+  VALUES (?, ?, 'pending', 0)
+  ON CONFLICT(MIN(sender_id, receiver_id), MAX(sender_id, receiver_id)) DO UPDATE SET
+    status     = 'pending',
+    deleted    = 0,
+    updated_at = CURRENT_TIMESTAMP;`;
 
-export const pastFriendRequestQuery = `SELECT 1 from friend_requests where sender_id = ? and receiver_id = ? and deleted = 1;`;
+export const getRelationshipQuery = `
+  SELECT status, deleted, sender_id, receiver_id
+  FROM friend_requests
+  WHERE (sender_id = ? AND receiver_id = ?)
+     OR (sender_id = ? AND receiver_id = ?)
+  LIMIT 1;`;
 
-export const processpastFriendRequestQuery = `UPDATE friend_requests SET
-      status = 'pending',
-      updated_at = ?,
-      deleted = 0 where sender_id = ? and receiver_id = ?;`;
+export const searchFriendRequestQuery = `
+  SELECT status, sender_id, receiver_id
+  FROM friend_requests
+  WHERE (sender_id = ? AND receiver_id = ?)
+     OR (sender_id = ? AND receiver_id = ?)
+  AND deleted = 0;`;
 
-export const searchFriendRequestQuery = `SELECT status FROM friend_requests WHERE sender_id = ? AND receiver_id = ? AND deleted = 0;`;
+export const processRequestQuery = `
+  UPDATE friend_requests SET
+    status     = ?,
+    updated_at = ?,
+    deleted    = CASE WHEN ? = 'rejected' THEN 1 ELSE deleted END
+  WHERE sender_id = ? AND receiver_id = ?;`;
 
-export const processRequestQuery = `UPDATE friend_requests SET
-      status = ?,
-      updated_at = ?,
-      deleted = CASE
-        WHEN ? = 'rejected' THEN 1
-        ELSE deleted
-      END where sender_id = ? and receiver_id = ?;`;
+export const upsertFriendQuery = `
+  INSERT INTO friends (user1_id, user2_id)
+  VALUES (?, ?)
+  ON CONFLICT(user1_id, user2_id) DO UPDATE SET
+    deleted    = 0,
+    updated_at = CURRENT_TIMESTAMP;`;
 
-export const createFriendQuery = `INSERT into friends (user1_id, user2_id) VALUES(?, ?);`;
+export const searchFriendQuery = `
+  SELECT 1 FROM friends
+  WHERE user1_id = ? AND user2_id = ?
+  AND deleted = 0;`;
 
-export const fetchPastFriendQuery = `SELECT 1 from friends where user1_id = ? and user2_id = ? and deleted = 1;`;
+export const deleteFriendQuery = `
+  UPDATE friends SET deleted = 1, updated_at = ?
+  WHERE user1_id = ? AND user2_id = ?;`;
 
-export const updatePastFriendQuery = `UPDATE friends SET
-      updated_at = ?,
-      deleted = 0 where user1_id = ? and user2_id = ?;`;
+export const deleteFriendRequestQuery = `
+  UPDATE friend_requests SET updated_at = ?, deleted = 1
+  WHERE (sender_id = ? AND receiver_id = ?)
+     OR (sender_id = ? AND receiver_id = ?);`;
 
-export const searchFriendQuery = `SELECT 1 FROM friends WHERE user1_id = ? AND user2_id = ? AND deleted = 0;`;
-
-export const conversationExistsQuery = `SELECT EXISTS (
-  SELECT 1
-  FROM conversations
-  WHERE id = ? AND deleted = 0
-) AS conversation_exists;`;
-
-export const deleteFriendQuery = `UPDATE friends set deleted = 1, updated_at=? WHERE user1_id = ? AND user2_id =?;`;
-
-export const deleteFriendRequestQuery = `UPDATE friend_requests SET
-      updated_at = ?,
-      deleted = 1
-      where sender_id = ? and receiver_id = ?;`;
-
-export const deleteConverstationQuery = `UPDATE conversations SET
-      updated_at = ?,
-      deleted = 1
-      where user1_id = ? and user2_id = ?;`;
+export const deleteConversationQuery = `
+  UPDATE conversations SET updated_at = ?, deleted = 1
+  WHERE (user1_id = ? AND user2_id = ?)
+     OR (user1_id = ? AND user2_id = ?);`;
 
 export const findAllPendingRequests = `SELECT
-    fr.id,
-    fr.sender_id,
-    fr.receiver_id,
-    fr.status,
-    fr.created_at,
+  fr.id,
+  fr.sender_id,
+  fr.receiver_id,
+  fr.status,
+  fr.created_at,
+  u.username,
+  u.first_name,
+  u.last_name,
+  u.avatar_url
+FROM friend_requests fr
+JOIN users u ON u.id = CASE
+  WHEN fr.receiver_id = ? THEN fr.sender_id  
+  ELSE fr.receiver_id                         
+END
+WHERE (fr.sender_id = ? OR fr.receiver_id = ?)
+AND fr.status = 'pending'
+AND fr.deleted = 0
+ORDER BY fr.created_at DESC;`;
 
+export const searchUserQuery2 = `
+  SELECT
+    u.id AS peer_id,
     u.username,
     u.first_name,
     u.last_name,
     u.avatar_url
+  FROM users u
+  WHERE u.id = ? AND u.deleted = 0;`;
 
-FROM friend_requests fr
-
-JOIN users u
-ON u.id = fr.sender_id
-
-WHERE fr.receiver_id = ?
-AND fr.status = 'pending'
-AND fr.deleted = 0
-
-ORDER BY fr.created_at DESC;`;
+export const conversationExistsQuery = `SELECT EXISTS (
+    SELECT 1
+    FROM conversations
+    WHERE id = ? AND deleted = 0
+  ) AS conversation_exists;`;

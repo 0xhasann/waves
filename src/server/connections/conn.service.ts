@@ -11,61 +11,67 @@ import type { FriendsSchema, ProcessFriendRequestSchema, SendFriendRequestSchema
 export const search = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);
   const result = repo.searchUser(sender_id, req.query.query as string);
-  sendResponse(res, 200, result, 'Request has been processed Successfully');
+  sendResponse(res, 200, result, 'Request has been processed successfully');
 };
 
 export const sendFriendRequest = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);
-  const pastFriendRequest = repo.pastFriendRequest(sender_id, req.body as SendFriendRequestSchema);
-  let result;
-  if (pastFriendRequest) result = repo.processPastFriendRequest(sender_id, req.body as SendFriendRequestSchema);
-  else result = repo.sendRequest(sender_id, req.body as SendFriendRequestSchema);
+  const { receiver_id } = req.body as SendFriendRequestSchema;
+
+  const existing = repo.getRelationship(sender_id, receiver_id);
+
+  if (existing && existing.deleted === 0) {
+    if (existing.status === RequestStatus.pending) throw new AppError('Friend request already pending', 409);
+    if (existing.status === RequestStatus.accepted) throw new AppError('Already friends', 409);
+  }
+
+  const result = repo.upsertFriendRequest(sender_id, receiver_id);
   sendResponse(res, 200, result, 'Request has been sent');
 };
 
 export const processFriendRequest = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);
-  const result = withTransaction(() => {
-    const isRequestExist = repo.findPendingRequest(sender_id, req.body as ProcessFriendRequestSchema);
-    if (!isRequestExist) {
-      throw new AppError('Record not found');
-    }
-    if (isRequestExist.status !== RequestStatus.pending) {
-      throw new AppError('Request already processed');
-    }
-    const processed = repo.processRequest(sender_id, req.body as ProcessFriendRequestSchema);
-    if (!processed) throw new AppError('Request failed');
+  const body = req.body as ProcessFriendRequestSchema;
 
-    if ((req.body as ProcessFriendRequestSchema).status === RequestStatus.accepted) {
-      const pastFriend = repo.fetchPastFriend(sender_id, req.body as ProcessFriendRequestSchema);
-      if (pastFriend) repo.updatePastFriend(sender_id, req.body as ProcessFriendRequestSchema);
-      else repo.createFriends(sender_id, req.body as ProcessFriendRequestSchema);
-      conRepo.getOrCreateConversation(sender_id, (req.body as ProcessFriendRequestSchema).receiver_id);
+  const result = withTransaction(() => {
+    const existing = repo.findPendingRequest(sender_id, body.receiver_id);
+
+    if (!existing) throw new AppError('Record not found', 404);
+    if (existing.status !== RequestStatus.pending) throw new AppError('Request already processed', 409);
+
+    const processed = repo.processRequest(existing.sender_id, existing.receiver_id, body.status);
+    if (!processed) throw new AppError('Request failed', 500);
+
+    if (body.status === RequestStatus.accepted) {
+      repo.upsertFriend(sender_id, body.receiver_id);
+      conRepo.getOrCreateConversation(sender_id, body.receiver_id);
     }
+
     return processed;
   });
-  sendResponse(res, 200, result, 'Request has been processed Successfully');
+
+  sendResponse(res, 200, result, 'Request has been processed successfully');
 };
 
 export const unfollowFriend = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);
+
   const result = withTransaction(() => {
-    const isFriendsExits = repo.findFriends(sender_id, req.body as FriendsSchema);
-    if (!isFriendsExits) {
-      throw new AppError('Record not found');
-    }
+    const isFriendExists = repo.findFriends(sender_id, req.body as FriendsSchema);
+    if (!isFriendExists) throw new AppError('Record not found', 404);
+
     const processed = repo.deleteFriends(sender_id, req.body as FriendsSchema);
     repo.deleteFriendRequest(sender_id, req.body as FriendsSchema);
-    repo.deleteConverstation(sender_id, req.body as FriendsSchema);
+    repo.deleteConversation(sender_id, req.body as FriendsSchema);
+
     return processed;
   });
 
-  sendResponse(res, 200, result, 'Request has been processed Successfully');
+  sendResponse(res, 200, result, 'Request has been processed successfully');
 };
 
 export const fetchPendingRequests = (req: Request, res: Response) => {
   const sender_id = getSenderId(req);
   const result = repo.findPendingRequests(sender_id);
-
-  sendResponse(res, 200, result, 'pending Requests');
+  sendResponse(res, 200, result, 'Pending requests');
 };
