@@ -1048,3 +1048,83 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+@media (max-width: 768px) {
+
+  .auth-container {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 20px 16px;
+    min-height: 100vh;
+  }
+
+  .app {
+    flex-direction: column;
+    position: relative;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
+    min-width: unset;
+    height: 100vh;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 10;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.hidden-mobile {
+    transform: translateX(-100%);
+  }
+
+  .chat {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+
+  .back-btn {
+    display: flex !important;
+  }
+
+  #camerabox {
+    height: 100dvh;
+    width: 100vw;
+    border-radius: 0;
+  }
+
+  .controls {
+    gap: 8px;
+    padding: 8px 14px;
+  }
+
+  .controls button {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .controls {
+    gap: 6px;
+    padding: 6px 10px;
+  }
+
+  .controls button {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+
+  .controls img {
+    width: 16px;
+    height: 16px;
+  }
+}

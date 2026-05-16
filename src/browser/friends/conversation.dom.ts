@@ -136,12 +136,25 @@ export async function conversations(friend: HTMLElement) {
 
   chat.innerHTML = `
   <div class="chat-header">
+              <button
+              class="back-btn"
+              style="
+                display: none;
+                border: none;
+                background: none;
+                font-size: 20px;
+                cursor: pointer;
+               
+              "
+            >
+              ⬅︎
+            </button>
     <img src="${avatarUrl}" />
     <div class="chat-user">
       <h3>${displayName}</h3>
       <small>online</small>
     </div>
-  <button ${conversationDeleted ? 'disabled' : ''}id="call-btn" style="margin-left:auto;">Call</button>' 
+  <button ${conversationDeleted ? 'disabled' : ''}id="call-btn" style="margin-left:auto;">Call</button>
   </div>
   <div class="messages" id="p2p-messages">
     ${result.data
@@ -162,6 +175,8 @@ export async function conversations(friend: HTMLElement) {
     <button id="p2p-send-btn" ${conversationDeleted ? 'disabled' : ''}>Send</button>
   </div>
 `;
+
+  document.querySelector('.back-btn')?.addEventListener('click', closeChatMobile);
 
   setTimeout(() => {
     const messagesNode = document.getElementById('p2p-messages');
@@ -258,4 +273,15 @@ export function getFriendFromSearch() {
   const params = new URLSearchParams(window.location.search);
   const username = params.get('username');
   return username;
+}
+
+export function closeChatMobile() {
+  document.querySelector('.sidebar')?.classList.remove('hidden-mobile');
+}
+
+export function openChatMobile() {
+  if (window.innerWidth <= 768) {
+    const openChatMob = document.querySelector('.sidebar');
+    if (openChatMob) openChatMob.classList.add('hidden-mobile');
+  }
 }

@@ -21,7 +21,7 @@ ws.on("new-ice-candidate") → pc.addIceCandidate()
 import { pageLoader, showForm, signin, signup } from './auth.user.dom';
 import { ChatUI } from './chat';
 import { attachUserMedia, hangUpCall, renderIncomingCall, setRemoteNameLabel, localStream } from './dom';
-import { conversations, searchUserWithDelay } from './friends/conversation.dom';
+import { conversations, openChatMobile, searchUserWithDelay } from './friends/conversation.dom';
 import { fetchPendingRequests, sendFriendRequest } from './friends/conversationDetails';
 import { recordStream } from './recordStream';
 import { shareScreen } from './shareScreen';
@@ -41,6 +41,10 @@ googleButtons.forEach((btn) => {
 });
 window?.addEventListener('DOMContentLoaded', () => {
   void pageLoader();
+});
+
+document.getElementById('home')?.addEventListener('click', () => {
+  window.location.href = '/conversation.html';
 });
 
 const signupForm = document.getElementById('signupForm') as HTMLFormElement;
@@ -118,6 +122,7 @@ friends.addEventListener('click', (e) => {
   url.searchParams.set('username', friend.dataset.username);
   window.history.pushState({}, '', url);
   void conversations(friend);
+  openChatMobile();
 });
 
 let audioEnabled = true;
