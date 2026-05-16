@@ -35,10 +35,6 @@ export class WebSocketHandler {
 
     this.ws.onopen = () => {
       console.log('WebSocket connected');
-
-      if (this.myUserName) {
-        this.login(this.myUserName);
-      }
     };
 
     this.ws.onmessage = this.handleWsMessages.bind(this);
